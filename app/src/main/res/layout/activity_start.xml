@@ -7,7 +7,7 @@
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:layout_centerInParent="true"
-        android:background="@mipmap/ic_kitter_round1"
+        android:background="@mipmap/ic_kitter"
         android:contentDescription="Kitter Logo"
         android:visibility="visible" />
 
