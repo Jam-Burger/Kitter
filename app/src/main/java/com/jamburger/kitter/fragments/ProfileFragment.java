@@ -1,20 +1,98 @@
 package com.jamburger.kitter.fragments;
 
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.bumptech.glide.Glide;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.jamburger.kitter.R;
+import com.jamburger.kitter.adapters.PostAdapter;
+import com.jamburger.kitter.components.Post;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ProfileFragment extends Fragment {
+    ImageView backgroundImage, profileImage;
+    TextView name, username, bio;
+    DatabaseReference userdata;
+    RecyclerView recyclerViewPosts;
+    PostAdapter postAdapter;
+    List<Post> posts;
+
+    public ProfileFragment(DatabaseReference userdata) {
+        this.userdata = userdata;
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_profile, container, false);
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_profile, container, false);
+        backgroundImage = view.findViewById(R.id.img_background);
+        profileImage = view.findViewById(R.id.img_profile);
+        name = view.findViewById(R.id.txt_name);
+        username = view.findViewById(R.id.txt_username);
+        bio = view.findViewById(R.id.txt_bio);
+        userdata.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                String txt_username = "@" + task.getResult().child("username").getValue();
+                username.setText(txt_username);
+                Glide.with(this)
+                        .load(R.mipmap.gavi)
+                        .into(profileImage);
+                name.setText(task.getResult().child("name").getValue().toString());
+                bio.setText(task.getResult().child("bio").getValue().toString());
+            }
+        });
+
+        recyclerViewPosts = view.findViewById(R.id.recyclerview_myposts);
+        recyclerViewPosts.setHasFixedSize(true);
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
+        linearLayoutManager.setStackFromEnd(true);
+        linearLayoutManager.setReverseLayout(true);
+        recyclerViewPosts.setLayoutManager(linearLayoutManager);
+
+        posts = new ArrayList<>();
+        postAdapter = new PostAdapter(getContext(), posts);
+        recyclerViewPosts.setAdapter(postAdapter);
+
+        readPosts();
+        return view;
+    }
+
+    private void readPosts() {
+        userdata.child("posts").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                posts.clear();
+                for (DataSnapshot postNameSnapshot : snapshot.getChildren()) {
+                    String name = postNameSnapshot.getValue().toString();
+                    FirebaseDatabase.getInstance().getReference().child("Posts").child(name).get().addOnSuccessListener(postSnapshot -> {
+                        Post post = postSnapshot.getValue(Post.class);
+                        posts.add(post);
+                        postAdapter.notifyDataSetChanged();
+                    });
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
 }

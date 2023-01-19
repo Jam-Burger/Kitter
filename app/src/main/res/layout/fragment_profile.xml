@@ -18,6 +18,11 @@
         android:textColor="@color/inverted"
         android:textSize="25sp" />
 
+<androidx.core.widget.NestedScrollView
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_below="@id/txt_username">
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -60,6 +65,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:id="@+id/txt_bio"
             android:text="This is my Bio..." />
 
         <com.google.android.material.divider.MaterialDivider
@@ -77,8 +83,12 @@
             android:textStyle="bold" />
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerview_posts"
+            android:id="@+id/recyclerview_myposts"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content">
+
+        </androidx.recyclerview.widget.RecyclerView>
     </LinearLayout>
+</androidx.core.widget.NestedScrollView>
+
 </RelativeLayout>

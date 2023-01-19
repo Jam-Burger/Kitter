@@ -8,6 +8,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.jamburger.kitter.fragments.HomeFragment;
 import com.jamburger.kitter.fragments.ProfileFragment;
 import com.jamburger.kitter.fragments.SearchFragment;
@@ -15,6 +19,7 @@ import com.jamburger.kitter.fragments.SearchFragment;
 public class MainActivity extends AppCompatActivity {
     BottomNavigationView bottomNavigationView;
     Fragment selectorFragment;
+    FirebaseUser user;
 
     @SuppressLint("NonConstantResourceId")
     @Override
@@ -22,6 +27,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         bottomNavigationView = findViewById(R.id.bottom_navigation);
+        user = FirebaseAuth.getInstance().getCurrentUser();
+        DatabaseReference userData = FirebaseDatabase.getInstance().getReference().child("Users").child(user.getUid());
         bottomNavigationView.setOnItemSelectedListener(item -> {
             switch (item.getItemId()) {
                 case R.id.nav_home:
@@ -35,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
                     startActivity(new Intent(this, PostActivity.class));
                     break;
                 case R.id.nav_profile:
-                    selectorFragment = new ProfileFragment();
+                    selectorFragment = new ProfileFragment(userData);
                     break;
             }
             if (selectorFragment != null) {
