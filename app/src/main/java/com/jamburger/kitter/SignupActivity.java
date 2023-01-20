@@ -7,13 +7,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -41,7 +36,7 @@ public class SignupActivity extends AppCompatActivity {
 
         dbRef = FirebaseDatabase.getInstance().getReference();
         auth = FirebaseAuth.getInstance();
-        pd= new ProgressDialog(this);
+        pd = new ProgressDialog(this);
         signupButton.setOnClickListener(view -> {
             String strEmail = email.getText().toString();
             String strName = name.getText().toString();
@@ -71,14 +66,12 @@ public class SignupActivity extends AppCompatActivity {
                     map.put("id", auth.getCurrentUser().getUid());
 
                     dbRef.child("Users").child(auth.getCurrentUser().getUid()).setValue(map)
-                            .addOnCompleteListener(task -> {
-                                if (task.isSuccessful()) {
-                                    Intent intent = new Intent(SignupActivity.this, MainActivity.class);
-                                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                    startActivity(intent);
-                                    pd.dismiss();
-                                    finish();
-                                }
+                            .addOnSuccessListener(result -> {
+                                Intent intent = new Intent(SignupActivity.this, MainActivity.class);
+                                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                startActivity(intent);
+                                pd.dismiss();
+                                finish();
                             });
                 }).addOnFailureListener(e -> {
                     Toast.makeText(SignupActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();

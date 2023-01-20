@@ -18,20 +18,19 @@
         android:textColor="@color/inverted"
         android:textSize="25sp" />
 
-<androidx.core.widget.NestedScrollView
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_below="@id/txt_username">
-
-    <LinearLayout
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/txt_username"
-        android:gravity="center_horizontal"
-        android:orientation="vertical">
+        android:layout_height="match_parent"
+        android:layout_below="@id/txt_username">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/txt_username"
+            android:gravity="center_horizontal"
+            android:orientation="vertical">
 
         <RelativeLayout
-            android:id="@+id/images"
             android:layout_width="match_parent"
             android:layout_height="300dp">
 

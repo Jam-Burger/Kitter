@@ -1,6 +1,7 @@
 package com.jamburger.kitter.fragments;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,9 +22,11 @@ import com.google.firebase.database.ValueEventListener;
 import com.jamburger.kitter.R;
 import com.jamburger.kitter.adapters.PostAdapter;
 import com.jamburger.kitter.components.Post;
+import com.jamburger.kitter.components.User;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class ProfileFragment extends Fragment {
     ImageView backgroundImage, profileImage;
@@ -47,27 +50,40 @@ public class ProfileFragment extends Fragment {
         name = view.findViewById(R.id.txt_name);
         username = view.findViewById(R.id.txt_username);
         bio = view.findViewById(R.id.txt_bio);
-        userdata.get().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                String txt_username = "@" + task.getResult().child("username").getValue();
+        userdata.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                User user= snapshot.getValue(User.class);
+                assert user != null;
+                String txt_username = "@" + user.getUsername();
                 username.setText(txt_username);
-                Glide.with(this)
-                        .load(R.mipmap.gavi)
+                name.setText(user.getName());
+                bio.setText(user.getBio());
+
+                Glide.with(requireActivity())
+                        .load(user.getProfileImageUrl())
                         .into(profileImage);
-                name.setText(task.getResult().child("name").getValue().toString());
-                bio.setText(task.getResult().child("bio").getValue().toString());
+                Glide.with(requireActivity())
+                        .load(user.getBackgroundImageUrl())
+                        .into(backgroundImage);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
             }
         });
 
+
         recyclerViewPosts = view.findViewById(R.id.recyclerview_myposts);
         recyclerViewPosts.setHasFixedSize(true);
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(requireContext());
         linearLayoutManager.setStackFromEnd(true);
         linearLayoutManager.setReverseLayout(true);
         recyclerViewPosts.setLayoutManager(linearLayoutManager);
 
         posts = new ArrayList<>();
-        postAdapter = new PostAdapter(getContext(), posts);
+        postAdapter = new PostAdapter(requireContext(), posts);
         recyclerViewPosts.setAdapter(postAdapter);
 
         readPosts();

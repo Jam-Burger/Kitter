@@ -1,17 +1,16 @@
 package com.jamburger.kitter.fragments;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
@@ -20,8 +19,11 @@ import com.jamburger.kitter.R;
 import com.jamburger.kitter.adapters.PostAdapter;
 import com.jamburger.kitter.components.Post;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class HomeFragment extends Fragment {
 
@@ -41,8 +43,9 @@ public class HomeFragment extends Fragment {
         recyclerViewPosts.setLayoutManager(linearLayoutManager);
 
         posts = new ArrayList<>();
-        postAdapter = new PostAdapter(getContext(), posts);
+        postAdapter = new PostAdapter(requireContext(), posts);
         recyclerViewPosts.setAdapter(postAdapter);
+
 
         readPosts();
         return view;

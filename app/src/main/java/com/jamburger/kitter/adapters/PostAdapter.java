@@ -15,11 +15,12 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.firestore.auth.User;
 import com.jamburger.kitter.R;
 import com.jamburger.kitter.components.Post;
+import com.jamburger.kitter.components.User;
 
 import java.util.List;
 
@@ -27,6 +28,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
     Context mContext;
     List<Post> mPosts;
     FirebaseUser firebaseUser;
+    DatabaseReference databaseReference;
 
     public PostAdapter(Context mContext, List<Post> mPosts) {
         this.mContext = mContext;
@@ -37,23 +39,25 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(mContext).inflate(R.layout.post_item, parent, false);
+        databaseReference = FirebaseDatabase.getInstance().getReference();
+        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         Post post = mPosts.get(position);
         Glide.with(mContext).load(post.getImageUrl()).into(holder.postImage);
-        holder.description.setText(post.getDescription());
-        FirebaseDatabase.getInstance().getReference().child("Users").child(post.getPublisher()).addValueEventListener(new ValueEventListener() {
+        holder.description.setText(post.getCaption());
+        databaseReference.child("Users").child(post.getCreator()).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 User user = snapshot.getValue(User.class);
+                assert user != null;
                 Glide.with(mContext)
-                        .load("https://www.fcbarcelona.com/photo-resources/2022/11/02/ffeb9318-5479-4648-9fd5-a7486db80937/mini_30-GAVI.png?width=670&height=790")
+                        .load(user.getProfileImageUrl())
                         .into(holder.profileImage);
-                holder.username.setText(post.getPublisher());
+                holder.username.setText(user.getUsername());
             }
 
             @Override

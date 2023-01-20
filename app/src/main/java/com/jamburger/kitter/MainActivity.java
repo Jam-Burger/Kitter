@@ -20,6 +20,7 @@ public class MainActivity extends AppCompatActivity {
     BottomNavigationView bottomNavigationView;
     Fragment selectorFragment;
     FirebaseUser user;
+    DatabaseReference userData;
 
     @SuppressLint("NonConstantResourceId")
     @Override
@@ -28,7 +29,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         bottomNavigationView = findViewById(R.id.bottom_navigation);
         user = FirebaseAuth.getInstance().getCurrentUser();
-        DatabaseReference userData = FirebaseDatabase.getInstance().getReference().child("Users").child(user.getUid());
+        userData = FirebaseDatabase.getInstance().getReference().child("Users").child(user.getUid());
+
         bottomNavigationView.setOnItemSelectedListener(item -> {
             switch (item.getItemId()) {
                 case R.id.nav_home:
@@ -39,7 +41,9 @@ public class MainActivity extends AppCompatActivity {
                     break;
                 case R.id.nav_add:
                     selectorFragment = null;
-                    startActivity(new Intent(this, PostActivity.class));
+                    Intent intent = new Intent(this, PostActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(intent);
                     break;
                 case R.id.nav_profile:
                     selectorFragment = new ProfileFragment(userData);

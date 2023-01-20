@@ -1,21 +1,11 @@
 package com.jamburger.kitter.components;
 
+import java.util.HashMap;
 import java.util.List;
 
 public class User {
     String id, name, username, email, bio, profileImageUrl, backgroundImageUrl;
-    List<String> posts;
-
-    public List<String> getPosts() {
-        return posts;
-    }
-
-    public void setPosts(List<String> posts) {
-        this.posts = posts;
-    }
-
-    public User() {
-    }
+    HashMap<String, String> posts;
 
     public String getId() {
         return id;
@@ -37,25 +27,11 @@ public class User {
         return username;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
 
     public String getBio() {
         return bio;
     }
 
-    public void setBio(String bio) {
-        this.bio = bio;
-    }
 
     public String getProfileImageUrl() {
         return profileImageUrl;
