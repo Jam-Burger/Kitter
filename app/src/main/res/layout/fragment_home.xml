@@ -39,9 +39,7 @@
                     android:layout_height="@dimen/icon_size"
                     android:layout_alignParentEnd="true"
                     android:layout_centerVertical="true"
-                    android:src="@drawable/ic_settings"
-                    android:tint="@color/inverted"
-                    tools:ignore="UseAppTint" />
+                    android:src="@drawable/ic_settings" />
             </RelativeLayout>
         </androidx.appcompat.widget.Toolbar>
     </com.google.android.material.appbar.AppBarLayout>

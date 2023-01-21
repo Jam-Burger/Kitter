@@ -7,12 +7,13 @@ import java.util.List;
 public class User {
     String id, name, username, email, bio, profileImageUrl, backgroundImageUrl;
     List<DocumentReference> posts;
+    List<DocumentReference> saved;
 
     public User() {
 
     }
 
-    public User(String id, String name, String username, String email, String bio, String profileImageUrl, String backgroundImageUrl, List<DocumentReference> posts) {
+    public User(String id, String name, String username, String email, String bio, String profileImageUrl, String backgroundImageUrl, List<DocumentReference> posts, List<DocumentReference> saved) {
         this.id = id;
         this.name = name;
         this.username = username;
@@ -21,6 +22,11 @@ public class User {
         this.profileImageUrl = profileImageUrl;
         this.backgroundImageUrl = backgroundImageUrl;
         this.posts = posts;
+        this.saved = saved;
+    }
+
+    public List<DocumentReference> getSaved() {
+        return saved;
     }
 
     public String getEmail() {
@@ -65,5 +71,4 @@ public class User {
     public String getBackgroundImageUrl() {
         return backgroundImageUrl;
     }
-
 }

@@ -46,13 +46,10 @@ public class HomeFragment extends Fragment {
         postAdapter = new PostAdapter(requireContext(), posts);
         recyclerViewPosts.setAdapter(postAdapter);
 
-        settingsButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                FirebaseAuth.getInstance().signOut();
-                startActivity(new Intent(getActivity(), LoginActivity.class));
-                getActivity().finish();
-            }
+        settingsButton.setOnClickListener(v -> {
+            FirebaseAuth.getInstance().signOut();
+            startActivity(new Intent(requireActivity(), LoginActivity.class));
+            requireActivity().finish();
         });
         readPosts();
         return view;

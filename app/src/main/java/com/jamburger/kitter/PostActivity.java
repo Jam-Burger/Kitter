@@ -26,6 +26,7 @@ import com.jamburger.kitter.components.Post;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 
@@ -90,9 +91,8 @@ public class PostActivity extends AppCompatActivity {
             ref.putFile(filePath).addOnSuccessListener(snapshot -> {
                 Toast.makeText(this, "Image Uploaded!!", Toast.LENGTH_SHORT).show();
 
-
                 storageReference.child("Posts").child(postId).getDownloadUrl().addOnSuccessListener(uri -> {
-                    Post post = new Post(user.getUid(), postId, uri.toString(), caption.getText().toString(), 0);
+                    Post post = new Post(user.getUid(), postId, uri.toString(), caption.getText().toString(), new ArrayList<>());
                     DocumentReference postRef = db.collection("Posts").document(postId);
 
                     postRef.set(post).addOnCompleteListener(task -> {
@@ -101,7 +101,6 @@ public class PostActivity extends AppCompatActivity {
                     });
                     db.collection("Users").document(user.getUid())
                             .update("posts", FieldValue.arrayUnion(postRef));
-                    //arrayRemove can also be done!
                 });
             }).addOnFailureListener(e -> {
                 progressDialog.dismiss();

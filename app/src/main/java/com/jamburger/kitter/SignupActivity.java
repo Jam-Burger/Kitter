@@ -11,8 +11,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
-
-import java.util.HashMap;
+import com.jamburger.kitter.components.User;
 
 public class SignupActivity extends AppCompatActivity {
     EditText email, name, username, password;
@@ -59,13 +58,10 @@ public class SignupActivity extends AppCompatActivity {
         pd.show();
         auth.createUserWithEmailAndPassword(strEmail, strPassword)
                 .addOnSuccessListener(authResult -> {
-                    HashMap<String, String> map = new HashMap<>();
-                    map.put("name", strName);
-                    map.put("email", strEmail);
-                    map.put("username", strUsername);
-                    map.put("id", auth.getCurrentUser().getUid());
+                    User user = new User(auth.getCurrentUser().getUid(), strName, strUsername, strEmail,
+                            "", "", "", null, null);
 
-                    db.collection("Users").document(map.get("id")).set(map)
+                    db.collection("Users").document(user.getId()).set(user)
                             .addOnSuccessListener(result -> {
                                 Intent intent = new Intent(SignupActivity.this, MainActivity.class);
                                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);

@@ -58,8 +58,7 @@
             android:id="@+id/btn_like"
             android:layout_width="@dimen/icon_size"
             android:layout_height="@dimen/icon_size"
-            android:background="@drawable/ic_heart_outlined"
-            android:backgroundTint="@color/inverted" />
+            android:src="@drawable/ic_heart_outlined" />
 
         <ImageView
             android:id="@+id/btn_comment"
@@ -67,30 +66,30 @@
             android:layout_height="@dimen/icon_size"
             android:layout_marginLeft="20dp"
             android:layout_toRightOf="@id/btn_like"
-            android:background="@drawable/ic_comment"
-            android:backgroundTint="@color/inverted" />
+            android:src="@drawable/ic_comment" />
 
         <ImageView
             android:id="@+id/btn_save"
             android:layout_width="@dimen/icon_size"
             android:layout_height="@dimen/icon_size"
             android:layout_alignParentRight="true"
-            android:background="@drawable/ic_bookmark_outlined"
-            android:backgroundTint="@color/inverted" />
+            android:src="@drawable/ic_bookmark_outlined" />
+
         <TextView
+            android:id="@+id/txt_likes"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/txt_likes"
-            android:text="69 likes"
             android:layout_below="@id/btn_like"
-            android:textStyle="bold"
-            android:layout_marginTop="5dp"/>
+            android:layout_marginTop="5dp"
+            android:text="69 likes"
+            android:textStyle="bold" />
+
         <TextView
+            android:id="@+id/description"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/description"
-            android:text="Damn! Gavi is too hott🔥🔥"
-            android:layout_below="@id/txt_likes"/>
+            android:layout_below="@id/txt_likes"
+            android:text="Damn! Gavi is too hott🔥🔥" />
     </RelativeLayout>
 
     <com.google.android.material.divider.MaterialDivider

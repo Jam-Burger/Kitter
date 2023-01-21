@@ -27,9 +27,7 @@
             android:layout_width="@dimen/icon_size"
             android:layout_height="@dimen/icon_size"
             android:layout_alignParentEnd="true"
-            android:src="@drawable/ic_edit"
-            android:tint="@color/inverted"
-            tools:ignore="UseAppTint" />
+            android:src="@drawable/ic_edit" />
     </RelativeLayout>
 
     <androidx.core.widget.NestedScrollView

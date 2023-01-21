@@ -40,7 +40,7 @@ public class ProfileFragment extends Fragment {
     final byte PROFILE_IMG = 0;
     final byte BACKGROUND_IMG = 1;
     ImageView backgroundImage, profileImage;
-    TextView name, username, bio;
+    TextView name, username, bio, likes;
     DocumentReference userdata;
     RecyclerView recyclerViewPosts;
     PostAdapter postAdapter;
@@ -145,7 +145,6 @@ public class ProfileFragment extends Fragment {
             username.setText(txt_username);
             name.setText(user.getName());
             bio.setText(user.getBio());
-
             Glide.with(requireActivity()).load(user.getProfileImageUrl()).into(profileImage);
             Glide.with(requireActivity()).load(user.getBackgroundImageUrl()).into(backgroundImage);
         });

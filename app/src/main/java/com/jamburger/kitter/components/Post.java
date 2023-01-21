@@ -1,10 +1,14 @@
 package com.jamburger.kitter.components;
 
+import com.google.firebase.firestore.DocumentReference;
+
+import java.util.List;
+
 public class Post {
     String creator, postid, imageUrl, caption;
-    int likes;
+    List<DocumentReference> likes;
 
-    public Post(String creator, String postid, String imageUrl, String caption, int likes) {
+    public Post(String creator, String postid, String imageUrl, String caption, List<DocumentReference> likes) {
         this.creator = creator;
         this.postid = postid;
         this.imageUrl = imageUrl;
@@ -12,15 +16,15 @@ public class Post {
         this.likes = likes;
     }
 
-    public Post() {
-    }
-
-    public int getLikes() {
+    public List<DocumentReference> getLikes() {
         return likes;
     }
 
-    public void setLikes(int likes) {
+    public void setLikes(List<DocumentReference> likes) {
         this.likes = likes;
+    }
+
+    public Post() {
     }
 
     public String getPostid() {
