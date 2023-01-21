@@ -10,8 +10,8 @@ import androidx.fragment.app.Fragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.jamburger.kitter.fragments.HomeFragment;
 import com.jamburger.kitter.fragments.ProfileFragment;
 import com.jamburger.kitter.fragments.SearchFragment;
@@ -20,7 +20,7 @@ public class MainActivity extends AppCompatActivity {
     BottomNavigationView bottomNavigationView;
     Fragment selectorFragment;
     FirebaseUser user;
-    DatabaseReference userData;
+    DocumentReference userData;
 
     @SuppressLint("NonConstantResourceId")
     @Override
@@ -29,7 +29,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         bottomNavigationView = findViewById(R.id.bottom_navigation);
         user = FirebaseAuth.getInstance().getCurrentUser();
-        userData = FirebaseDatabase.getInstance().getReference().child("Users").child(user.getUid());
+
+        userData = FirebaseFirestore.getInstance().collection("Users").document(user.getUid());
 
         bottomNavigationView.setOnItemSelectedListener(item -> {
             switch (item.getItemId()) {

@@ -1,11 +1,35 @@
 package com.jamburger.kitter.components;
 
-import java.util.HashMap;
+import com.google.firebase.firestore.DocumentReference;
+
 import java.util.List;
 
 public class User {
     String id, name, username, email, bio, profileImageUrl, backgroundImageUrl;
-    HashMap<String, String> posts;
+    List<DocumentReference> posts;
+
+    public User() {
+
+    }
+
+    public User(String id, String name, String username, String email, String bio, String profileImageUrl, String backgroundImageUrl, List<DocumentReference> posts) {
+        this.id = id;
+        this.name = name;
+        this.username = username;
+        this.email = email;
+        this.bio = bio;
+        this.profileImageUrl = profileImageUrl;
+        this.backgroundImageUrl = backgroundImageUrl;
+        this.posts = posts;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public List<DocumentReference> getPosts() {
+        return posts;
+    }
 
     public String getId() {
         return id;
@@ -37,15 +61,9 @@ public class User {
         return profileImageUrl;
     }
 
-    public void setProfileImageUrl(String profileImageUrl) {
-        this.profileImageUrl = profileImageUrl;
-    }
 
     public String getBackgroundImageUrl() {
         return backgroundImageUrl;
     }
 
-    public void setBackgroundImageUrl(String backgroundImageUrl) {
-        this.backgroundImageUrl = backgroundImageUrl;
-    }
 }

@@ -17,15 +17,16 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FieldValue;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.jamburger.kitter.components.Post;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Locale;
 
 public class PostActivity extends AppCompatActivity {
@@ -33,7 +34,7 @@ public class PostActivity extends AppCompatActivity {
     TextView caption;
     Uri filePath = null;
     StorageReference storageReference;
-    DatabaseReference databaseReference;
+    FirebaseFirestore db;
     FirebaseUser user;
     ActivityResultLauncher<Intent> myActivityResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
         if (result.getResultCode() == Activity.RESULT_OK) {
@@ -64,7 +65,7 @@ public class PostActivity extends AppCompatActivity {
 
         user = FirebaseAuth.getInstance().getCurrentUser();
         storageReference = FirebaseStorage.getInstance().getReference();
-        databaseReference = FirebaseDatabase.getInstance().getReference();
+        db = FirebaseFirestore.getInstance();
 
         selectImage();
 
@@ -88,18 +89,19 @@ public class PostActivity extends AppCompatActivity {
 
             ref.putFile(filePath).addOnSuccessListener(snapshot -> {
                 Toast.makeText(this, "Image Uploaded!!", Toast.LENGTH_SHORT).show();
-                HashMap<String, String> map = new HashMap<>();
-                map.put("postid", postId);
-                map.put("creator", user.getUid());
-                map.put("caption", caption.getText().toString());
-                databaseReference.child("Users").child(user.getUid()).child("posts").push().setValue(postId);
+
+
                 storageReference.child("Posts").child(postId).getDownloadUrl().addOnSuccessListener(uri -> {
-                    map.put("imageUrl", uri.toString());
-                    databaseReference.child("Posts").child(postId).setValue(map).addOnCompleteListener(task -> {
-                        startHomeFragment();
+                    Post post = new Post(user.getUid(), postId, uri.toString(), caption.getText().toString(), 0);
+                    DocumentReference postRef = db.collection("Posts").document(postId);
+
+                    postRef.set(post).addOnCompleteListener(task -> {
                         progressDialog.dismiss();
+                        startHomeFragment();
                     });
-                    startHomeFragment();
+                    db.collection("Users").document(user.getUid())
+                            .update("posts", FieldValue.arrayUnion(postRef));
+                    //arrayRemove can also be done!
                 });
             }).addOnFailureListener(e -> {
                 progressDialog.dismiss();

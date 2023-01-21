@@ -10,15 +10,14 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.HashMap;
 
 public class SignupActivity extends AppCompatActivity {
     EditText email, name, username, password;
     Button signupButton;
-    DatabaseReference dbRef;
+    FirebaseFirestore db;
     FirebaseAuth auth;
     ProgressDialog pd;
 
@@ -34,7 +33,8 @@ public class SignupActivity extends AppCompatActivity {
         password = findViewById(R.id.et_password);
         signupButton = findViewById(R.id.btn_signup);
 
-        dbRef = FirebaseDatabase.getInstance().getReference();
+        db = FirebaseFirestore.getInstance();
+
         auth = FirebaseAuth.getInstance();
         pd = new ProgressDialog(this);
         signupButton.setOnClickListener(view -> {
@@ -59,13 +59,13 @@ public class SignupActivity extends AppCompatActivity {
         pd.show();
         auth.createUserWithEmailAndPassword(strEmail, strPassword)
                 .addOnSuccessListener(authResult -> {
-                    HashMap<String, Object> map = new HashMap<>();
+                    HashMap<String, String> map = new HashMap<>();
                     map.put("name", strName);
                     map.put("email", strEmail);
                     map.put("username", strUsername);
                     map.put("id", auth.getCurrentUser().getUid());
 
-                    dbRef.child("Users").child(auth.getCurrentUser().getUid()).setValue(map)
+                    db.collection("Users").document(map.get("id")).set(map)
                             .addOnSuccessListener(result -> {
                                 Intent intent = new Intent(SignupActivity.this, MainActivity.class);
                                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
