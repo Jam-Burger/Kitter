@@ -24,6 +24,7 @@
         android:background="@android:color/transparent"
         android:outlineSpotShadowColor="@android:color/transparent"
         app:itemIconSize="@dimen/icon_size"
+        app:itemIconTint="@color/bottom_nav_item_color"
         app:labelVisibilityMode="unlabeled"
         app:menu="@menu/bottom_menu" />
 

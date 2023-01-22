@@ -1,10 +1,13 @@
 package com.jamburger.kitter.fragments;
 
+import static com.jamburger.kitter.MainActivity.TAG;
+
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,19 +17,21 @@ import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.jamburger.kitter.R;
-import com.jamburger.kitter.adapters.PostAdapter;
+import com.jamburger.kitter.adapters.MyPostAdapter;
 import com.jamburger.kitter.components.Post;
 import com.jamburger.kitter.components.User;
 
@@ -40,10 +45,10 @@ public class ProfileFragment extends Fragment {
     final byte PROFILE_IMG = 0;
     final byte BACKGROUND_IMG = 1;
     ImageView backgroundImage, profileImage;
-    TextView name, username, bio, likes;
+    TextView name, username, bio;
     DocumentReference userdata;
     RecyclerView recyclerViewPosts;
-    PostAdapter postAdapter;
+    MyPostAdapter myPostAdapter;
     StorageReference storageReference;
     FirebaseFirestore db;
     FirebaseUser user;
@@ -58,34 +63,33 @@ public class ProfileFragment extends Fragment {
         }
     });
 
-    public ProfileFragment(DocumentReference userdata) {
-        this.userdata = userdata;
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        user = FirebaseAuth.getInstance().getCurrentUser();
+        db = FirebaseFirestore.getInstance();
+        userdata = db.collection("Users").document(user.getUid());
+        storageReference = FirebaseStorage.getInstance().getReference();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
-
         backgroundImage = view.findViewById(R.id.img_background);
         profileImage = view.findViewById(R.id.img_profile);
         name = view.findViewById(R.id.txt_name);
         username = view.findViewById(R.id.txt_username);
         bio = view.findViewById(R.id.txt_bio);
-        user = FirebaseAuth.getInstance().getCurrentUser();
-        storageReference = FirebaseStorage.getInstance().getReference();
-        db = FirebaseFirestore.getInstance();
-
 
         recyclerViewPosts = view.findViewById(R.id.recyclerview_myposts);
         recyclerViewPosts.setHasFixedSize(true);
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(requireContext());
-        linearLayoutManager.setStackFromEnd(true);
-        linearLayoutManager.setReverseLayout(true);
-        recyclerViewPosts.setLayoutManager(linearLayoutManager);
+
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(requireContext(), 3);
+        recyclerViewPosts.setLayoutManager(gridLayoutManager);
 
         posts = new ArrayList<>();
-        postAdapter = new PostAdapter(requireContext(), posts);
-        recyclerViewPosts.setAdapter(postAdapter);
+        myPostAdapter = new MyPostAdapter(requireContext(), posts);
+        recyclerViewPosts.setAdapter(myPostAdapter);
 
         fillUserData();
         readPosts();
@@ -151,15 +155,29 @@ public class ProfileFragment extends Fragment {
     }
 
     private void readPosts() {
-        userdata.get().addOnSuccessListener(documentSnapshot -> {
-            List<DocumentReference> postReferences = (List<DocumentReference>) documentSnapshot.get("posts");
-            posts.clear();
-            if (postReferences == null) return;
-            for (DocumentReference postReference : postReferences) {
-                postReference.get().addOnSuccessListener(postSnapshot -> {
-                    Post post = postSnapshot.toObject(Post.class);
-                    posts.add(post);
-                    postAdapter.notifyDataSetChanged();
+        userdata.get().addOnSuccessListener(userSnapshot -> {
+            User user = userSnapshot.toObject(User.class);
+            List<Post> myPosts = new ArrayList<>();
+            if (user.getPosts().size() == 0) return;
+
+            for (DocumentReference documentReference : user.getPosts()) {
+                documentReference.get().addOnSuccessListener(documentSnapshot -> {
+                    myPosts.add(documentSnapshot.toObject(Post.class));
+                    if (myPosts.size() == user.getPosts().size()) {
+                        FirebaseFirestore.getInstance().collection("Posts").get().addOnSuccessListener(postSnapshots -> {
+                            posts.clear();
+                            for (DocumentSnapshot postSnapshot : postSnapshots) {
+                                Post post = postSnapshot.toObject(Post.class);
+                                for (Post current : myPosts) {
+                                    if (!current.getPostid().equals(post.getPostid())) continue;
+                                    Log.d(TAG, "post cap " + post.getCaption());
+                                    posts.add(0, post);
+                                    break;
+                                }
+                            }
+                            myPostAdapter.notifyDataSetChanged();
+                        });
+                    }
                 });
             }
         });

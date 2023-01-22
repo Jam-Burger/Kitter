@@ -7,4 +7,6 @@
     <color name="app_name_color">#D7000000</color>
     <color name="inverted">@color/black</color>
     <color name="like">#FF2323</color>
+    <color name="item_color_active">@color/inverted</color>
+    <color name="item_color_inactive">#E2717171</color>
 </resources>

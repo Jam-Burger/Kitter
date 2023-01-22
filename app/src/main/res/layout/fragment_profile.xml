@@ -96,9 +96,8 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerview_myposts"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-            </androidx.recyclerview.widget.RecyclerView>
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="50dp" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 
