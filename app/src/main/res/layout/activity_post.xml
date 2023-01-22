@@ -4,58 +4,49 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:id="@+id/post_parent"
     tools:context=".PostActivity">
 
-    <com.google.android.material.appbar.AppBarLayout
+
+    <RelativeLayout
         android:id="@+id/header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginVertical="5dp"
         android:background="@android:color/transparent"
         android:outlineSpotShadowColor="@android:color/transparent"
-        android:paddingEnd="10dp">
+        android:padding="10dp">
 
-        <androidx.appcompat.widget.Toolbar
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+        <ImageView
+            android:id="@+id/btn_close"
+            android:layout_width="@dimen/icon_size"
+            android:layout_height="@dimen/icon_size"
+            android:layout_centerVertical="true"
+            android:contentDescription="close button"
+            android:src="@drawable/ic_close"
+            android:tint="@color/inverted"
+            tools:ignore="UseAppTint" />
 
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_toEndOf="@id/btn_close"
+            android:paddingBottom="5dp"
+            android:text="New Post"
+            android:textColor="@color/inverted"
+            android:textSize="25sp" />
 
-                <ImageView
-                    android:id="@+id/btn_close"
-                    android:layout_width="@dimen/icon_size"
-                    android:layout_height="@dimen/icon_size"
-                    android:layout_centerVertical="true"
-                    android:contentDescription="close button"
-                    android:src="@drawable/ic_close"
-                    android:tint="@color/inverted"
-                    tools:ignore="UseAppTint" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="10dp"
-                    android:layout_toEndOf="@id/btn_close"
-                    android:paddingBottom="5dp"
-                    android:text="New Post"
-                    android:textColor="@color/inverted"
-                    android:textSize="25sp" />
-
-                <ImageView
-                    android:layout_width="@dimen/icon_size"
-                    android:layout_height="@dimen/icon_size"
-                    android:id="@+id/btn_post"
-                    android:layout_alignParentEnd="true"
-                    android:layout_centerVertical="true"
-                    android:contentDescription="post button"
-                    android:src="@drawable/ic_arrow"
-                    android:tint="@color/inverted"
-                    tools:ignore="UseAppTint" />
-            </RelativeLayout>
-        </androidx.appcompat.widget.Toolbar>
-    </com.google.android.material.appbar.AppBarLayout>
+        <ImageView
+            android:id="@+id/btn_post"
+            android:layout_width="@dimen/icon_size"
+            android:layout_height="@dimen/icon_size"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:contentDescription="post button"
+            android:src="@drawable/ic_arrow"
+            android:tint="@color/inverted"
+            tools:ignore="UseAppTint" />
+    </RelativeLayout>
 
     <com.google.android.material.divider.MaterialDivider
         android:layout_width="wrap_content"
@@ -66,9 +57,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:adjustViewBounds="true"
-        android:maxHeight="400dp"
-        android:src="@mipmap/ic_kitter"
-        tools:ignore="MissingConstraints" />
+        android:maxHeight="400dp" />
 
     <com.google.android.material.divider.MaterialDivider
         android:layout_width="wrap_content"

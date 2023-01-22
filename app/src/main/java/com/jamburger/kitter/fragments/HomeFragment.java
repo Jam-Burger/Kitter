@@ -5,8 +5,9 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
+import android.widget.Toast;
 
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -25,8 +26,8 @@ import java.util.List;
 public class HomeFragment extends Fragment {
 
     RecyclerView recyclerViewPosts;
-    ImageView settingsButton;
     PostAdapter postAdapter;
+    Toolbar toolbar;
     List<Post> posts;
 
     @Override
@@ -34,7 +35,23 @@ public class HomeFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
         recyclerViewPosts = view.findViewById(R.id.recyclerview_posts);
-        settingsButton = view.findViewById(R.id.btn_settings);
+        toolbar = view.findViewById(R.id.top_menu);
+
+        toolbar.setOnMenuItemClickListener(item -> {
+            switch (item.getItemId()) {
+                case R.id.nav_saved:
+                    Toast.makeText(requireContext(), "In Development", Toast.LENGTH_SHORT).show();
+                    break;
+                case R.id.nav_logout:
+                    FirebaseAuth.getInstance().signOut();
+                    Intent intent = new Intent(requireActivity(), LoginActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(intent);
+                    requireActivity().finish();
+                    break;
+            }
+            return true;
+        });
 
         recyclerViewPosts.setHasFixedSize(true);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
@@ -45,12 +62,6 @@ public class HomeFragment extends Fragment {
         posts = new ArrayList<>();
         postAdapter = new PostAdapter(requireContext(), posts);
         recyclerViewPosts.setAdapter(postAdapter);
-
-        settingsButton.setOnClickListener(v -> {
-            FirebaseAuth.getInstance().signOut();
-            startActivity(new Intent(requireActivity(), LoginActivity.class));
-            requireActivity().finish();
-        });
         readPosts();
         return view;
     }

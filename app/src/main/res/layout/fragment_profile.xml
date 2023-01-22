@@ -11,7 +11,7 @@
         android:layout_height="wrap_content"
         android:paddingHorizontal="15dp"
         android:paddingTop="10dp"
-        android:paddingBottom="5dp">
+        android:paddingBottom="10dp">
 
         <TextView
             android:id="@+id/txt_username"
@@ -90,15 +90,15 @@
                 android:layout_gravity="left"
                 android:layout_margin="10dp"
                 android:text="Posts"
+                android:textColor="@color/inverted"
                 android:textSize="20sp"
                 android:textStyle="bold" />
 
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerview_myposts"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-            </androidx.recyclerview.widget.RecyclerView>
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="50dp" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 

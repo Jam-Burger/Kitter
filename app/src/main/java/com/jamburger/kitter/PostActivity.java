@@ -6,7 +6,9 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -14,6 +16,7 @@ import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.FileProvider;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -23,7 +26,9 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.jamburger.kitter.components.Post;
+import com.jamburger.kitter.fragments.SelectSourceDialogFragment;
 
+import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -31,17 +36,21 @@ import java.util.Date;
 import java.util.Locale;
 
 public class PostActivity extends AppCompatActivity {
+    private static final byte REQUEST_IMAGE_CAPTURE = 69;
     ImageView imageView;
+
     TextView caption;
     Uri filePath = null;
     StorageReference storageReference;
     FirebaseFirestore db;
     FirebaseUser user;
-    ActivityResultLauncher<Intent> myActivityResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+    String currentPhotoPath;
+    ActivityResultLauncher<Intent> fromGalleryResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
         if (result.getResultCode() == Activity.RESULT_OK) {
             Intent data = result.getData();
             if (data != null && data.getData() != null) {
                 filePath = data.getData();
+                showActivity(true);
                 try {
                     Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), filePath);
                     imageView.setImageBitmap(bitmap);
@@ -53,11 +62,25 @@ public class PostActivity extends AppCompatActivity {
             startHomeFragment();
         }
     });
+    ActivityResultLauncher<Intent> fromCameraResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+        if (result.getResultCode() == Activity.RESULT_OK) {
+            showActivity(true);
+            try {
+                Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), filePath);
+                imageView.setImageBitmap(bitmap);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else if (result.getResultCode() == Activity.RESULT_CANCELED) {
+            startHomeFragment();
+        }
+    });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_post);
+
         imageView = findViewById(R.id.post_img);
         caption = findViewById(R.id.et_caption);
 
@@ -68,14 +91,54 @@ public class PostActivity extends AppCompatActivity {
         storageReference = FirebaseStorage.getInstance().getReference();
         db = FirebaseFirestore.getInstance();
 
-        selectImage();
-
         closeButton.setOnClickListener(view -> {
             startHomeFragment();
         });
         postButton.setOnClickListener(view -> {
             postImage();
         });
+
+        showActivity(false);
+        showDialog();
+    }
+
+    void showDialog() {
+        SelectSourceDialogFragment newFragment = SelectSourceDialogFragment.newInstance();
+        newFragment.show(getSupportFragmentManager(), "dialog");
+    }
+
+    private File createImageFile() throws IOException {
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile(
+                imageFileName,  /* prefix */
+                ".jpg",         /* suffix */
+                storageDir      /* directory */
+        );
+
+        currentPhotoPath = image.getAbsolutePath();
+        return image;
+    }
+
+    private void takePicture() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            File photoFile = null;
+            try {
+                photoFile = createImageFile();
+            } catch (IOException ex) {
+                // Error occurred while creating the File
+            }
+            if (photoFile != null) {
+                filePath = FileProvider.getUriForFile(this,
+                        "com.jamburger.kitter.fileprovider",
+                        photoFile);
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, filePath);
+                fromCameraResultLauncher.launch(Intent.createChooser(takePictureIntent, "Select Picture"));
+            }
+        }
     }
 
     private void postImage() {
@@ -113,17 +176,30 @@ public class PostActivity extends AppCompatActivity {
         }
     }
 
-    private void startHomeFragment() {
+    public void startHomeFragment() {
         Intent intent = new Intent(this, MainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
         finish();
     }
 
-    private void selectImage() {
+    private void selectPicture() {
         Intent intent = new Intent();
         intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
-        myActivityResultLauncher.launch(Intent.createChooser(intent, "Select Picture"));
+        fromGalleryResultLauncher.launch(Intent.createChooser(intent, "Select Picture"));
+    }
+
+    private void showActivity(boolean set) {
+        if (set) findViewById(R.id.post_parent).setVisibility(View.VISIBLE);
+        else findViewById(R.id.post_parent).setVisibility(View.INVISIBLE);
+    }
+
+    public void selectFromCamera() {
+        takePicture();
+    }
+
+    public void selectFromGallery() {
+        selectPicture();
     }
 }
