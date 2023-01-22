@@ -21,14 +21,15 @@ public class MainActivity extends AppCompatActivity {
     Fragment selectorFragment;
     FirebaseUser user;
 
+
     @SuppressLint("NonConstantResourceId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         bottomNavigationView = findViewById(R.id.bottom_navigation);
-        user = FirebaseAuth.getInstance().getCurrentUser();
 
+        user = FirebaseAuth.getInstance().getCurrentUser();
 
         bottomNavigationView.setOnItemSelectedListener(item -> {
             switch (item.getItemId()) {

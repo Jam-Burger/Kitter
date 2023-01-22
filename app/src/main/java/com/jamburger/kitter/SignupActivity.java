@@ -13,6 +13,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.jamburger.kitter.components.User;
 
+import java.util.ArrayList;
+
 public class SignupActivity extends AppCompatActivity {
     EditText email, name, username, password;
     Button signupButton;
@@ -59,7 +61,7 @@ public class SignupActivity extends AppCompatActivity {
         auth.createUserWithEmailAndPassword(strEmail, strPassword)
                 .addOnSuccessListener(authResult -> {
                     User user = new User(auth.getCurrentUser().getUid(), strName, strUsername, strEmail,
-                            "", "", "", null, null);
+                            "", "", "", new ArrayList<>(), new ArrayList<>());
 
                     db.collection("Users").document(user.getId()).set(user)
                             .addOnSuccessListener(result -> {

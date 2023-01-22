@@ -7,11 +7,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -29,10 +33,16 @@ public class HomeFragment extends Fragment {
     PostAdapter postAdapter;
     Toolbar toolbar;
     List<Post> posts;
+    GoogleSignInClient googleSignInClient;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        googleSignInClient = GoogleSignIn.getClient(requireActivity(), GoogleSignInOptions.DEFAULT_SIGN_IN);
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
         recyclerViewPosts = view.findViewById(R.id.recyclerview_posts);
         toolbar = view.findViewById(R.id.top_menu);
@@ -43,11 +53,16 @@ public class HomeFragment extends Fragment {
                     Toast.makeText(requireContext(), "In Development", Toast.LENGTH_SHORT).show();
                     break;
                 case R.id.nav_logout:
-                    FirebaseAuth.getInstance().signOut();
-                    Intent intent = new Intent(requireActivity(), LoginActivity.class);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    startActivity(intent);
-                    requireActivity().finish();
+                    googleSignInClient.signOut().addOnCompleteListener(task -> {
+                        // Check condition
+                        if (task.isSuccessful()) {
+                            FirebaseAuth.getInstance().signOut();
+                            Intent intent = new Intent(requireActivity(), LoginActivity.class);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            startActivity(intent);
+                            requireActivity().finish();
+                        }
+                    });
                     break;
             }
             return true;

@@ -47,7 +47,7 @@
         <Button
             android:id="@+id/btn_login"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="50dp"
             android:layout_marginHorizontal="50dp"
             android:text="Log in"
             android:textAllCaps="false" />
@@ -88,6 +88,7 @@
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:id="@+id/btn_google"
             android:drawableLeft="@mipmap/ic_google"
             android:text="Continue with google"
             android:backgroundTint="@color/white"
