@@ -1,7 +1,6 @@
 package com.jamburger.kitter;
 
 import android.annotation.SuppressLint;
-import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -38,12 +37,6 @@ public class MainActivity extends AppCompatActivity {
                     break;
                 case R.id.nav_search:
                     selectorFragment = new SearchFragment();
-                    break;
-                case R.id.nav_add:
-                    selectorFragment = null;
-                    Intent intent = new Intent(this, PostActivity.class);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    startActivity(intent);
                     break;
                 case R.id.nav_profile:
                     selectorFragment = new ProfileFragment();

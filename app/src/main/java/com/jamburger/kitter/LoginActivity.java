@@ -56,17 +56,17 @@ public class LoginActivity extends AppCompatActivity {
                 , googleSignInOptions);
 
 
-        loginButton.setOnClickListener(view -> {
-            String strEmail = email.getText().toString();
-            String strPassword = password.getText().toString();
-            login(strEmail, strPassword);
-        });
+//        loginButton.setOnClickListener(view -> {
+//            String strEmail = email.getText().toString();
+//            String strPassword = password.getText().toString();
+//            login(strEmail, strPassword);
+//        });
 
-        signupText.setOnClickListener(view -> startActivity(new Intent(LoginActivity.this, SignupActivity.class)));
-        googleButton.setOnClickListener(view -> {
-            Intent intent = googleSignInClient.getSignInIntent();
-            startActivityForResult(intent, 100);
-        });
+//        signupText.setOnClickListener(view -> startActivity(new Intent(LoginActivity.this, SignupActivity.class)));
+//        googleButton.setOnClickListener(view -> {
+//            Intent intent = googleSignInClient.getSignInIntent();
+//            startActivityForResult(intent, 100);
+//        });
     }
 
     void login(String strEmail, String strPassword) {

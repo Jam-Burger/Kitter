@@ -15,11 +15,15 @@ import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
@@ -27,6 +31,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.jamburger.kitter.LoginActivity;
 import com.jamburger.kitter.R;
 import com.jamburger.kitter.adapters.MyPostAdapter;
 import com.jamburger.kitter.components.Post;
@@ -43,12 +48,16 @@ public class ProfileFragment extends Fragment {
     final byte BACKGROUND_IMG = 1;
     ImageView backgroundImage, profileImage;
     TextView name, username, bio;
+    Toolbar toolbar;
+
     DocumentReference userdata;
     RecyclerView recyclerViewPosts;
     MyPostAdapter myPostAdapter;
     StorageReference storageReference;
     FirebaseFirestore db;
     FirebaseUser user;
+    GoogleSignInClient googleSignInClient;
+
     List<Post> posts;
     byte mode;
     ActivityResultLauncher<Intent> myActivityResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
@@ -66,6 +75,7 @@ public class ProfileFragment extends Fragment {
         user = FirebaseAuth.getInstance().getCurrentUser();
         db = FirebaseFirestore.getInstance();
         userdata = db.collection("Users").document(user.getUid());
+        googleSignInClient = GoogleSignIn.getClient(requireActivity(), GoogleSignInOptions.DEFAULT_SIGN_IN);
         storageReference = FirebaseStorage.getInstance().getReference();
     }
 
@@ -77,6 +87,33 @@ public class ProfileFragment extends Fragment {
         name = view.findViewById(R.id.txt_name);
         username = view.findViewById(R.id.txt_username);
         bio = view.findViewById(R.id.txt_bio);
+
+        toolbar = view.findViewById(R.id.top_menu);
+
+        toolbar.setOnMenuItemClickListener(item -> {
+            switch (item.getItemId()) {
+                case R.id.nav_edit:
+                    break;
+                case R.id.nav_saved:
+                    Toast.makeText(requireContext(), "In Development", Toast.LENGTH_SHORT).show();
+                    break;
+                case R.id.nav_change_password:
+                    break;
+                case R.id.nav_logout:
+                    googleSignInClient.signOut().addOnCompleteListener(task -> {
+                        // Check condition
+                        if (task.isSuccessful()) {
+                            FirebaseAuth.getInstance().signOut();
+                            Intent intent = new Intent(requireActivity(), LoginActivity.class);
+                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            startActivity(intent);
+                            requireActivity().finish();
+                        }
+                    });
+                    break;
+            }
+            return true;
+        });
 
         recyclerViewPosts = view.findViewById(R.id.recyclerview_myposts);
         recyclerViewPosts.setHasFixedSize(true);

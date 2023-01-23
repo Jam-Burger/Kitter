@@ -1,37 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".fragments.HomeFragment">
-    <com.google.android.material.appbar.AppBarLayout
+
+    <RelativeLayout
         android:id="@+id/header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_marginVertical="5dp"
-        android:background="@android:color/transparent"
-        android:outlineSpotShadowColor="@android:color/transparent"
-        android:paddingRight="10dp">
+        android:paddingHorizontal="15dp"
+        android:paddingVertical="8dp">
 
-        <androidx.appcompat.widget.Toolbar
-            android:layout_width="match_parent"
-            android:id="@+id/top_menu"
+        <TextView
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:menu="@menu/top_menu">
+            android:layout_alignParentStart="true"
+            android:fontFamily="@font/dancing_script"
+            android:text="@string/app_name"
+            android:textColor="@color/app_name_color"
+            android:textSize="40sp"
+            android:textStyle="bold" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentStart="true"
-                android:fontFamily="@font/dancing_script"
-                android:text="@string/app_name"
-                android:textColor="@color/app_name_color"
-                android:textSize="40sp"
-                android:textStyle="bold" />
-        </androidx.appcompat.widget.Toolbar>
-    </com.google.android.material.appbar.AppBarLayout>
+
+        <ImageView
+            android:id="@+id/btn_add_post"
+            android:layout_width="@dimen/icon_size"
+            android:layout_height="@dimen/icon_size"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:src="@drawable/ic_add" />
+    </RelativeLayout>
 
     <com.google.android.material.divider.MaterialDivider
         android:layout_width="match_parent"
