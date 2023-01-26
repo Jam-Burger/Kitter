@@ -161,6 +161,17 @@ public class PostActivity extends AppCompatActivity {
                         ((100.0 * taskSnapshot.getBytesTransferred() / taskSnapshot.getTotalByteCount()));
                 progressDialog.setMessage("Uploaded " + (int) progress + "%");
             });
+        } else {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
+            String postId = sdf.format(new Date());
+            Post post = new Post(user.getUid(), postId, "", "");
+            post.setKitt(caption.getText().toString());
+            DocumentReference postRef = db.collection("Posts").document(postId);
+            postRef.set(post).addOnCompleteListener(task -> {
+                startHomeFragment();
+            });
+            db.collection("Users").document(user.getUid())
+                    .update("posts", FieldValue.arrayUnion(postRef));
         }
     }
 
@@ -189,5 +200,9 @@ public class PostActivity extends AppCompatActivity {
 
     public void selectFromGallery() {
         selectPicture();
+    }
+
+    public void sendTextOnly() {
+        showActivity(true);
     }
 }

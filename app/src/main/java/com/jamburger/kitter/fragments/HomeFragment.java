@@ -57,6 +57,8 @@ public class HomeFragment extends Fragment {
                 Post post = postSnapshot.toObject(Post.class);
                 if (post.getComments() == null)
                     postsReference.document(post.getPostid()).update("comments", new ArrayList<>());
+                if (post.getKitt() == null)
+                    postsReference.document(post.getPostid()).update("kitt", "");
                 posts.add(post);
             }
             postAdapter.notifyDataSetChanged();

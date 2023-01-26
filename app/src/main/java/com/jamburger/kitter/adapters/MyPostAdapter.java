@@ -44,7 +44,6 @@ public class MyPostAdapter extends RecyclerView.Adapter<MyPostAdapter.ViewHolder
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         ImageView myPostImage;
-
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             myPostImage = itemView.findViewById(R.id.img_mypost);

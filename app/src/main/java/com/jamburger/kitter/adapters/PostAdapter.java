@@ -54,8 +54,13 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Post post = mPosts.get(position);
 
-        Glide.with(mContext).load(post.getImageUrl()).into(holder.postImage);
         holder.caption.setText(post.getCaption());
+        if (post.getKitt() != null && post.getKitt().isEmpty()) {
+            Glide.with(mContext).load(post.getImageUrl()).into(holder.postImage);
+        } else {
+            holder.kitt.setVisibility(View.VISIBLE);
+            holder.kitt.setText(post.getKitt());
+        }
         holder.post = post;
 
         db.collection("Users").document(post.getCreator()).get().addOnSuccessListener(documentSnapshot -> {
@@ -133,7 +138,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public ImageView profileImage, like, comment, save, postImage;
-        public TextView username, noOfLikes, caption;
+        public TextView username, noOfLikes, caption, kitt;
         public static DocumentReference userReference;
         protected boolean isLiked, isSaved;
         public Post post;
@@ -150,6 +155,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
             noOfLikes = itemView.findViewById(R.id.txt_likes);
             username = itemView.findViewById(R.id.txt_username);
             caption = itemView.findViewById(R.id.description);
+            kitt = itemView.findViewById(R.id.txt_kitt);
         }
 
         void update() {
