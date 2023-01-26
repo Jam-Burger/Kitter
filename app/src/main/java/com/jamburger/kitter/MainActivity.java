@@ -17,9 +17,8 @@ import com.jamburger.kitter.fragments.SearchFragment;
 public class MainActivity extends AppCompatActivity {
     public static final String TAG = "com.jamburger.kitter";
     BottomNavigationView bottomNavigationView;
-    Fragment selectorFragment;
+    public static Fragment selectorFragment = null;
     FirebaseUser user;
-
 
     @SuppressLint("NonConstantResourceId")
     @Override
@@ -47,6 +46,11 @@ public class MainActivity extends AppCompatActivity {
             }
             return true;
         });
-        getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, new HomeFragment()).commit();
+        if (selectorFragment != null) {
+            getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, selectorFragment).commit();
+            selectorFragment = null;
+        } else {
+            getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, new HomeFragment()).commit();
+        }
     }
 }

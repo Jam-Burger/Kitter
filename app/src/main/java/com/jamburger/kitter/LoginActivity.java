@@ -92,29 +92,18 @@ public class LoginActivity extends AppCompatActivity {
             Task<GoogleSignInAccount> signInAccountTask = GoogleSignIn
                     .getSignedInAccountFromIntent(data);
 
-            // check condition
             if (signInAccountTask.isSuccessful()) {
-                // When google sign in successful
                 Toast.makeText(this, "Google sign in successful", Toast.LENGTH_SHORT).show();
-                // Initialize sign in account
                 try {
-                    // Initialize sign in account
                     GoogleSignInAccount googleSignInAccount = signInAccountTask
                             .getResult(ApiException.class);
-                    // Check condition
                     if (googleSignInAccount != null) {
-                        // When sign in account is not equal to null
-                        // Initialize auth credential
                         AuthCredential authCredential = GoogleAuthProvider
                                 .getCredential(googleSignInAccount.getIdToken()
                                         , null);
-                        // Check credential
                         auth.signInWithCredential(authCredential)
                                 .addOnCompleteListener(this, task -> {
-                                    // Check condition
                                     if (task.isSuccessful()) {
-                                        // When task is successful
-                                        // Redirect to profile activity
                                         FirebaseUser currentUser = auth.getCurrentUser();
                                         User user = new User(auth.getCurrentUser().getUid(), currentUser.getDisplayName(), currentUser.getDisplayName(), currentUser.getEmail(), getString(R.string.default_profile_img_url));
 

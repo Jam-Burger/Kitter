@@ -14,6 +14,18 @@ public class User {
 
     }
 
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public void setBio(String bio) {
+        this.bio = bio;
+    }
+
+    public void setProfileImageUrl(String profileImageUrl) {
+        this.profileImageUrl = profileImageUrl;
+    }
+
     public User(String id, String name, String username, String email, String profileImageUrl) {
         this.id = id;
         this.name = name;

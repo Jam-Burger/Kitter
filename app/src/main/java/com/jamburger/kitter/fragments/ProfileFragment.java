@@ -45,29 +45,23 @@ import java.util.List;
 import java.util.Locale;
 
 public class ProfileFragment extends Fragment {
-    final byte PROFILE_IMG = 0;
-    final byte BACKGROUND_IMG = 1;
-    ImageView backgroundImage, profileImage;
+    ImageView backgroundImage, profileImage, backgroundImageEditButton;
     TextView name, username, bio;
     Toolbar toolbar;
-
     DocumentReference userdata;
     RecyclerView recyclerViewPosts;
     MyPostAdapter myPostAdapter;
-    StorageReference storageReference;
     FirebaseFirestore db;
     FirebaseUser user;
     GoogleSignInClient googleSignInClient;
 
     List<Post> posts;
-    byte mode;
     ActivityResultLauncher<Intent> myActivityResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
         if (result.getResultCode() == Activity.RESULT_OK) {
             Intent data = result.getData();
             if (data != null && data.getData() != null) {
                 Uri uri = data.getData();
-                if (mode == PROFILE_IMG) Glide.with(this).load(uri).into(profileImage);
-                else Glide.with(this).load(uri).into(backgroundImage);
+                Glide.with(this).load(uri).into(backgroundImage);
                 postImage(uri);
             }
         }
@@ -80,7 +74,6 @@ public class ProfileFragment extends Fragment {
         db = FirebaseFirestore.getInstance();
         userdata = db.collection("Users").document(user.getUid());
         googleSignInClient = GoogleSignIn.getClient(requireActivity(), GoogleSignInOptions.DEFAULT_SIGN_IN);
-        storageReference = FirebaseStorage.getInstance().getReference();
     }
 
     @SuppressLint("NonConstantResourceId")
@@ -88,6 +81,7 @@ public class ProfileFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
         backgroundImage = view.findViewById(R.id.img_background);
+        backgroundImageEditButton = view.findViewById(R.id.btn_change_background_img);
         profileImage = view.findViewById(R.id.img_profile);
         name = view.findViewById(R.id.txt_name);
         username = view.findViewById(R.id.txt_username);
@@ -130,33 +124,27 @@ public class ProfileFragment extends Fragment {
         fillUserData();
         readPosts();
 
-        profileImage.setOnClickListener(v -> {
+        backgroundImageEditButton.setOnClickListener(v -> {
             selectImage();
-            mode = PROFILE_IMG;
-        });
-        backgroundImage.setOnClickListener(v -> {
-            selectImage();
-            mode = BACKGROUND_IMG;
         });
         return view;
     }
 
     private void postImage(Uri filePath) {
         if (filePath != null) {
-            String folder = mode == PROFILE_IMG ? "Profile Pictures" : "Background Pictures";
-            String attribute = mode == PROFILE_IMG ? "profileImageUrl" : "backgroundImageUrl";
+            StorageReference storageReference = FirebaseStorage.getInstance().getReference();
             ProgressDialog progressDialog = new ProgressDialog(requireActivity());
             progressDialog.setTitle("Uploading...");
             progressDialog.show();
 
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss", Locale.CHINA);
             String postId = sdf.format(new Date());
-            StorageReference ref = storageReference.child(folder + "/" + postId);
+            StorageReference ref = storageReference.child("Background Pictures/" + postId);
 
             ref.putFile(filePath).addOnSuccessListener(snapshot -> {
                 Toast.makeText(requireActivity(), "Image Uploaded!!", Toast.LENGTH_SHORT).show();
-                storageReference.child(folder).child(postId).getDownloadUrl().addOnSuccessListener(uri -> {
-                    db.collection("Users").document(user.getUid()).update(attribute, uri.toString()).addOnCompleteListener(task -> {
+                storageReference.child("Background Pictures").child(postId).getDownloadUrl().addOnSuccessListener(uri -> {
+                    db.collection("Users").document(user.getUid()).update("backgroundImageUrl", uri.toString()).addOnCompleteListener(task -> {
                         progressDialog.dismiss();
                     });
                 }).addOnFailureListener(e -> progressDialog.dismiss());

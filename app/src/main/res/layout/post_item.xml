@@ -15,15 +15,13 @@
             android:layout_width="@dimen/profile_img_icon_size"
             android:layout_height="@dimen/profile_img_icon_size"
             android:layout_margin="10dp"
-            android:scaleType="centerCrop"
-            android:src="@mipmap/gavi" />
+            android:scaleType="centerCrop" />
 
         <TextView
             android:id="@+id/txt_username"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="5dp"
-            android:text="pablogavi"
             android:textSize="15sp"
             android:textStyle="bold" />
     </LinearLayout>
