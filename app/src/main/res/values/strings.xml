@@ -2,4 +2,5 @@
     <string name="app_name">Kitter</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="default_profile_img_url">https://www.fcbarcelona.com/photo-resources/2022/11/02/68339d90-282b-4e03-98fa-54395765867c/30-GAVI_.jpg</string>
 </resources>

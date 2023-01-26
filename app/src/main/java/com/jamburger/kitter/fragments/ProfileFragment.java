@@ -1,5 +1,6 @@
 package com.jamburger.kitter.fragments;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -17,7 +18,6 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -31,6 +31,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.jamburger.kitter.EditInfoActivity;
 import com.jamburger.kitter.LoginActivity;
 import com.jamburger.kitter.R;
 import com.jamburger.kitter.adapters.MyPostAdapter;
@@ -64,7 +65,10 @@ public class ProfileFragment extends Fragment {
         if (result.getResultCode() == Activity.RESULT_OK) {
             Intent data = result.getData();
             if (data != null && data.getData() != null) {
-                postImage(data.getData());
+                Uri uri = data.getData();
+                if (mode == PROFILE_IMG) Glide.with(this).load(uri).into(profileImage);
+                else Glide.with(this).load(uri).into(backgroundImage);
+                postImage(uri);
             }
         }
     });
@@ -79,6 +83,7 @@ public class ProfileFragment extends Fragment {
         storageReference = FirebaseStorage.getInstance().getReference();
     }
 
+    @SuppressLint("NonConstantResourceId")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
@@ -93,6 +98,7 @@ public class ProfileFragment extends Fragment {
         toolbar.setOnMenuItemClickListener(item -> {
             switch (item.getItemId()) {
                 case R.id.nav_edit:
+                    startActivity(new Intent(requireActivity(), EditInfoActivity.class));
                     break;
                 case R.id.nav_saved:
                     Toast.makeText(requireContext(), "In Development", Toast.LENGTH_SHORT).show();
@@ -101,7 +107,6 @@ public class ProfileFragment extends Fragment {
                     break;
                 case R.id.nav_logout:
                     googleSignInClient.signOut().addOnCompleteListener(task -> {
-                        // Check condition
                         if (task.isSuccessful()) {
                             FirebaseAuth.getInstance().signOut();
                             Intent intent = new Intent(requireActivity(), LoginActivity.class);
@@ -117,9 +122,6 @@ public class ProfileFragment extends Fragment {
 
         recyclerViewPosts = view.findViewById(R.id.recyclerview_myposts);
         recyclerViewPosts.setHasFixedSize(true);
-
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(requireContext(), 3);
-        recyclerViewPosts.setLayoutManager(gridLayoutManager);
 
         posts = new ArrayList<>();
         myPostAdapter = new MyPostAdapter(requireContext(), posts);

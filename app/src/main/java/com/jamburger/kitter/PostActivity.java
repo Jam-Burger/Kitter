@@ -3,7 +3,6 @@ package com.jamburger.kitter;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -18,6 +17,7 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
 
+import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
@@ -31,9 +31,7 @@ import com.jamburger.kitter.fragments.SelectSourceDialogFragment;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.Locale;
 
 public class PostActivity extends AppCompatActivity {
     private static final byte REQUEST_IMAGE_CAPTURE = 69;
@@ -51,12 +49,7 @@ public class PostActivity extends AppCompatActivity {
             if (data != null && data.getData() != null) {
                 filePath = data.getData();
                 showActivity(true);
-                try {
-                    Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), filePath);
-                    imageView.setImageBitmap(bitmap);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                Glide.with(this).load(filePath).into(imageView);
             }
         } else if (result.getResultCode() == Activity.RESULT_CANCELED) {
             startHomeFragment();
@@ -65,12 +58,7 @@ public class PostActivity extends AppCompatActivity {
     ActivityResultLauncher<Intent> fromCameraResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
         if (result.getResultCode() == Activity.RESULT_OK) {
             showActivity(true);
-            try {
-                Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), filePath);
-                imageView.setImageBitmap(bitmap);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            Glide.with(this).load(filePath).into(imageView);
         } else if (result.getResultCode() == Activity.RESULT_CANCELED) {
             startHomeFragment();
         }
@@ -147,7 +135,7 @@ public class PostActivity extends AppCompatActivity {
             progressDialog.setTitle("Uploading...");
             progressDialog.show();
 
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss", Locale.CHINA);
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
             String postId = sdf.format(new Date());
             StorageReference ref = storageReference.child("Posts/" + postId);
 
@@ -155,7 +143,7 @@ public class PostActivity extends AppCompatActivity {
                 Toast.makeText(this, "Image Uploaded!!", Toast.LENGTH_SHORT).show();
 
                 storageReference.child("Posts").child(postId).getDownloadUrl().addOnSuccessListener(uri -> {
-                    Post post = new Post(user.getUid(), postId, uri.toString(), caption.getText().toString(), new ArrayList<>());
+                    Post post = new Post(user.getUid(), postId, uri.toString(), caption.getText().toString());
                     DocumentReference postRef = db.collection("Posts").document(postId);
 
                     postRef.set(post).addOnCompleteListener(task -> {

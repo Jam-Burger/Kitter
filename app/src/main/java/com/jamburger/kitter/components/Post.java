@@ -2,18 +2,32 @@ package com.jamburger.kitter.components;
 
 import com.google.firebase.firestore.DocumentReference;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Post {
     String creator, postid, imageUrl, caption;
     List<DocumentReference> likes;
+    List<Comment> comments;
 
-    public Post(String creator, String postid, String imageUrl, String caption, List<DocumentReference> likes) {
+    public Post() {
+    }
+
+    public Post(String creator, String postid, String imageUrl, String caption) {
         this.creator = creator;
         this.postid = postid;
         this.imageUrl = imageUrl;
         this.caption = caption;
-        this.likes = likes;
+        this.likes = new ArrayList<>();
+        this.comments = new ArrayList<>();
+    }
+
+    public List<Comment> getComments() {
+        return comments;
+    }
+
+    public void setComments(List<Comment> comments) {
+        this.comments = comments;
     }
 
     public List<DocumentReference> getLikes() {
@@ -24,8 +38,6 @@ public class Post {
         this.likes = likes;
     }
 
-    public Post() {
-    }
 
     public String getPostid() {
         return postid;

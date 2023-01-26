@@ -8,9 +8,9 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.jamburger.kitter.PostActivity;
@@ -34,15 +34,9 @@ public class HomeFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
         recyclerViewPosts = view.findViewById(R.id.recyclerview_posts);
 
-
-        recyclerViewPosts.setHasFixedSize(true);
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
-        linearLayoutManager.setStackFromEnd(true);
-        linearLayoutManager.setReverseLayout(true);
-        recyclerViewPosts.setLayoutManager(linearLayoutManager);
-
         posts = new ArrayList<>();
         postAdapter = new PostAdapter(requireContext(), posts);
+        recyclerViewPosts.setHasFixedSize(true);
         recyclerViewPosts.setAdapter(postAdapter);
         readPosts();
 
@@ -56,10 +50,13 @@ public class HomeFragment extends Fragment {
     }
 
     void readPosts() {
-        FirebaseFirestore.getInstance().collection("Posts").get().addOnSuccessListener(postSnapshots -> {
+        CollectionReference postsReference = FirebaseFirestore.getInstance().collection("Posts");
+        postsReference.get().addOnSuccessListener(postSnapshots -> {
             posts.clear();
             for (DocumentSnapshot postSnapshot : postSnapshots) {
                 Post post = postSnapshot.toObject(Post.class);
+                if (post.getComments() == null)
+                    postsReference.document(post.getPostid()).update("comments", new ArrayList<>());
                 posts.add(post);
             }
             postAdapter.notifyDataSetChanged();

@@ -19,6 +19,12 @@
         android:theme="@style/Theme.Kitter"
         tools:targetApi="31">
         <activity
+            android:name=".EditInfoActivity"
+            android:exported="false" />
+        <activity
+            android:name=".CommentActivity"
+            android:exported="false" />
+        <activity
             android:name=".PostActivity"
             android:exported="false" />
         <activity
@@ -54,4 +60,5 @@
                 android:resource="@xml/file_paths" />
         </provider>
     </application>
+
 </manifest>

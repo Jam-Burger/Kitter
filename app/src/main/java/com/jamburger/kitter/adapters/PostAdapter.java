@@ -1,6 +1,7 @@
 package com.jamburger.kitter.adapters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,6 +16,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.jamburger.kitter.CommentActivity;
 import com.jamburger.kitter.R;
 import com.jamburger.kitter.components.Post;
 import com.jamburger.kitter.components.User;
@@ -28,6 +30,9 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
     FirebaseFirestore db;
     DocumentReference userReference;
     User user;
+    private static final long DOUBLE_CLICK_TIME_DELTA = 300;//milliseconds
+
+    long lastClickTime = 0;
 
     public PostAdapter(Context mContext, List<Post> mPosts) {
         this.mContext = mContext;
@@ -37,12 +42,11 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-//        mContext=parent.getContext();
-
         View view = LayoutInflater.from(mContext).inflate(R.layout.post_item, parent, false);
         db = FirebaseFirestore.getInstance();
         userReference = db.collection("Users").document(FirebaseAuth.getInstance().getUid());
         userReference.get().addOnSuccessListener(snapshot -> user = snapshot.toObject(User.class));
+        ViewHolder.userReference = userReference;
         return new ViewHolder(view);
     }
 
@@ -52,6 +56,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
 
         Glide.with(mContext).load(post.getImageUrl()).into(holder.postImage);
         holder.caption.setText(post.getCaption());
+        holder.post = post;
 
         db.collection("Users").document(post.getCreator()).get().addOnSuccessListener(documentSnapshot -> {
             user = documentSnapshot.toObject(User.class);
@@ -60,14 +65,18 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         });
 
 
-        checkIfLiked(holder, post);
-        updateHolder(holder, post);
+        holder.checkIfLiked();
+        holder.update();
 
         holder.like.setOnClickListener(v -> {
-            checkIfLiked(holder, post);
-            holder.isLiked = !holder.isLiked;
-            updateLikesData(holder, post);
-            updateHolder(holder, post);
+            holder.likePost();
+        });
+        holder.postImage.setOnClickListener(view -> {
+            long clickTime = System.currentTimeMillis();
+            if (clickTime - lastClickTime < DOUBLE_CLICK_TIME_DELTA) {
+                holder.likePost();
+            }
+            lastClickTime = clickTime;
         });
 
         DocumentReference postReference = db.collection("Posts").document(post.getPostid());
@@ -80,33 +89,17 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                     break;
                 }
             }
-            updateHolder(holder, post);
+            holder.update();
         });
         holder.save.setOnClickListener(v -> {
             updateIfSaved(holder, post);
         });
-    }
 
-
-    private void checkIfLiked(ViewHolder holder, Post post) {
-        holder.isLiked = false;
-        for (DocumentReference s : post.getLikes()) {
-            if (s.equals(userReference)) {
-                holder.isLiked = true;
-                break;
-            }
-        }
-    }
-
-    void updateLikesData(ViewHolder holder, Post post) {
-        DocumentReference postReference = db.collection("Posts").document(post.getPostid());
-        if (holder.isLiked) {
-            postReference.update("likes", FieldValue.arrayUnion(userReference));
-            post.getLikes().add(userReference);
-        } else {
-            postReference.update("likes", FieldValue.arrayRemove(userReference));
-            post.getLikes().remove(userReference);
-        }
+        holder.comment.setOnClickListener(view -> {
+            Intent intent = new Intent(mContext, CommentActivity.class);
+            intent.putExtra("postid", post.getPostid());
+            mContext.startActivity(intent);
+        });
     }
 
     private void updateIfSaved(ViewHolder holder, Post post) {
@@ -128,21 +121,8 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                 userReference.update("saved", FieldValue.arrayRemove(postReference));
                 user.getSaved().remove(postReference);
             }
-            updateHolder(holder, post);
+            holder.update();
         });
-    }
-
-    void updateHolder(ViewHolder holder, Post post) {
-        if (holder.isLiked)
-            holder.like.setImageResource(R.drawable.ic_heart);
-        else
-            holder.like.setImageResource(R.drawable.ic_heart_outlined);
-        holder.noOfLikes.setText(post.getLikes().size() + " likes");
-
-        if (holder.isSaved)
-            holder.save.setImageResource(R.drawable.ic_bookmark);
-        else
-            holder.save.setImageResource(R.drawable.ic_bookmark_outlined);
     }
 
 
@@ -154,7 +134,9 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public ImageView profileImage, like, comment, save, postImage;
         public TextView username, noOfLikes, caption;
+        public static DocumentReference userReference;
         protected boolean isLiked, isSaved;
+        public Post post;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -168,6 +150,47 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
             noOfLikes = itemView.findViewById(R.id.txt_likes);
             username = itemView.findViewById(R.id.txt_username);
             caption = itemView.findViewById(R.id.description);
+        }
+
+        void update() {
+            if (isLiked)
+                like.setImageResource(R.drawable.ic_heart);
+            else
+                like.setImageResource(R.drawable.ic_heart_outlined);
+            noOfLikes.setText(post.getLikes().size() + " likes");
+
+            if (isSaved)
+                save.setImageResource(R.drawable.ic_bookmark);
+            else
+                save.setImageResource(R.drawable.ic_bookmark_outlined);
+        }
+
+        public void likePost() {
+            checkIfLiked();
+            isLiked = !isLiked;
+            updateLikesData();
+            update();
+        }
+
+        private void checkIfLiked() {
+            isLiked = false;
+            for (DocumentReference s : post.getLikes()) {
+                if (s.equals(userReference)) {
+                    isLiked = true;
+                    break;
+                }
+            }
+        }
+
+        void updateLikesData() {
+            DocumentReference postReference = FirebaseFirestore.getInstance().collection("Posts").document(post.getPostid());
+            if (isLiked) {
+                postReference.update("likes", FieldValue.arrayUnion(userReference));
+                post.getLikes().add(userReference);
+            } else {
+                postReference.update("likes", FieldValue.arrayRemove(userReference));
+                post.getLikes().remove(userReference);
+            }
         }
     }
 }

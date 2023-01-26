@@ -24,8 +24,6 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.jamburger.kitter.components.User;
 
-import java.util.ArrayList;
-
 public class LoginActivity extends AppCompatActivity {
     EditText email, password;
     Button loginButton, googleButton;
@@ -56,17 +54,17 @@ public class LoginActivity extends AppCompatActivity {
                 , googleSignInOptions);
 
 
-//        loginButton.setOnClickListener(view -> {
-//            String strEmail = email.getText().toString();
-//            String strPassword = password.getText().toString();
-//            login(strEmail, strPassword);
-//        });
+        loginButton.setOnClickListener(view -> {
+            String strEmail = email.getText().toString();
+            String strPassword = password.getText().toString();
+            login(strEmail, strPassword);
+        });
 
-//        signupText.setOnClickListener(view -> startActivity(new Intent(LoginActivity.this, SignupActivity.class)));
-//        googleButton.setOnClickListener(view -> {
-//            Intent intent = googleSignInClient.getSignInIntent();
-//            startActivityForResult(intent, 100);
-//        });
+        signupText.setOnClickListener(view -> startActivity(new Intent(LoginActivity.this, SignupActivity.class)));
+        googleButton.setOnClickListener(view -> {
+            Intent intent = googleSignInClient.getSignInIntent();
+            startActivityForResult(intent, 100);
+        });
     }
 
     void login(String strEmail, String strPassword) {
@@ -118,8 +116,7 @@ public class LoginActivity extends AppCompatActivity {
                                         // When task is successful
                                         // Redirect to profile activity
                                         FirebaseUser currentUser = auth.getCurrentUser();
-                                        User user = new User(auth.getCurrentUser().getUid(), currentUser.getDisplayName(), currentUser.getDisplayName(), currentUser.getEmail(),
-                                                "", "", "", new ArrayList<>(), new ArrayList<>());
+                                        User user = new User(auth.getCurrentUser().getUid(), currentUser.getDisplayName(), currentUser.getDisplayName(), currentUser.getEmail(), getString(R.string.default_profile_img_url));
 
                                         usersReference.document(user.getId()).set(user)
                                                 .addOnSuccessListener(result -> {

@@ -19,7 +19,7 @@
             <item
                 android:id="@+id/nav_change_password"
                 android:icon="@drawable/ic_password"
-                android:title="Saved" />
+                android:title="Change Password" />
             <item
                 android:id="@+id/nav_logout"
                 android:icon="@drawable/ic_logout"

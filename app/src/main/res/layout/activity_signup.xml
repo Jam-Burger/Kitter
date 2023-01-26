@@ -6,6 +6,7 @@
     android:layout_centerInParent="true"
     android:orientation="vertical"
     android:paddingHorizontal="30dp"
+    android:gravity="center_vertical"
     android:visibility="visible">
 
     <TextView
