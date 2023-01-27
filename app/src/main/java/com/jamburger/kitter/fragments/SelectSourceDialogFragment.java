@@ -24,15 +24,12 @@ public class SelectSourceDialogFragment extends DialogFragment {
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle("Select from")
-                .setItems(new String[]{"Text only", "Camera", "Gallery"}, (dialog, which) -> {
+                .setItems(new String[]{"Camera", "Gallery"}, (dialog, which) -> {
                     switch (which) {
                         case 0:
-                            ((PostActivity) requireActivity()).sendTextOnly();
-                            break;
-                        case 1:
                             ((PostActivity) requireActivity()).selectFromCamera();
                             break;
-                        case 2:
+                        case 1:
                             ((PostActivity) requireActivity()).selectFromGallery();
                             break;
                     }

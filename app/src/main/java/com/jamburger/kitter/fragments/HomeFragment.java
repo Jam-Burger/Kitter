@@ -5,8 +5,8 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -25,7 +25,7 @@ public class HomeFragment extends Fragment {
 
     RecyclerView recyclerViewPosts;
     PostAdapter postAdapter;
-    ImageView postButton;
+    Toolbar toolbar;
     List<Post> posts;
 
     @Override
@@ -34,18 +34,33 @@ public class HomeFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_home, container, false);
         recyclerViewPosts = view.findViewById(R.id.recyclerview_posts);
 
+        toolbar = view.findViewById(R.id.top_menu);
+
+        toolbar.setOnMenuItemClickListener(item -> {
+            Intent intent;
+            switch (item.getItemId()) {
+                case R.id.nav_post_image:
+                    intent = new Intent(requireActivity(), PostActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    intent.putExtra("type", "picture");
+                    startActivity(intent);
+                    break;
+                case R.id.nav_post_text:
+                    intent = new Intent(requireActivity(), PostActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    intent.putExtra("type", "text");
+                    startActivity(intent);
+                    break;
+            }
+            return true;
+        });
+
         posts = new ArrayList<>();
         postAdapter = new PostAdapter(requireContext(), posts);
         recyclerViewPosts.setHasFixedSize(true);
         recyclerViewPosts.setAdapter(postAdapter);
         readPosts();
 
-        postButton = view.findViewById(R.id.btn_add_post);
-        postButton.setOnClickListener(v -> {
-            Intent intent = new Intent(requireActivity(), PostActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
-        });
         return view;
     }
 

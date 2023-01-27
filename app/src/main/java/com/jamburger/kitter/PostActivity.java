@@ -83,11 +83,18 @@ public class PostActivity extends AppCompatActivity {
             startHomeFragment();
         });
         postButton.setOnClickListener(view -> {
-            postImage();
+            publishPost();
         });
 
-        showActivity(false);
-        showDialog();
+        String type = getIntent().getStringExtra("type");
+        Toast.makeText(this, type, Toast.LENGTH_SHORT).show();
+
+        if (type.equals("picture")) {
+            showDialog();
+            showActivity(false);
+        } else {
+            caption.setHint("Enter text content");
+        }
     }
 
     void showDialog() {
@@ -129,7 +136,7 @@ public class PostActivity extends AppCompatActivity {
         }
     }
 
-    private void postImage() {
+    private void publishPost() {
         if (filePath != null) {
             ProgressDialog progressDialog = new ProgressDialog(this);
             progressDialog.setTitle("Uploading...");
@@ -200,9 +207,5 @@ public class PostActivity extends AppCompatActivity {
 
     public void selectFromGallery() {
         selectPicture();
-    }
-
-    public void sendTextOnly() {
-        showActivity(true);
     }
 }
