@@ -40,7 +40,7 @@ public class SelectSourceDialogFragment extends DialogFragment {
     @Override
     public void onCancel(@NonNull DialogInterface dialog) {
         super.onCancel(dialog);
-        ((PostActivity) getActivity()).startHomeFragment();
+        ((PostActivity) getActivity()).startMainActivity();
     }
 
 }

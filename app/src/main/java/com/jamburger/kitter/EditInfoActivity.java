@@ -104,7 +104,6 @@ public class EditInfoActivity extends AppCompatActivity {
     }
 
     private void postImage(Uri filePath) {
-        DocumentReference usersReference = FirebaseFirestore.getInstance().collection("Users").document(user.getId());
         if (filePath != null) {
             StorageReference storageReference = FirebaseStorage.getInstance().getReference();
 

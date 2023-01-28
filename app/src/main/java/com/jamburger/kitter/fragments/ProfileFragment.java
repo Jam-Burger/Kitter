@@ -193,7 +193,8 @@ public class ProfileFragment extends Fragment {
                             for (DocumentSnapshot postSnapshot : postSnapshots) {
                                 Post post = postSnapshot.toObject(Post.class);
                                 for (Post current : myPosts) {
-                                    if (!current.getPostid().equals(post.getPostid())) continue;
+                                    if (!current.getPostid().equals(post.getPostid()) || post.getImageUrl().isEmpty())
+                                        continue;
                                     posts.add(0, post);
                                     break;
                                 }

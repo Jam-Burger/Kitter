@@ -52,7 +52,7 @@ public class PostActivity extends AppCompatActivity {
                 Glide.with(this).load(filePath).into(imageView);
             }
         } else if (result.getResultCode() == Activity.RESULT_CANCELED) {
-            startHomeFragment();
+            startMainActivity();
         }
     });
     ActivityResultLauncher<Intent> fromCameraResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
@@ -60,7 +60,7 @@ public class PostActivity extends AppCompatActivity {
             showActivity(true);
             Glide.with(this).load(filePath).into(imageView);
         } else if (result.getResultCode() == Activity.RESULT_CANCELED) {
-            startHomeFragment();
+            startMainActivity();
         }
     });
 
@@ -80,14 +80,14 @@ public class PostActivity extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();
 
         closeButton.setOnClickListener(view -> {
-            startHomeFragment();
+            startMainActivity();
         });
         postButton.setOnClickListener(view -> {
             publishPost();
         });
 
         String type = getIntent().getStringExtra("type");
-        Toast.makeText(this, type, Toast.LENGTH_SHORT).show();
+//        Toast.makeText(this, type, Toast.LENGTH_SHORT).show();
 
         if (type.equals("picture")) {
             showDialog();
@@ -155,7 +155,7 @@ public class PostActivity extends AppCompatActivity {
 
                     postRef.set(post).addOnCompleteListener(task -> {
                         progressDialog.dismiss();
-                        startHomeFragment();
+                        startMainActivity();
                     });
                     db.collection("Users").document(user.getUid())
                             .update("posts", FieldValue.arrayUnion(postRef));
@@ -175,14 +175,14 @@ public class PostActivity extends AppCompatActivity {
             post.setKitt(caption.getText().toString());
             DocumentReference postRef = db.collection("Posts").document(postId);
             postRef.set(post).addOnCompleteListener(task -> {
-                startHomeFragment();
+                startMainActivity();
             });
             db.collection("Users").document(user.getUid())
                     .update("posts", FieldValue.arrayUnion(postRef));
         }
     }
 
-    public void startHomeFragment() {
+    public void startMainActivity() {
         Intent intent = new Intent(this, MainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
