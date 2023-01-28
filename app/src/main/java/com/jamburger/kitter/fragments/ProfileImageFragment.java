@@ -19,7 +19,7 @@ import com.jamburger.kitter.AddInfoActivity;
 import com.jamburger.kitter.R;
 
 public class ProfileImageFragment extends Fragment {
-    Button chooseButton, skipButton;
+    Button chooseButton;
     ImageView profileImage;
     AddInfoActivity parent;
     ActivityResultLauncher<Intent> myActivityResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
@@ -43,7 +43,6 @@ public class ProfileImageFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_profile_image, container, false);
 
         chooseButton = view.findViewById(R.id.btn_choose);
-        skipButton = view.findViewById(R.id.btn_skip);
         profileImage = view.findViewById(R.id.img_profile);
         parent.headerText.setText("Choose a profile image");
         Glide.with(requireContext())
@@ -51,9 +50,6 @@ public class ProfileImageFragment extends Fragment {
                 .into(profileImage);
         chooseButton.setOnClickListener(v -> {
             selectImage();
-        });
-        skipButton.setOnClickListener(v -> {
-            parent.nextFragment();
         });
         return view;
     }

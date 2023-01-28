@@ -6,12 +6,19 @@
     android:orientation="vertical"
     tools:context=".fragments.UsernameFragment">
 
-    <EditText
-        android:id="@+id/et_username"
+    <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginHorizontal="20dp"
         android:layout_marginTop="40dp"
-        android:hint="Username"
-        android:minHeight="48dp" />
+        android:layout_marginHorizontal="20dp"
+        android:hint="Username">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/et_username"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            android:maxLines="1"
+            android:text="username" />
+    </com.google.android.material.textfield.TextInputLayout>
 </LinearLayout>

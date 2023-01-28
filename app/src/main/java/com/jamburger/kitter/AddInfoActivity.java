@@ -1,12 +1,9 @@
 package com.jamburger.kitter;
 
-import static com.jamburger.kitter.MainActivity.TAG;
-
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -29,12 +26,12 @@ import java.util.Locale;
 
 public class AddInfoActivity extends AppCompatActivity {
 
-    public Fragments current;
+    public ImageView nextButton;
     public HashMap<String, Object> data;
     public Uri profileImagePath = null;
 
     public TextView headerText;
-    ImageView nextButton;
+    Fragments current;
     DocumentReference userReference;
 
     @Override
@@ -61,11 +58,10 @@ public class AddInfoActivity extends AppCompatActivity {
             getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, new DetailsFragment(this)).commit();
             current = Fragments.DETAILS;
         } else if (current == Fragments.DETAILS) {
-            if (profileImagePath != null) {
+            if (profileImagePath != null)
                 updateDataWithImage();
-            } else {
+            else
                 updateData();
-            }
         }
     }
 
@@ -76,15 +72,12 @@ public class AddInfoActivity extends AppCompatActivity {
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(intent);
                 finish();
-            } else {
-                Log.d(TAG, "updateData: " + task.getException().getMessage());
             }
         });
     }
 
     void updateDataWithImage() {
         StorageReference storageReference = FirebaseStorage.getInstance().getReference();
-
         ProgressDialog progressDialog = new ProgressDialog(this);
         progressDialog.setTitle("Saving Profile...");
         progressDialog.show();
@@ -95,7 +88,6 @@ public class AddInfoActivity extends AppCompatActivity {
 
         ref.putFile(profileImagePath).addOnCompleteListener(task0 -> {
             if (task0.isSuccessful()) {
-                Toast.makeText(this, "Image Uploaded!!", Toast.LENGTH_SHORT).show();
                 storageReference.child("Profile Pictures/").child(postId).getDownloadUrl().addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         data.put("profileImageUrl", task.getResult().toString());
@@ -109,7 +101,7 @@ public class AddInfoActivity extends AppCompatActivity {
             }
         }).addOnProgressListener(taskSnapshot -> {
             double progress = ((100.0 * taskSnapshot.getBytesTransferred() / taskSnapshot.getTotalByteCount()));
-            progressDialog.setMessage("Uploaded " + (int) progress + "%");
+            progressDialog.setMessage("Saving " + (int) progress + "%");
         });
     }
 
