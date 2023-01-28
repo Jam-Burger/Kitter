@@ -54,21 +54,23 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Post post = mPosts.get(position);
 
+        db.collection("Users").document(post.getCreator()).get().addOnSuccessListener(snapshot -> {
+            user = snapshot.toObject(User.class);
+            Glide.with(mContext).load(user.getProfileImageUrl()).into(holder.profileImage);
+            holder.username.setText(user.getUsername());
+
+//          db.collection("Posts").document(post.getPostid()).delete();
+
+        });
+
         holder.caption.setText(post.getCaption());
-        if (post.getKitt() != null && post.getKitt().isEmpty()) {
+        if (post.getKitt().isEmpty()) {
             Glide.with(mContext).load(post.getImageUrl()).into(holder.postImage);
         } else {
             holder.kitt.setVisibility(View.VISIBLE);
             holder.kitt.setText(post.getKitt());
         }
         holder.post = post;
-
-        db.collection("Users").document(post.getCreator()).get().addOnSuccessListener(documentSnapshot -> {
-            user = documentSnapshot.toObject(User.class);
-            Glide.with(mContext).load(user.getProfileImageUrl()).into(holder.profileImage);
-            holder.username.setText(user.getUsername());
-        });
-
 
         holder.checkIfLiked();
         holder.update();

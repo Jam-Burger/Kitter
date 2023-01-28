@@ -15,6 +15,11 @@ import com.jamburger.kitter.R;
 
 public class DetailsFragment extends Fragment {
     EditText name, bio;
+    AddInfoActivity parent;
+
+    public DetailsFragment(AddInfoActivity parent) {
+        this.parent = parent;
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -22,6 +27,7 @@ public class DetailsFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_details, container, false);
         name = view.findViewById(R.id.et_name);
         bio = view.findViewById(R.id.et_bio);
+        parent.headerText.setText("Add details");
 
         name.addTextChangedListener(new TextWatcher() {
             @Override
@@ -36,7 +42,7 @@ public class DetailsFragment extends Fragment {
 
             @Override
             public void afterTextChanged(Editable s) {
-                AddInfoActivity.data.put("name", s.toString());
+                parent.data.put("name", s.toString());
             }
         });
         bio.addTextChangedListener(new TextWatcher() {
@@ -52,7 +58,7 @@ public class DetailsFragment extends Fragment {
 
             @Override
             public void afterTextChanged(Editable s) {
-                AddInfoActivity.data.put("bio", s.toString());
+                parent.data.put("bio", s.toString());
             }
         });
         return view;

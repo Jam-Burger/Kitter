@@ -26,14 +26,14 @@ public class User {
         this.profileImageUrl = profileImageUrl;
     }
 
-    public User(String id, String name, String username, String email, String profileImageUrl) {
+    public User(String id, String name, String username, String email, String profileImageUrl, String backgroundImageUrl) {
         this.id = id;
         this.name = name;
         this.username = username;
         this.email = email;
         this.bio = "";
         this.profileImageUrl = profileImageUrl;
-        this.backgroundImageUrl = "";
+        this.backgroundImageUrl = backgroundImageUrl;
         this.posts = new ArrayList<>();
         this.saved = new ArrayList<>();
     }

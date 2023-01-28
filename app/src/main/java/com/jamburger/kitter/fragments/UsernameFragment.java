@@ -16,12 +16,19 @@ import com.jamburger.kitter.R;
 public class UsernameFragment extends Fragment {
 
     EditText username;
+    AddInfoActivity parent;
+
+    public UsernameFragment(AddInfoActivity parent) {
+        this.parent = parent;
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_username, container, false);
         username = view.findViewById(R.id.et_username);
+        parent.headerText.setText("Choose a username");
+
         username.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -35,7 +42,7 @@ public class UsernameFragment extends Fragment {
 
             @Override
             public void afterTextChanged(Editable s) {
-                AddInfoActivity.data.put("username", s.toString());
+                parent.data.put("username", s.toString());
             }
         });
         return view;

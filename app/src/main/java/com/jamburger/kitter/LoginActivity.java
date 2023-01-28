@@ -18,7 +18,6 @@ import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -74,10 +73,7 @@ public class LoginActivity extends AppCompatActivity {
         }
         auth.signInWithEmailAndPassword(strEmail, strPassword).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
-                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(intent);
-                finish();
+                startMainActivity();
             } else {
                 Toast.makeText(LoginActivity.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
             }
@@ -88,7 +84,6 @@ public class LoginActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 100) {
-            // Initialize task
             Task<GoogleSignInAccount> signInAccountTask = GoogleSignIn
                     .getSignedInAccountFromIntent(data);
 
@@ -104,16 +99,16 @@ public class LoginActivity extends AppCompatActivity {
                         auth.signInWithCredential(authCredential)
                                 .addOnCompleteListener(this, task -> {
                                     if (task.isSuccessful()) {
-                                        FirebaseUser currentUser = auth.getCurrentUser();
-                                        usersReference.document(currentUser.getUid()).get().addOnCompleteListener(task1 -> {
+                                        usersReference.document(auth.getUid()).get().addOnCompleteListener(task1 -> {
                                             if (task1.isSuccessful()) {
                                                 User user = task1.getResult().toObject(User.class);
                                                 if (user != null) {
                                                     startMainActivity();
                                                 } else {
+                                                    user = new User(auth.getUid(), "", "", googleSignInAccount.getEmail(), getResources().getString(R.string.default_profile_img_url), getResources().getString(R.string.default_background_img_url));
+                                                    usersReference.document(auth.getUid()).set(user);
                                                     startAddInfoActivity();
                                                 }
-                                                Toast.makeText(this, "" + (user == null), Toast.LENGTH_SHORT).show();
                                             }
                                         });
                                     } else {
@@ -142,15 +137,5 @@ public class LoginActivity extends AppCompatActivity {
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
         finish();
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
-            startMainActivity();
-            auth.signOut();
-            googleSignInClient.signOut();
-        }
     }
 }

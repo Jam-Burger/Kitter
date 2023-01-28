@@ -32,15 +32,16 @@ public class EditInfoActivity extends AppCompatActivity {
     DocumentReference userReference;
     EditText name, username, bio;
     ImageView profileImage;
+    Uri profileImageUri = null;
+    HashMap<String, Object> data = new HashMap<>();
     ImageView saveInfoButton, closeButton, profileImageEditButton;
 
     ActivityResultLauncher<Intent> myActivityResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
         if (result.getResultCode() == Activity.RESULT_OK) {
             Intent data = result.getData();
             if (data != null && data.getData() != null) {
-                Uri uri = data.getData();
-                Glide.with(this).load(uri).into(profileImage);
-                postImage(uri);
+                profileImageUri = data.getData();
+                Glide.with(this).load(profileImageUri).into(profileImage);
             }
         }
     });
@@ -67,19 +68,25 @@ public class EditInfoActivity extends AppCompatActivity {
             finish();
         });
         saveInfoButton.setOnClickListener(view -> {
-            HashMap<String, Object> map = new HashMap<>();
-            map.put("name", name.getText().toString());
-            map.put("username", username.getText().toString());
-            map.put("bio", bio.getText().toString());
-            userReference.update(map).addOnCompleteListener(task -> {
-                if (task.isSuccessful()) {
-                    Intent intent = new Intent(this, MainActivity.class);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    MainActivity.selectorFragment = new ProfileFragment();
-                    startActivity(intent);
-                    finish();
-                }
-            });
+            data.put("name", name.getText().toString());
+            data.put("username", username.getText().toString());
+            data.put("bio", bio.getText().toString());
+            if (profileImageUri != null)
+                updateImageAndData();
+            else
+                updateData();
+        });
+    }
+
+    private void updateData() {
+        userReference.update(data).addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                Intent intent = new Intent(this, MainActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                MainActivity.selectorFragment = new ProfileFragment();
+                startActivity(intent);
+                finish();
+            }
         });
     }
 
@@ -103,33 +110,32 @@ public class EditInfoActivity extends AppCompatActivity {
         myActivityResultLauncher.launch(Intent.createChooser(intent, "Select Picture"));
     }
 
-    private void postImage(Uri filePath) {
-        if (filePath != null) {
-            StorageReference storageReference = FirebaseStorage.getInstance().getReference();
+    private void updateImageAndData() {
+        StorageReference storageReference = FirebaseStorage.getInstance().getReference();
 
-            ProgressDialog progressDialog = new ProgressDialog(this);
-            progressDialog.setTitle("Uploading...");
-            progressDialog.show();
+        ProgressDialog progressDialog = new ProgressDialog(this);
+        progressDialog.setTitle("Saving Profile...");
+        progressDialog.show();
 
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss", Locale.CHINA);
-            String postId = sdf.format(new Date());
-            StorageReference ref = storageReference.child("Profile Pictures/" + postId);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss", Locale.CHINA);
+        String postId = sdf.format(new Date());
+        StorageReference ref = storageReference.child("Profile Pictures/" + postId);
 
-            ref.putFile(filePath).addOnSuccessListener(snapshot -> {
-                Toast.makeText(this, "Image Uploaded!!", Toast.LENGTH_SHORT).show();
-                storageReference.child("Profile Pictures/").child(postId).getDownloadUrl().addOnSuccessListener(uri -> {
-                    userReference.update("profileImageUrl", uri.toString()).addOnCompleteListener(task -> {
-                        progressDialog.dismiss();
-                    });
-                }).addOnFailureListener(e -> progressDialog.dismiss());
-            }).addOnFailureListener(e -> {
+        ref.putFile(profileImageUri).addOnSuccessListener(snapshot -> {
+            Toast.makeText(this, "Image Uploaded!!", Toast.LENGTH_SHORT).show();
+            storageReference.child("Profile Pictures/").child(postId).getDownloadUrl().addOnSuccessListener(uri -> {
+                data.put("profileImageUrl", uri.toString());
+                updateData();
                 progressDialog.dismiss();
-                Toast.makeText(this, "Failed " + e.getMessage(), Toast.LENGTH_SHORT).show();
-            }).addOnProgressListener(taskSnapshot -> {
-                double progress =
-                        ((100.0 * taskSnapshot.getBytesTransferred() / taskSnapshot.getTotalByteCount()));
-                progressDialog.setMessage("Uploaded " + (int) progress + "%");
-            });
-        }
+            }).addOnFailureListener(e -> progressDialog.dismiss());
+        }).addOnFailureListener(e -> {
+            progressDialog.dismiss();
+            Toast.makeText(this, "Failed " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }).addOnProgressListener(taskSnapshot -> {
+            double progress =
+                    ((100.0 * taskSnapshot.getBytesTransferred() / taskSnapshot.getTotalByteCount()));
+            progressDialog.setMessage("Uploaded " + (int) progress + "%");
+        });
+
     }
 }

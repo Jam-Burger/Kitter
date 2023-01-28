@@ -55,7 +55,7 @@ public class SignupEmailActivity extends AppCompatActivity {
         pd.setMessage("Please Wait");
         pd.show();
         auth.createUserWithEmailAndPassword(strEmail, strPassword).addOnSuccessListener(authResult -> {
-            User user = new User(auth.getCurrentUser().getUid(), "", "", strEmail, "");
+            User user = new User(auth.getCurrentUser().getUid(), "", "", strEmail, getResources().getString(R.string.default_profile_img_url), getResources().getString(R.string.default_background_img_url));
             db.collection("Users").document(user.getId()).set(user).addOnSuccessListener(result -> {
                 Intent intent = new Intent(SignupEmailActivity.this, AddInfoActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
