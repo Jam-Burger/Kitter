@@ -44,7 +44,6 @@
             android:layout_centerVertical="true"
             android:contentDescription="post button"
             android:src="@drawable/ic_arrow"
-            android:tint="@color/inverted"
             tools:ignore="UseAppTint" />
     </RelativeLayout>
 
@@ -63,14 +62,20 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
-    <EditText
-        android:id="@+id/et_caption"
+    <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="10dp"
         android:layout_marginTop="10dp"
-        android:hint="Add Caption"
-        android:maxLines="5"
-        android:minHeight="48dp" />
+        android:id="@+id/layout_caption"
+        android:hint="Add Caption">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/et_caption"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            android:maxLines="5" />
+    </com.google.android.material.textfield.TextInputLayout>
 
 </LinearLayout>

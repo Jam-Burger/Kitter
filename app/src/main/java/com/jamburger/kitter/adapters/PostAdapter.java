@@ -30,7 +30,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
     FirebaseFirestore db;
     DocumentReference userReference;
     User user;
-    private static final long DOUBLE_CLICK_TIME_DELTA = 300;//milliseconds
+    private static final long DOUBLE_CLICK_TIME_DELTA = 300; //milliseconds
 
     long lastClickTime = 0;
 
@@ -58,14 +58,11 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
             user = snapshot.toObject(User.class);
             Glide.with(mContext).load(user.getProfileImageUrl()).into(holder.profileImage);
             holder.username.setText(user.getUsername());
-
-//          db.collection("Posts").document(post.getPostid()).delete();
-
         });
-
-        holder.caption.setText(post.getCaption());
         if (post.getKitt().isEmpty()) {
             Glide.with(mContext).load(post.getImageUrl()).into(holder.postImage);
+            holder.caption.setVisibility(View.VISIBLE);
+            holder.caption.setText(post.getCaption());
         } else {
             holder.kitt.setVisibility(View.VISIBLE);
             holder.kitt.setText(post.getKitt());
@@ -157,16 +154,18 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         }
 
         void update() {
-            if (isLiked)
-                like.setImageResource(R.drawable.ic_heart);
-            else
-                like.setImageResource(R.drawable.ic_heart_outlined);
-            noOfLikes.setText(post.getLikes().size() + " likes");
-
-            if (isSaved)
-                save.setImageResource(R.drawable.ic_bookmark);
-            else
-                save.setImageResource(R.drawable.ic_bookmark_outlined);
+            if (isLiked) like.setImageResource(R.drawable.ic_heart);
+            else like.setImageResource(R.drawable.ic_heart_outlined);
+            int n = post.getLikes().size();
+            if (n > 0) {
+                noOfLikes.setVisibility(View.VISIBLE);
+                String str = n + (n > 1 ? " likes" : " like");
+                noOfLikes.setText(str);
+            } else {
+                noOfLikes.setVisibility(View.GONE);
+            }
+            if (isSaved) save.setImageResource(R.drawable.ic_bookmark);
+            else save.setImageResource(R.drawable.ic_bookmark_outlined);
         }
 
         public void likePost() {

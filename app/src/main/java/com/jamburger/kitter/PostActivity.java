@@ -2,12 +2,14 @@ package com.jamburger.kitter;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -18,6 +20,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
 
 import com.bumptech.glide.Glide;
+import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
@@ -83,17 +86,18 @@ public class PostActivity extends AppCompatActivity {
             startMainActivity();
         });
         postButton.setOnClickListener(view -> {
+            closeKeyboard();
             publishPost();
         });
 
         String type = getIntent().getStringExtra("type");
-//        Toast.makeText(this, type, Toast.LENGTH_SHORT).show();
 
         if (type.equals("picture")) {
             showDialog();
             showActivity(false);
         } else {
-            caption.setHint("Enter text content");
+            TextInputLayout captionLayout = findViewById(R.id.layout_caption);
+            captionLayout.setHint("Enter text content");
         }
     }
 
@@ -115,6 +119,14 @@ public class PostActivity extends AppCompatActivity {
 
         currentPhotoPath = image.getAbsolutePath();
         return image;
+    }
+
+    private void closeKeyboard() {
+        View view = this.getCurrentFocus();
+        if (view != null) {
+            InputMethodManager manager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            manager.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
     }
 
     private void takePicture() {

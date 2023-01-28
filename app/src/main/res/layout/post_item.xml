@@ -94,15 +94,15 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/btn_like"
             android:layout_marginTop="5dp"
-            android:text="69 likes"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:visibility="gone" />
 
         <TextView
             android:id="@+id/description"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/txt_likes"
-            android:text="Damn! Gavi is too hott🔥🔥" />
+            android:visibility="gone" />
     </RelativeLayout>
 
     <com.google.android.material.divider.MaterialDivider

@@ -3,6 +3,10 @@ package com.jamburger.kitter;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
@@ -25,7 +29,6 @@ public class StartActivity extends AppCompatActivity {
 
 
         SharedPreferences sharedPreferences = getSharedPreferences("sharedPrefs", MODE_PRIVATE);
-        final SharedPreferences.Editor editor = sharedPreferences.edit();
         final boolean isDarkModeOn = sharedPreferences.getBoolean("isDarkModeOn", true);
         if (isDarkModeOn) {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
@@ -46,32 +49,30 @@ public class StartActivity extends AppCompatActivity {
             userReference.get().addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
                     User user = task.getResult().toObject(User.class);
+                    Intent intent;
                     if (user != null) {
                         if (user.getUsername().isEmpty()) {
-                            Intent intent = new Intent(this, AddInfoActivity.class);
-                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                            startActivity(intent);
-                            finish();
-
+                            intent = new Intent(this, AddInfoActivity.class);
                         } else {
-                            Intent intent = new Intent(this, MainActivity.class);
-                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                            startActivity(intent);
-                            finish();
+                            intent = new Intent(this, MainActivity.class);
                         }
-
                     } else {
                         auth.signOut();
                         gsc.signOut();
-                        Intent intent = new Intent(this, LoginActivity.class);
-                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                        startActivity(intent);
-                        finish();
+                        intent = new Intent(this, LoginActivity.class);
                     }
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    startActivity(intent);
+                    finish();
                 }
             });
         }
 
+        Animation logoAnimation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.logo_animation);
+        Animation appNameAnimation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.app_name_animation);
+        ImageView logo = findViewById(R.id.img_logo);
+        TextView appName = findViewById(R.id.txt_appname);
+        logo.startAnimation(logoAnimation);
+        appName.startAnimation(appNameAnimation);
     }
-
 }
