@@ -59,15 +59,19 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
             Glide.with(mContext).load(user.getProfileImageUrl()).into(holder.profileImage);
             holder.username.setText(user.getUsername());
         });
+
+        holder.post = post;
+        Glide.with(mContext).load(post.getImageUrl()).into(holder.postImage);
+        holder.caption.setText(post.getCaption());
+        holder.kitt.setText(post.getKitt());
+
         if (post.getKitt().isEmpty()) {
-            Glide.with(mContext).load(post.getImageUrl()).into(holder.postImage);
+            holder.kitt.setVisibility(View.GONE);
             holder.caption.setVisibility(View.VISIBLE);
-            holder.caption.setText(post.getCaption());
         } else {
             holder.kitt.setVisibility(View.VISIBLE);
-            holder.kitt.setText(post.getKitt());
+            holder.caption.setVisibility(View.GONE);
         }
-        holder.post = post;
 
         holder.checkIfLiked();
         holder.update();
@@ -149,7 +153,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
 
             noOfLikes = itemView.findViewById(R.id.txt_likes);
             username = itemView.findViewById(R.id.txt_username);
-            caption = itemView.findViewById(R.id.description);
+            caption = itemView.findViewById(R.id.caption);
             kitt = itemView.findViewById(R.id.txt_kitt);
         }
 

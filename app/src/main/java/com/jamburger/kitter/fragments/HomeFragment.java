@@ -28,6 +28,7 @@ public class HomeFragment extends Fragment {
     Toolbar toolbar;
     List<Post> posts;
 
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
@@ -60,9 +61,9 @@ public class HomeFragment extends Fragment {
         recyclerViewPosts.setHasFixedSize(true);
         recyclerViewPosts.setAdapter(postAdapter);
         readPosts();
-
         return view;
     }
+
 
     void readPosts() {
         CollectionReference postsReference = FirebaseFirestore.getInstance().collection("Posts");
@@ -70,10 +71,10 @@ public class HomeFragment extends Fragment {
             posts.clear();
             for (DocumentSnapshot postSnapshot : postSnapshots) {
                 Post post = postSnapshot.toObject(Post.class);
-                if (post.getComments() == null)
-                    postsReference.document(post.getPostid()).update("comments", new ArrayList<>());
-                if (post.getKitt() == null)
-                    postsReference.document(post.getPostid()).update("kitt", "");
+//                if (post.getComments() == null)
+//                    postsReference.document(post.getPostid()).update("comments", new ArrayList<>());
+//                if (post.getKitt() == null)
+//                    postsReference.document(post.getPostid()).update("kitt", "");
                 posts.add(post);
             }
             postAdapter.notifyDataSetChanged();

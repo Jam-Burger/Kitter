@@ -6,36 +6,37 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class User {
-    String id, name, username, email, bio, profileImageUrl, backgroundImageUrl;
+    String id;
+    String name;
+    String username;
+    String email;
+    String bio;
+    String profileImageUrl;
+    String backgroundImageUrl;
+    String password;
     List<DocumentReference> posts;
     List<DocumentReference> saved;
+
 
     public User() {
 
     }
 
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public void setBio(String bio) {
-        this.bio = bio;
-    }
-
-    public void setProfileImageUrl(String profileImageUrl) {
-        this.profileImageUrl = profileImageUrl;
-    }
-
-    public User(String id, String name, String username, String email, String profileImageUrl, String backgroundImageUrl) {
+    public User(String id, String name, String username, String email, String password, String profileImageUrl, String backgroundImageUrl) {
         this.id = id;
         this.name = name;
         this.username = username;
         this.email = email;
-        this.bio = "";
+        this.password = password;
         this.profileImageUrl = profileImageUrl;
         this.backgroundImageUrl = backgroundImageUrl;
+        this.bio = "";
         this.posts = new ArrayList<>();
         this.saved = new ArrayList<>();
+    }
+
+    public String getPassword() {
+        return password;
     }
 
     public List<DocumentReference> getSaved() {

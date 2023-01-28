@@ -1,9 +1,13 @@
 package com.jamburger.kitter;
 
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.InputType;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -25,7 +29,7 @@ import com.jamburger.kitter.components.User;
 
 public class LoginActivity extends AppCompatActivity {
     EditText email, password;
-    Button loginButton, googleButton;
+    Button loginButton, googleButton, forgetPasswordButton;
     TextView signupText;
     FirebaseAuth auth;
     GoogleSignInClient googleSignInClient;
@@ -40,6 +44,7 @@ public class LoginActivity extends AppCompatActivity {
         password = findViewById(R.id.et_password);
         loginButton = findViewById(R.id.btn_login);
         googleButton = findViewById(R.id.btn_google);
+        forgetPasswordButton = findViewById(R.id.btn_forget_password);
         signupText = findViewById(R.id.txt_signup);
 
         auth = FirebaseAuth.getInstance();
@@ -64,6 +69,9 @@ public class LoginActivity extends AppCompatActivity {
             Intent intent = googleSignInClient.getSignInIntent();
             startActivityForResult(intent, 100);
         });
+        forgetPasswordButton.setOnClickListener(view -> {
+            showRecoverPasswordDialog();
+        });
     }
 
     void login(String strEmail, String strPassword) {
@@ -74,6 +82,44 @@ public class LoginActivity extends AppCompatActivity {
         auth.signInWithEmailAndPassword(strEmail, strPassword).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 startMainActivity();
+            } else {
+                Toast.makeText(LoginActivity.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    void showRecoverPasswordDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Recover Password");
+        LinearLayout linearLayout = new LinearLayout(this);
+        final EditText emailEt = new EditText(this);
+
+        emailEt.setText(email.getText());
+        emailEt.setMinEms(16);
+        emailEt.setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
+        linearLayout.addView(emailEt);
+        linearLayout.setPadding(10, 10, 10, 10);
+        builder.setView(linearLayout);
+
+        builder.setPositiveButton("Recover", (dialog, which) -> {
+            String email = emailEt.getText().toString().trim();
+            beginRecovery(email);
+        });
+
+        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss());
+        builder.create().show();
+    }
+
+    private void beginRecovery(String email) {
+        ProgressDialog loadingBar = new ProgressDialog(this);
+        loadingBar.setMessage("Sending Email....");
+        loadingBar.setCanceledOnTouchOutside(false);
+        loadingBar.show();
+
+        auth.sendPasswordResetEmail(email).addOnCompleteListener(task -> {
+            loadingBar.dismiss();
+            if (task.isSuccessful()) {
+                Toast.makeText(LoginActivity.this, "Recovery email sent", Toast.LENGTH_SHORT).show();
             } else {
                 Toast.makeText(LoginActivity.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
             }
@@ -105,7 +151,7 @@ public class LoginActivity extends AppCompatActivity {
                                                 if (user != null) {
                                                     startMainActivity();
                                                 } else {
-                                                    user = new User(auth.getUid(), "", "", googleSignInAccount.getEmail(), getResources().getString(R.string.default_profile_img_url), getResources().getString(R.string.default_background_img_url));
+                                                    user = new User(auth.getUid(), "", "", googleSignInAccount.getEmail(), "", getResources().getString(R.string.default_profile_img_url), getResources().getString(R.string.default_background_img_url));
                                                     usersReference.document(auth.getUid()).set(user);
                                                     startAddInfoActivity();
                                                 }
