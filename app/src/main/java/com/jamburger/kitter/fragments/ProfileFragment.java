@@ -1,6 +1,7 @@
 package com.jamburger.kitter.fragments;
 
 import static android.content.Context.MODE_PRIVATE;
+import static com.jamburger.kitter.MainActivity.bottomNavigationView;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -40,6 +41,7 @@ import com.jamburger.kitter.EditInfoActivity;
 import com.jamburger.kitter.LoginActivity;
 import com.jamburger.kitter.MainActivity;
 import com.jamburger.kitter.R;
+import com.jamburger.kitter.SavedPostsActivity;
 import com.jamburger.kitter.adapters.MyPostAdapter;
 import com.jamburger.kitter.components.Post;
 import com.jamburger.kitter.components.User;
@@ -113,7 +115,8 @@ public class ProfileFragment extends Fragment {
                     startActivity(new Intent(requireActivity(), EditInfoActivity.class));
                     break;
                 case R.id.nav_saved:
-                    Toast.makeText(requireContext(), "In Development", Toast.LENGTH_SHORT).show();
+                    Intent intent0 = new Intent(requireActivity(), SavedPostsActivity.class);
+                    startActivity(intent0);
                     break;
                 case R.id.nav_change_password:
                     break;
@@ -121,6 +124,7 @@ public class ProfileFragment extends Fragment {
                     Intent intent1 = new Intent(requireActivity(), MainActivity.class);
                     intent1.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     MainActivity.selectorFragment = new ProfileFragment();
+                    bottomNavigationView.getMenu().findItem(R.id.nav_profile).setChecked(true);
                     startActivity(intent1);
                     requireActivity().finish();
 

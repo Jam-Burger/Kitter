@@ -75,9 +75,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         holder.checkIfLiked();
         holder.update();
 
-        holder.like.setOnClickListener(v -> {
-            holder.likePost();
-        });
+        holder.like.setOnClickListener(v -> holder.likePost());
         holder.postImage.setOnClickListener(view -> {
             long clickTime = System.currentTimeMillis();
             if (clickTime - lastClickTime < DOUBLE_CLICK_TIME_DELTA) {
@@ -98,9 +96,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
             }
             holder.update();
         });
-        holder.save.setOnClickListener(v -> {
-            updateIfSaved(holder, post);
-        });
+        holder.save.setOnClickListener(v -> updateIfSaved(holder, post));
 
         holder.comment.setOnClickListener(view -> {
             Intent intent = new Intent(mContext, CommentActivity.class);

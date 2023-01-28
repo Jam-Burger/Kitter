@@ -16,7 +16,7 @@ import com.jamburger.kitter.fragments.SearchFragment;
 
 public class MainActivity extends AppCompatActivity {
     public static final String TAG = "com.jamburger.kitter";
-    BottomNavigationView bottomNavigationView;
+    public static BottomNavigationView bottomNavigationView;
     public static Fragment selectorFragment = null;
     FirebaseUser user;
 
@@ -55,6 +55,5 @@ public class MainActivity extends AppCompatActivity {
 
     public void startFragment(Fragment fragment) {
         getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, fragment).commit();
-        bottomNavigationView.getMenu().getItem(R.id.nav_profile).setChecked(true);
     }
 }

@@ -1,5 +1,7 @@
 package com.jamburger.kitter;
 
+import static com.jamburger.kitter.MainActivity.bottomNavigationView;
+
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -83,6 +85,7 @@ public class EditInfoActivity extends AppCompatActivity {
             if (task.isSuccessful()) {
                 Intent intent = new Intent(this, MainActivity.class);
                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                bottomNavigationView.getMenu().findItem(R.id.nav_profile).setChecked(true);
                 MainActivity.selectorFragment = new ProfileFragment();
                 startActivity(intent);
                 finish();
