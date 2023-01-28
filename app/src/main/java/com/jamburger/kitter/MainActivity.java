@@ -28,7 +28,6 @@ public class MainActivity extends AppCompatActivity {
         bottomNavigationView = findViewById(R.id.bottom_navigation);
 
         user = FirebaseAuth.getInstance().getCurrentUser();
-
         bottomNavigationView.setOnItemSelectedListener(item -> {
             switch (item.getItemId()) {
                 case R.id.nav_home:
@@ -47,10 +46,15 @@ public class MainActivity extends AppCompatActivity {
             return true;
         });
         if (selectorFragment != null) {
-            getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, selectorFragment).commit();
+            startFragment(selectorFragment);
             selectorFragment = null;
         } else {
-            getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, new HomeFragment()).commit();
+            startFragment(new HomeFragment());
         }
+    }
+
+    public void startFragment(Fragment fragment) {
+        getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, fragment).commit();
+        bottomNavigationView.getMenu().getItem(R.id.nav_profile).setChecked(true);
     }
 }

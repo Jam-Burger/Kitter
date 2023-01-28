@@ -1,12 +1,16 @@
 package com.jamburger.kitter.fragments;
 
+import static android.content.Context.MODE_PRIVATE;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -16,6 +20,7 @@ import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
@@ -33,6 +38,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.jamburger.kitter.EditInfoActivity;
 import com.jamburger.kitter.LoginActivity;
+import com.jamburger.kitter.MainActivity;
 import com.jamburger.kitter.R;
 import com.jamburger.kitter.adapters.MyPostAdapter;
 import com.jamburger.kitter.components.Post;
@@ -87,7 +93,19 @@ public class ProfileFragment extends Fragment {
         username = view.findViewById(R.id.txt_username);
         bio = view.findViewById(R.id.txt_bio);
 
+        SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("sharedPrefs", MODE_PRIVATE);
+        final SharedPreferences.Editor editor = sharedPreferences.edit();
+        final boolean isDarkModeOn = sharedPreferences.getBoolean("isDarkModeOn", true);
         toolbar = view.findViewById(R.id.top_menu);
+
+        MenuItem themeItem = toolbar.getMenu().findItem(R.id.nav_change_theme);
+        if (isDarkModeOn) {
+            themeItem.setTitle("Dark Mode");
+            themeItem.setIcon(R.drawable.ic_dark);
+        } else {
+            themeItem.setTitle("Light Mode");
+            themeItem.setIcon(R.drawable.ic_light);
+        }
 
         toolbar.setOnMenuItemClickListener(item -> {
             switch (item.getItemId()) {
@@ -99,13 +117,28 @@ public class ProfileFragment extends Fragment {
                     break;
                 case R.id.nav_change_password:
                     break;
+                case R.id.nav_change_theme:
+                    Intent intent1 = new Intent(requireActivity(), MainActivity.class);
+                    intent1.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    MainActivity.selectorFragment = new ProfileFragment();
+                    startActivity(intent1);
+                    requireActivity().finish();
+
+                    if (isDarkModeOn) {
+                        editor.putBoolean("isDarkModeOn", false).apply();
+                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                    } else {
+                        editor.putBoolean("isDarkModeOn", true).apply();
+                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                    }
+                    break;
                 case R.id.nav_logout:
                     googleSignInClient.signOut().addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
                             FirebaseAuth.getInstance().signOut();
-                            Intent intent = new Intent(requireActivity(), LoginActivity.class);
-                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                            startActivity(intent);
+                            Intent intent2 = new Intent(requireActivity(), LoginActivity.class);
+                            intent2.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            startActivity(intent2);
                             requireActivity().finish();
                         }
                     });

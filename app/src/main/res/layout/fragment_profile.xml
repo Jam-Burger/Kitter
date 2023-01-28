@@ -19,7 +19,7 @@
             android:id="@+id/top_menu"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:menu="@menu/top_menu">
+            app:menu="@menu/profile_top_menu">
 
             <TextView
                 android:id="@+id/txt_username"
