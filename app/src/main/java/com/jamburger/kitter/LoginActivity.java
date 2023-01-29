@@ -95,15 +95,16 @@ public class LoginActivity extends AppCompatActivity {
         final EditText emailEt = new EditText(this);
 
         emailEt.setText(email.getText());
-        emailEt.setMinEms(16);
+        emailEt.setMinEms(14);
+        emailEt.setHint("E-mail");
         emailEt.setInputType(InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS);
         linearLayout.addView(emailEt);
-        linearLayout.setPadding(10, 10, 10, 10);
+        linearLayout.setPadding(30, 20, 30, 10);
         builder.setView(linearLayout);
 
         builder.setPositiveButton("Recover", (dialog, which) -> {
             String email = emailEt.getText().toString().trim();
-            beginRecovery(email);
+            if (!email.isEmpty()) beginRecovery(email);
         });
 
         builder.setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss());

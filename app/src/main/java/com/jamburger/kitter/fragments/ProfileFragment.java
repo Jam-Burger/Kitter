@@ -5,6 +5,7 @@ import static com.jamburger.kitter.MainActivity.bottomNavigationView;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -15,6 +16,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -62,7 +64,6 @@ public class ProfileFragment extends Fragment {
     FirebaseFirestore db;
     FirebaseUser user;
     GoogleSignInClient googleSignInClient;
-
     List<Post> posts;
     ActivityResultLauncher<Intent> myActivityResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
         if (result.getResultCode() == Activity.RESULT_OK) {
@@ -115,19 +116,18 @@ public class ProfileFragment extends Fragment {
                     startActivity(new Intent(requireActivity(), EditInfoActivity.class));
                     break;
                 case R.id.nav_saved:
-                    Intent intent0 = new Intent(requireActivity(), SavedPostsActivity.class);
-                    startActivity(intent0);
+                    startActivity(new Intent(requireActivity(), SavedPostsActivity.class));
                     break;
                 case R.id.nav_change_password:
+                    showRecoverPasswordDialog();
                     break;
                 case R.id.nav_change_theme:
-                    Intent intent1 = new Intent(requireActivity(), MainActivity.class);
-                    intent1.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                    Intent intentMain = new Intent(requireActivity(), MainActivity.class);
+                    intentMain.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     MainActivity.selectorFragment = new ProfileFragment();
                     bottomNavigationView.getMenu().findItem(R.id.nav_profile).setChecked(true);
-                    startActivity(intent1);
+                    startActivity(intentMain);
                     requireActivity().finish();
-
                     if (isDarkModeOn) {
                         editor.putBoolean("isDarkModeOn", false).apply();
                         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
@@ -140,9 +140,9 @@ public class ProfileFragment extends Fragment {
                     googleSignInClient.signOut().addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
                             FirebaseAuth.getInstance().signOut();
-                            Intent intent2 = new Intent(requireActivity(), LoginActivity.class);
-                            intent2.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                            startActivity(intent2);
+                            Intent intentLogin = new Intent(requireActivity(), LoginActivity.class);
+                            intentLogin.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            startActivity(intentLogin);
                             requireActivity().finish();
                         }
                     });
@@ -165,6 +165,44 @@ public class ProfileFragment extends Fragment {
             selectImage();
         });
         return view;
+    }
+
+    void showRecoverPasswordDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setTitle("Change Password");
+        String email = user.getEmail();
+
+        final LinearLayout linearLayout = new LinearLayout(getContext());
+        final TextView emailEt = new TextView(getContext());
+        final String txt = "We will send change password link to :\n" + email;
+        emailEt.setText(txt);
+        emailEt.setMinEms(16);
+        linearLayout.setPadding(50, 20, 50, 0);
+        linearLayout.addView(emailEt);
+        builder.setView(linearLayout);
+
+        builder.setPositiveButton("Confirm", (dialog, which) -> {
+            beginRecovery(email);
+        });
+
+        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss());
+        builder.create().show();
+    }
+
+    private void beginRecovery(String email) {
+        ProgressDialog loadingBar = new ProgressDialog(getContext());
+        loadingBar.setMessage("Sending Email....");
+        loadingBar.setCanceledOnTouchOutside(false);
+        loadingBar.show();
+
+        FirebaseAuth.getInstance().sendPasswordResetEmail(email).addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                Toast.makeText(requireContext(), "Link sent on " + email, Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(requireContext(), task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+            }
+            loadingBar.dismiss();
+        });
     }
 
     private void postImage(Uri filePath) {
