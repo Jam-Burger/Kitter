@@ -15,11 +15,11 @@ import com.jamburger.kitter.components.Post;
 
 import java.util.List;
 
-public class MyPostAdapter extends RecyclerView.Adapter<MyPostAdapter.ViewHolder> {
+public class MyPictureAdapter extends RecyclerView.Adapter<MyPictureAdapter.ViewHolder> {
     Context mContext;
     List<Post> mPosts;
 
-    public MyPostAdapter(Context mContext, List<Post> mPosts) {
+    public MyPictureAdapter(Context mContext, List<Post> mPosts) {
         this.mContext = mContext;
         this.mPosts = mPosts;
     }
@@ -27,8 +27,8 @@ public class MyPostAdapter extends RecyclerView.Adapter<MyPostAdapter.ViewHolder
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(mContext).inflate(R.layout.mypost_item, parent, false);
-        return new MyPostAdapter.ViewHolder(view);
+        View view = LayoutInflater.from(mContext).inflate(R.layout.my_post_item, parent, false);
+        return new MyPictureAdapter.ViewHolder(view);
     }
 
     @Override

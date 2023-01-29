@@ -26,6 +26,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -44,7 +45,8 @@ import com.jamburger.kitter.LoginActivity;
 import com.jamburger.kitter.MainActivity;
 import com.jamburger.kitter.R;
 import com.jamburger.kitter.SavedPostsActivity;
-import com.jamburger.kitter.adapters.MyPostAdapter;
+import com.jamburger.kitter.adapters.MyKittAdapter;
+import com.jamburger.kitter.adapters.MyPictureAdapter;
 import com.jamburger.kitter.components.Post;
 import com.jamburger.kitter.components.User;
 
@@ -59,12 +61,15 @@ public class ProfileFragment extends Fragment {
     TextView name, username, bio;
     Toolbar toolbar;
     DocumentReference userdata;
-    RecyclerView recyclerViewPosts;
-    MyPostAdapter myPostAdapter;
+    public MyPictureAdapter myPictureAdapter;
+    public MyKittAdapter myKittAdapter;
     FirebaseFirestore db;
     FirebaseUser user;
     GoogleSignInClient googleSignInClient;
-    List<Post> posts;
+    ImageView picturesButton, kittsButton;
+    RecyclerView recyclerViewMyPosts;
+    List<Post> pictures;
+    List<Post> kitts;
     ActivityResultLauncher<Intent> myActivityResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
         if (result.getResultCode() == Activity.RESULT_OK) {
             Intent data = result.getData();
@@ -96,6 +101,9 @@ public class ProfileFragment extends Fragment {
         username = view.findViewById(R.id.txt_username);
         bio = view.findViewById(R.id.txt_bio);
 
+        picturesButton = view.findViewById(R.id.btn_my_pictures);
+        kittsButton = view.findViewById(R.id.btn_my_kitts);
+
         SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("sharedPrefs", MODE_PRIVATE);
         final SharedPreferences.Editor editor = sharedPreferences.edit();
         final boolean isDarkModeOn = sharedPreferences.getBoolean("isDarkModeOn", true);
@@ -109,7 +117,6 @@ public class ProfileFragment extends Fragment {
             themeItem.setTitle("Light Mode");
             themeItem.setIcon(R.drawable.ic_light);
         }
-
         toolbar.setOnMenuItemClickListener(item -> {
             switch (item.getItemId()) {
                 case R.id.nav_edit:
@@ -151,19 +158,39 @@ public class ProfileFragment extends Fragment {
             return true;
         });
 
-        recyclerViewPosts = view.findViewById(R.id.recyclerview_myposts);
-        recyclerViewPosts.setHasFixedSize(true);
+        pictures = new ArrayList<>();
+        myPictureAdapter = new MyPictureAdapter(getContext(), pictures);
 
-        posts = new ArrayList<>();
-        myPostAdapter = new MyPostAdapter(requireContext(), posts);
-        recyclerViewPosts.setAdapter(myPostAdapter);
+        kitts = new ArrayList<>();
+        myKittAdapter = new MyKittAdapter(getContext(), kitts);
+
+        recyclerViewMyPosts = view.findViewById(R.id.recyclerview_my_posts);
+        recyclerViewMyPosts.setHasFixedSize(true);
+        ((GridLayoutManager) recyclerViewMyPosts.getLayoutManager()).setSpanCount(3);
+        recyclerViewMyPosts.setAdapter(myPictureAdapter);
 
         fillUserData();
         readPosts();
 
+        View picturesIndicator = view.findViewById(R.id.indicator_pictures);
+        View kittsIndicator = view.findViewById(R.id.indicator_kitts);
+        picturesButton.setOnClickListener(v -> {
+            recyclerViewMyPosts.setAdapter(myPictureAdapter);
+            ((GridLayoutManager) recyclerViewMyPosts.getLayoutManager()).setSpanCount(3);
+            picturesIndicator.setVisibility(View.VISIBLE);
+            kittsIndicator.setVisibility(View.INVISIBLE);
+        });
+        kittsButton.setOnClickListener(v -> {
+            recyclerViewMyPosts.setAdapter(myKittAdapter);
+            ((GridLayoutManager) recyclerViewMyPosts.getLayoutManager()).setSpanCount(1);
+            picturesIndicator.setVisibility(View.INVISIBLE);
+            kittsIndicator.setVisibility(View.VISIBLE);
+        });
+
         backgroundImageEditButton.setOnClickListener(v -> {
             selectImage();
         });
+
         return view;
     }
 
@@ -248,8 +275,8 @@ public class ProfileFragment extends Fragment {
             username.setText(txt_username);
             name.setText(user.getName());
             bio.setText(user.getBio());
-            Glide.with(requireActivity()).load(user.getProfileImageUrl()).into(profileImage);
-            Glide.with(requireActivity()).load(user.getBackgroundImageUrl()).into(backgroundImage);
+            Glide.with(requireContext()).load(user.getProfileImageUrl()).into(profileImage);
+            Glide.with(requireContext()).load(user.getBackgroundImageUrl()).into(backgroundImage);
         });
     }
 
@@ -258,23 +285,27 @@ public class ProfileFragment extends Fragment {
             User user = userSnapshot.toObject(User.class);
             List<Post> myPosts = new ArrayList<>();
             if (user.getPosts().size() == 0) return;
-
             for (DocumentReference documentReference : user.getPosts()) {
                 documentReference.get().addOnSuccessListener(documentSnapshot -> {
                     myPosts.add(documentSnapshot.toObject(Post.class));
                     if (myPosts.size() == user.getPosts().size()) {
                         FirebaseFirestore.getInstance().collection("Posts").get().addOnSuccessListener(postSnapshots -> {
-                            posts.clear();
+                            pictures.clear();
+                            kitts.clear();
                             for (DocumentSnapshot postSnapshot : postSnapshots) {
                                 Post post = postSnapshot.toObject(Post.class);
                                 for (Post current : myPosts) {
-                                    if (!current.getPostid().equals(post.getPostid()) || post.getImageUrl().isEmpty())
-                                        continue;
-                                    posts.add(0, post);
-                                    break;
+                                    if (current.getPostid().equals(post.getPostid())) {
+                                        if (post.getKitt().isEmpty()) {
+                                            pictures.add(0, post);
+                                        } else {
+                                            kitts.add(0, post);
+                                        }
+                                    }
                                 }
                             }
-                            myPostAdapter.notifyDataSetChanged();
+                            myKittAdapter.notifyDataSetChanged();
+                            myPictureAdapter.notifyDataSetChanged();
                         });
                     }
                 });

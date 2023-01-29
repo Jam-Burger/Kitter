@@ -85,7 +85,7 @@
             android:layout_width="@dimen/icon_size"
             android:layout_height="@dimen/icon_size"
             android:layout_alignParentRight="true"
-            android:src="@drawable/ic_bookmark_outlined" />
+            android:src="@drawable/ic_save_outlined" />
 
         <TextView
             android:id="@+id/txt_likes"

@@ -168,8 +168,8 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
             } else {
                 noOfLikes.setVisibility(View.GONE);
             }
-            if (isSaved) save.setImageResource(R.drawable.ic_bookmark);
-            else save.setImageResource(R.drawable.ic_bookmark_outlined);
+            if (isSaved) save.setImageResource(R.drawable.ic_save);
+            else save.setImageResource(R.drawable.ic_save_outlined);
         }
 
         public void likePost() {
