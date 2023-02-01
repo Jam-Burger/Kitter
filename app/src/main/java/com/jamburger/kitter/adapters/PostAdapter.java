@@ -72,20 +72,26 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
             Date now = new Date();
             assert postDate != null;
             long difference_In_Millis = now.getTime() - postDate.getTime();
-            long difference_In_Minutes = (difference_In_Millis / (1000 * 60));
-            long difference_In_Hours = (difference_In_Minutes / 60);
-            long difference_In_Days = (difference_In_Hours / 24);
+            long difference_In_Seconds = difference_In_Millis / 1000;
+            long difference_In_Minutes = difference_In_Seconds / 60;
+            long difference_In_Hours = difference_In_Minutes / 60;
+            long difference_In_Days = difference_In_Hours / 24;
 
-            String timeText;
+            String timeText = "";
             if (difference_In_Minutes == 0) {
-                timeText = "now";
+                timeText = difference_In_Seconds + " second";
+                if (difference_In_Seconds > 1) timeText += "s";
             } else if (difference_In_Hours == 0) {
-                timeText = difference_In_Minutes + " minutes ago";
+                timeText = difference_In_Minutes + " minute";
+                if (difference_In_Minutes > 1) timeText += "s";
             } else if (difference_In_Days == 0) {
-                timeText = difference_In_Hours + " hours ago";
+                timeText = difference_In_Hours + " hour";
+                if (difference_In_Hours > 1) timeText += "s";
             } else {
-                timeText = difference_In_Days + " days ago";
+                timeText = difference_In_Days + " day";
+                if (difference_In_Days > 1) timeText += "s";
             }
+            timeText += " ago";
             holder.time.setText(timeText);
         } catch (ParseException e) {
             throw new RuntimeException(e);

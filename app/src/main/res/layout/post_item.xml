@@ -31,15 +31,8 @@
                 android:id="@+id/txt_username"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="5dp"
                 android:textSize="15sp"
                 android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/txt_time"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="12sp" />
         </LinearLayout>
     </LinearLayout>
 
@@ -119,6 +112,14 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/txt_likes"
             android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/txt_time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/caption"
+            android:alpha=".6"
+            android:textSize="12sp" />
     </RelativeLayout>
 
     <com.google.android.material.divider.MaterialDivider
