@@ -125,7 +125,7 @@
                 </LinearLayout>
 
                 <View
-                    android:layout_width="2dp"
+                    android:layout_width="1dp"
                     android:layout_height="match_parent"
                     android:background="#858585" />
 
@@ -147,7 +147,7 @@
                     <View
                         android:id="@+id/indicator_kitts"
                         android:layout_width="match_parent"
-                        android:layout_height="2dp"
+                        android:layout_height="1dp"
                         android:background="@color/save"
                         android:visibility="invisible" />
                 </LinearLayout>
