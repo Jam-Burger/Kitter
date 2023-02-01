@@ -1,7 +1,5 @@
 package com.jamburger.kitter;
 
-import static com.jamburger.kitter.MainActivity.bottomNavigationView;
-
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -22,7 +20,6 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.jamburger.kitter.components.User;
-import com.jamburger.kitter.fragments.ProfileFragment;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -63,12 +60,8 @@ public class EditInfoActivity extends AppCompatActivity {
 
         fillUserData();
 
-        profileImageEditButton.setOnClickListener(view -> {
-            selectImage();
-        });
-        closeButton.setOnClickListener(view -> {
-            finish();
-        });
+        profileImageEditButton.setOnClickListener(view -> selectImage());
+        closeButton.setOnClickListener(view -> finish());
         saveInfoButton.setOnClickListener(view -> {
             data.put("name", name.getText().toString());
             data.put("username", username.getText().toString());
@@ -83,11 +76,6 @@ public class EditInfoActivity extends AppCompatActivity {
     private void updateData() {
         userReference.update(data).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
-                Intent intent = new Intent(this, MainActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                bottomNavigationView.getMenu().findItem(R.id.nav_profile).setChecked(true);
-                MainActivity.selectorFragment = new ProfileFragment();
-                startActivity(intent);
                 finish();
             }
         });

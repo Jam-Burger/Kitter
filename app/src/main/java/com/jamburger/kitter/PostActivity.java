@@ -154,7 +154,7 @@ public class PostActivity extends AppCompatActivity {
             progressDialog.setTitle("Uploading...");
             progressDialog.show();
 
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
+            SimpleDateFormat sdf = new SimpleDateFormat(getResources().getString(R.string.post_time_format));
             String postId = sdf.format(new Date());
             StorageReference ref = storageReference.child("Posts/" + postId);
 

@@ -16,8 +16,8 @@ import com.jamburger.kitter.fragments.SearchFragment;
 
 public class MainActivity extends AppCompatActivity {
     public static final String TAG = "com.jamburger.kitter";
-    public static BottomNavigationView bottomNavigationView;
-    public static Fragment selectorFragment = null;
+    BottomNavigationView bottomNavigationView;
+    Fragment selectorFragment;
     FirebaseUser user;
 
     @SuppressLint("NonConstantResourceId")
@@ -28,6 +28,16 @@ public class MainActivity extends AppCompatActivity {
         bottomNavigationView = findViewById(R.id.bottom_navigation);
 
         user = FirebaseAuth.getInstance().getCurrentUser();
+
+        String page = getIntent().getStringExtra("page");
+        if (page != null && page.equals("PROFILE")) {
+            selectorFragment = new ProfileFragment();
+            bottomNavigationView.setSelectedItemId(R.id.nav_profile);
+        } else {
+            selectorFragment = new HomeFragment();
+            bottomNavigationView.setSelectedItemId(R.id.nav_home);
+        }
+
         bottomNavigationView.setOnItemSelectedListener(item -> {
             switch (item.getItemId()) {
                 case R.id.nav_home:
@@ -45,15 +55,16 @@ public class MainActivity extends AppCompatActivity {
             }
             return true;
         });
-        if (selectorFragment != null) {
-            startFragment(selectorFragment);
-            selectorFragment = null;
-        } else {
-            startFragment(new HomeFragment());
-        }
+        startFragment(selectorFragment);
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
     }
 
     public void startFragment(Fragment fragment) {
         getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, fragment).commit();
     }
+
 }

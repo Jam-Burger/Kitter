@@ -1,7 +1,6 @@
 package com.jamburger.kitter.fragments;
 
 import static android.content.Context.MODE_PRIVATE;
-import static com.jamburger.kitter.MainActivity.bottomNavigationView;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -70,6 +69,7 @@ public class ProfileFragment extends Fragment {
     RecyclerView recyclerViewMyPosts;
     List<Post> pictures;
     List<Post> kitts;
+
     ActivityResultLauncher<Intent> myActivityResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
         if (result.getResultCode() == Activity.RESULT_OK) {
             Intent data = result.getData();
@@ -131,10 +131,9 @@ public class ProfileFragment extends Fragment {
                 case R.id.nav_change_theme:
                     Intent intentMain = new Intent(requireActivity(), MainActivity.class);
                     intentMain.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    MainActivity.selectorFragment = new ProfileFragment();
-                    bottomNavigationView.getMenu().findItem(R.id.nav_profile).setChecked(true);
-                    startActivity(intentMain);
+                    intentMain.putExtra("page", "PROFILE");
                     requireActivity().finish();
+                    startActivity(intentMain);
                     if (isDarkModeOn) {
                         editor.putBoolean("isDarkModeOn", false).apply();
                         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
@@ -275,8 +274,12 @@ public class ProfileFragment extends Fragment {
             username.setText(txt_username);
             name.setText(user.getName());
             bio.setText(user.getBio());
-            Glide.with(requireContext()).load(user.getProfileImageUrl()).into(profileImage);
-            Glide.with(requireContext()).load(user.getBackgroundImageUrl()).into(backgroundImage);
+            try {
+                Glide.with(requireActivity()).load(user.getProfileImageUrl()).into(profileImage);
+                Glide.with(requireActivity()).load(user.getBackgroundImageUrl()).into(backgroundImage);
+            } catch (Exception ignored) {
+
+            }
         });
     }
 

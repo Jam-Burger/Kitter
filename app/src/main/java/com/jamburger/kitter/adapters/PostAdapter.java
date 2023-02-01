@@ -1,5 +1,6 @@
 package com.jamburger.kitter.adapters;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.view.LayoutInflater;
@@ -21,6 +22,10 @@ import com.jamburger.kitter.R;
 import com.jamburger.kitter.components.Post;
 import com.jamburger.kitter.components.User;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 
@@ -61,6 +66,30 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         });
 
         holder.post = post;
+        try {
+            @SuppressLint("SimpleDateFormat") DateFormat format = new SimpleDateFormat(mContext.getResources().getString(R.string.post_time_format));
+            Date postDate = format.parse(post.getPostid());
+            Date now = new Date();
+            assert postDate != null;
+            long difference_In_Millis = now.getTime() - postDate.getTime();
+            long difference_In_Minutes = (difference_In_Millis / (1000 * 60));
+            long difference_In_Hours = (difference_In_Minutes / 60);
+            long difference_In_Days = (difference_In_Hours / 24);
+
+            String timeText;
+            if (difference_In_Minutes == 0) {
+                timeText = "now";
+            } else if (difference_In_Hours == 0) {
+                timeText = difference_In_Minutes + " minutes ago";
+            } else if (difference_In_Days == 0) {
+                timeText = difference_In_Hours + " hours ago";
+            } else {
+                timeText = difference_In_Days + " days ago";
+            }
+            holder.time.setText(timeText);
+        } catch (ParseException e) {
+            throw new RuntimeException(e);
+        }
         Glide.with(mContext).load(post.getImageUrl()).into(holder.postImage);
         holder.caption.setText(post.getCaption());
         holder.kitt.setText(post.getKitt());
@@ -137,7 +166,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public ImageView profileImage, like, comment, save, postImage;
-        public TextView username, noOfLikes, caption, kitt;
+        public TextView username, noOfLikes, caption, kitt, time;
         public static DocumentReference userReference;
         protected boolean isLiked, isSaved;
         public Post post;
@@ -146,6 +175,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
             super(itemView);
             postImage = itemView.findViewById(R.id.img_post);
             profileImage = itemView.findViewById(R.id.img_profile);
+            time = itemView.findViewById(R.id.txt_time);
 
             like = itemView.findViewById(R.id.btn_like);
             save = itemView.findViewById(R.id.btn_save);
