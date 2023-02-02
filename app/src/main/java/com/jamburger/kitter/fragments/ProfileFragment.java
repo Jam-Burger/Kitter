@@ -260,13 +260,13 @@ public class ProfileFragment extends Fragment {
         }
     }
 
-    private void selectImage() {
+    void selectImage() {
         Intent intent = new Intent();
         intent.setType("image/*").setAction(Intent.ACTION_GET_CONTENT);
         myActivityResultLauncher.launch(Intent.createChooser(intent, "Select Picture"));
     }
 
-    private void fillUserData() {
+    void fillUserData() {
         userdata.get().addOnSuccessListener(documentSnapshot -> {
             User user = documentSnapshot.toObject(User.class);
             assert user != null;
@@ -283,7 +283,7 @@ public class ProfileFragment extends Fragment {
         });
     }
 
-    private void readPosts() {
+    void readPosts() {
         userdata.get().addOnSuccessListener(userSnapshot -> {
             User user = userSnapshot.toObject(User.class);
             List<Post> myPosts = new ArrayList<>();

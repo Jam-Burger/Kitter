@@ -18,6 +18,7 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.jamburger.kitter.CommentActivity;
+import com.jamburger.kitter.OtherProfileActivity;
 import com.jamburger.kitter.R;
 import com.jamburger.kitter.components.Post;
 import com.jamburger.kitter.components.User;
@@ -139,6 +140,11 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
             intent.putExtra("postid", post.getPostid());
             mContext.startActivity(intent);
         });
+        holder.header.setOnClickListener(view -> {
+            Intent intent = new Intent(mContext, OtherProfileActivity.class);
+            intent.putExtra("userid", post.getCreator());
+            mContext.startActivity(intent);
+        });
     }
 
     private void updateIfSaved(ViewHolder holder, Post post) {
@@ -173,6 +179,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public ImageView profileImage, like, comment, save, postImage;
         public TextView username, noOfLikes, caption, kitt, time;
+        public View header;
         public static DocumentReference userReference;
         protected boolean isLiked, isSaved;
         public Post post;
@@ -182,6 +189,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
             postImage = itemView.findViewById(R.id.img_post);
             profileImage = itemView.findViewById(R.id.img_profile);
             time = itemView.findViewById(R.id.txt_time);
+            header = itemView.findViewById(R.id.header);
 
             like = itemView.findViewById(R.id.btn_like);
             save = itemView.findViewById(R.id.btn_save);

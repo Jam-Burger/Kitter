@@ -19,6 +19,9 @@
         android:theme="@style/Theme.Kitter"
         tools:targetApi="31">
         <activity
+            android:name=".OtherProfileActivity"
+            android:exported="false" />
+        <activity
             android:name=".SavedPostsActivity"
             android:exported="false" />
         <activity

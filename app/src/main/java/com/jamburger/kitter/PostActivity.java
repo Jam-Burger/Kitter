@@ -37,7 +37,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class PostActivity extends AppCompatActivity {
-    private static final byte REQUEST_IMAGE_CAPTURE = 69;
     ImageView imageView;
 
     TextView caption;
@@ -107,8 +106,7 @@ public class PostActivity extends AppCompatActivity {
     }
 
     private File createImageFile() throws IOException {
-        // Create an image file name
-        String timeStamp = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss").format(new Date());
+        String timeStamp = new SimpleDateFormat(getResources().getString(R.string.post_time_format)).format(new Date());
         String imageFileName = "JPEG_" + timeStamp + "_";
         File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
         File image = File.createTempFile(
@@ -181,7 +179,7 @@ public class PostActivity extends AppCompatActivity {
                 progressDialog.setMessage("Uploaded " + (int) progress + "%");
             });
         } else {
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss");
+            SimpleDateFormat sdf = new SimpleDateFormat(getResources().getString(R.string.post_time_format));
             String postId = sdf.format(new Date());
             Post post = new Post(user.getUid(), postId, "", "");
             post.setKitt(caption.getText().toString());

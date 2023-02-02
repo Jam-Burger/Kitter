@@ -1,6 +1,7 @@
 package com.jamburger.kitter.adapters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.jamburger.kitter.OtherProfileActivity;
 import com.jamburger.kitter.R;
 import com.jamburger.kitter.components.Comment;
 import com.jamburger.kitter.components.User;
@@ -41,6 +43,12 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
             Glide.with(mContext).load(user.getProfileImageUrl()).into(holder.profileImage);
             holder.username.setText(user.getUsername());
             holder.comment.setText(comment.getText());
+
+            holder.container.setOnClickListener(view -> {
+                Intent intent = new Intent(mContext, OtherProfileActivity.class);
+                intent.putExtra("userid", user.getId());
+                mContext.startActivity(intent);
+            });
         });
     }
 
@@ -52,9 +60,11 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
     public static class ViewHolder extends RecyclerView.ViewHolder {
         ImageView profileImage;
         TextView username, comment;
+        View container;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
+            container = itemView.findViewById(R.id.container);
             profileImage = itemView.findViewById(R.id.img_profile);
             username = itemView.findViewById(R.id.txt_username);
             comment = itemView.findViewById(R.id.txt_comment);

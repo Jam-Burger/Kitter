@@ -2,6 +2,7 @@ package com.jamburger.kitter;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.util.Log;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
@@ -17,8 +18,8 @@ import com.jamburger.kitter.fragments.SearchFragment;
 public class MainActivity extends AppCompatActivity {
     public static final String TAG = "com.jamburger.kitter";
     BottomNavigationView bottomNavigationView;
-    Fragment selectorFragment;
     FirebaseUser user;
+    String currentPage;
 
     @SuppressLint("NonConstantResourceId")
     @Override
@@ -30,40 +31,60 @@ public class MainActivity extends AppCompatActivity {
         user = FirebaseAuth.getInstance().getCurrentUser();
 
         String page = getIntent().getStringExtra("page");
-        if (page != null && page.equals("PROFILE")) {
-            selectorFragment = new ProfileFragment();
-            bottomNavigationView.setSelectedItemId(R.id.nav_profile);
+        if (page != null) {
+            if (page.equals("PROFILE")) {
+                currentPage = "PROFILE";
+                bottomNavigationView.setSelectedItemId(R.id.nav_profile);
+            }
         } else {
-            selectorFragment = new HomeFragment();
-            bottomNavigationView.setSelectedItemId(R.id.nav_home);
+            currentPage = "HOME";
         }
 
         bottomNavigationView.setOnItemSelectedListener(item -> {
             switch (item.getItemId()) {
                 case R.id.nav_home:
-                    selectorFragment = new HomeFragment();
+                    currentPage = "HOME";
                     break;
                 case R.id.nav_search:
-                    selectorFragment = new SearchFragment();
+                    currentPage = "SEARCH";
                     break;
                 case R.id.nav_profile:
-                    selectorFragment = new ProfileFragment();
+                    currentPage = "PROFILE";
                     break;
             }
-            if (selectorFragment != null) {
-                getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, selectorFragment).commit();
-            }
+            startFragment(currentPage);
             return true;
         });
-        startFragment(selectorFragment);
+        startFragment(currentPage);
+        Log.d(TAG, "onCreate: " + currentPage);
     }
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
+        if (currentPage.equals("HOME")) {
+            super.onBackPressed();
+        } else {
+            currentPage = "HOME";
+            bottomNavigationView.setSelectedItemId(R.id.nav_home);
+        }
     }
 
-    public void startFragment(Fragment fragment) {
+    public void startFragment(String fragment) {
+        Fragment frag = null;
+        if (fragment.equals("PROFILE")) {
+            frag = new ProfileFragment();
+            currentPage = "PROFILE";
+        } else if (fragment.equals("SEARCH")) {
+            frag = new SearchFragment();
+            currentPage = "SEARCH";
+        } else if (fragment.equals("HOME")) {
+            frag = new HomeFragment();
+            currentPage = "HOME";
+        }
+        if (frag != null) startFragment(frag);
+    }
+
+    void startFragment(Fragment fragment) {
         getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, fragment).commit();
     }
 
