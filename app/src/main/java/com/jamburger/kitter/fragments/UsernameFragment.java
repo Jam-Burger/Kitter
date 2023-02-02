@@ -36,8 +36,8 @@ public class UsernameFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_username, container, false);
         username = view.findViewById(R.id.et_username);
         parent.headerText.setText("Choose a username");
+        userNames = new ArrayList<>();
         FirebaseFirestore.getInstance().collection("Users").get().addOnSuccessListener(userSnapshots -> {
-            userNames = new ArrayList<>();
             for (DocumentSnapshot userSnapshot : userSnapshots) {
                 User user = userSnapshot.toObject(User.class);
                 userNames.add(user.getUsername());

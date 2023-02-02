@@ -19,7 +19,9 @@ import com.jamburger.kitter.adapters.CommentAdapter;
 import com.jamburger.kitter.components.Comment;
 import com.jamburger.kitter.components.Post;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class CommentActivity extends AppCompatActivity {
@@ -51,7 +53,11 @@ public class CommentActivity extends AppCompatActivity {
         sendButton.setOnClickListener(v -> {
             String commentString = commentText.getText().toString();
             DocumentReference userReference = FirebaseFirestore.getInstance().collection("Users").document(FirebaseAuth.getInstance().getUid());
-            Comment comment = new Comment(userReference, commentString);
+
+            SimpleDateFormat sdf = new SimpleDateFormat(getResources().getString(R.string.post_time_format));
+            String commentId = sdf.format(new Date());
+            Comment comment = new Comment(userReference, commentString, commentId);
+
             closeKeyboard();
             commentText.clearFocus();
             commentText.setText("");

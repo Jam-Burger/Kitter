@@ -9,6 +9,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.jamburger.kitter.MainActivity;
 import com.jamburger.kitter.R;
 import com.jamburger.kitter.components.Post;
 
@@ -34,6 +35,7 @@ public class MyKittAdapter extends RecyclerView.Adapter<MyKittAdapter.ViewHolder
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Post post = mPosts.get(position);
         holder.kitt.setText(post.getKitt());
+        holder.time.setText(MainActivity.dateIdToString(post.getPostid()));
     }
 
     @Override
@@ -42,11 +44,12 @@ public class MyKittAdapter extends RecyclerView.Adapter<MyKittAdapter.ViewHolder
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView kitt;
+        TextView kitt, time;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             kitt = itemView.findViewById(R.id.txt_kitt);
+            time = itemView.findViewById(R.id.txt_time);
         }
     }
 }

@@ -1,6 +1,5 @@
 package com.jamburger.kitter.adapters;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.view.LayoutInflater;
@@ -18,15 +17,12 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.jamburger.kitter.CommentActivity;
+import com.jamburger.kitter.MainActivity;
 import com.jamburger.kitter.OtherProfileActivity;
 import com.jamburger.kitter.R;
 import com.jamburger.kitter.components.Post;
 import com.jamburger.kitter.components.User;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 
 
@@ -67,36 +63,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         });
 
         holder.post = post;
-        try {
-            @SuppressLint("SimpleDateFormat") DateFormat format = new SimpleDateFormat(mContext.getResources().getString(R.string.post_time_format));
-            Date postDate = format.parse(post.getPostid());
-            Date now = new Date();
-            assert postDate != null;
-            long difference_In_Millis = now.getTime() - postDate.getTime();
-            long difference_In_Seconds = difference_In_Millis / 1000;
-            long difference_In_Minutes = difference_In_Seconds / 60;
-            long difference_In_Hours = difference_In_Minutes / 60;
-            long difference_In_Days = difference_In_Hours / 24;
-
-            String timeText = "";
-            if (difference_In_Minutes == 0) {
-                timeText = difference_In_Seconds + " second";
-                if (difference_In_Seconds > 1) timeText += "s";
-            } else if (difference_In_Hours == 0) {
-                timeText = difference_In_Minutes + " minute";
-                if (difference_In_Minutes > 1) timeText += "s";
-            } else if (difference_In_Days == 0) {
-                timeText = difference_In_Hours + " hour";
-                if (difference_In_Hours > 1) timeText += "s";
-            } else {
-                timeText = difference_In_Days + " day";
-                if (difference_In_Days > 1) timeText += "s";
-            }
-            timeText += " ago";
-            holder.time.setText(timeText);
-        } catch (ParseException e) {
-            throw new RuntimeException(e);
-        }
+        holder.time.setText(MainActivity.dateIdToString(post.getPostid()));
         Glide.with(mContext).load(post.getImageUrl()).into(holder.postImage);
         holder.caption.setText(post.getCaption());
         holder.kitt.setText(post.getKitt());
