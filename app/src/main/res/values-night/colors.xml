@@ -2,4 +2,6 @@
 <resources>
     <color name="app_name_color">#CEFFFFFF</color>
     <color name="inverted">@color/white</color>
+    <color name="text_strong">#D5D5D5</color>
+    <color name="text_light">#BFBFBF</color>
 </resources>

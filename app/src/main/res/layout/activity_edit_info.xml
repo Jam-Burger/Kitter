@@ -27,7 +27,6 @@
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
             android:layout_toEndOf="@id/btn_close"
-            android:paddingBottom="5dp"
             android:text="Edit info"
             android:textColor="@color/inverted"
             android:textSize="25sp" />

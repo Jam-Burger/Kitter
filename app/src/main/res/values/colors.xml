@@ -10,4 +10,6 @@
     <color name="like">#FF2323</color>
     <color name="item_color_active">@color/inverted</color>
     <color name="item_color_inactive">#E2717171</color>
+    <color name="text_strong">#323232</color>
+    <color name="text_light">#4A4A4A</color>
 </resources>

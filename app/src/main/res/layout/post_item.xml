@@ -17,13 +17,12 @@
             android:layout_height="@dimen/profile_img_icon_size"
             android:layout_margin="10dp"
             android:scaleType="centerCrop"
-            app:civ_border_color="@color/inverted"
+            app:civ_border_color="@color/app_name_color"
             app:civ_border_width=".1dp" />
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
             android:layout_marginLeft="5dp"
             android:orientation="vertical">
 
@@ -31,15 +30,12 @@
                 android:id="@+id/txt_username"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textSize="15sp"
+                android:fontFamily="@font/montserrat"
+                android:textColor="@color/text_strong"
+                android:textSize="@dimen/normal_txt"
                 android:textStyle="bold" />
         </LinearLayout>
     </LinearLayout>
-
-    <com.google.android.material.divider.MaterialDivider
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/header" />
 
     <RelativeLayout
         android:id="@+id/post_content"
@@ -57,16 +53,12 @@
             android:id="@+id/txt_kitt"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="10dp"
             android:layout_below="@id/img_post"
-            android:textColor="@color/inverted"
-            android:textSize="20sp" />
+            android:fontFamily="@font/lato"
+            android:padding="10dp"
+            android:textColor="@color/app_name_color"
+            android:textSize="@dimen/big_txt" />
     </RelativeLayout>
-
-    <com.google.android.material.divider.MaterialDivider
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/post_content" />
 
     <RelativeLayout
         android:id="@+id/footer"
@@ -103,6 +95,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/btn_like"
             android:layout_marginTop="5dp"
+            android:textColor="@color/text_strong"
             android:textStyle="bold"
             android:visibility="gone" />
 
@@ -110,6 +103,7 @@
             android:id="@+id/caption"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:textColor="@color/text_light"
             android:layout_below="@id/txt_likes"
             android:visibility="gone" />
 
@@ -118,7 +112,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/caption"
-            android:alpha=".6"
+            android:alpha=".7"
+            android:textColor="@color/text_light"
             android:textSize="12sp" />
     </RelativeLayout>
 
