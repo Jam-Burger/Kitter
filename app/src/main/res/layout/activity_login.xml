@@ -102,12 +102,12 @@
         </RelativeLayout>
 
         <Button
+            android:id="@+id/btn_google"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/btn_google"
-            android:drawableLeft="@mipmap/ic_google"
-            android:text="Continue with google"
             android:backgroundTint="@color/white"
+            android:drawableLeft="@drawable/ic_google"
+            android:text="Continue with google"
             android:textAllCaps="false"
             android:textColor="@color/black" />
 

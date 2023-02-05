@@ -42,7 +42,7 @@ public class SearchFragment extends Fragment {
 
         profiles = new ArrayList<>();
         allProfiles = new ArrayList<>();
-        profileAdapter = new ProfileAdapter(requireContext(), profiles);
+        profileAdapter = new ProfileAdapter(requireContext(), profiles, "PROFILE");
         recyclerViewProfiles.setHasFixedSize(true);
         recyclerViewProfiles.setAdapter(profileAdapter);
 
@@ -80,9 +80,9 @@ public class SearchFragment extends Fragment {
 
     private void readProfiles() {
         CollectionReference userReference = FirebaseFirestore.getInstance().collection("Users");
-        userReference.get().addOnSuccessListener(postSnapshots -> {
+        userReference.get().addOnSuccessListener(usersSnapshots -> {
             allProfiles.clear();
-            for (DocumentSnapshot userSnapshot : postSnapshots) {
+            for (DocumentSnapshot userSnapshot : usersSnapshots) {
                 User user = userSnapshot.toObject(User.class);
                 allProfiles.add(user);
             }

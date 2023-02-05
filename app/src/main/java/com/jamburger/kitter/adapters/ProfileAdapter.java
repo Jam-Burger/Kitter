@@ -12,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.jamburger.kitter.ChatActivity;
 import com.jamburger.kitter.OtherProfileActivity;
 import com.jamburger.kitter.R;
 import com.jamburger.kitter.components.User;
@@ -21,10 +22,12 @@ import java.util.List;
 public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.ViewHolder> {
     Context mContext;
     List<User> mUsers;
+    String use;
 
-    public ProfileAdapter(Context mContext, List<User> mUsers) {
+    public ProfileAdapter(Context mContext, List<User> mUsers, String use) {
         this.mContext = mContext;
         this.mUsers = mUsers;
+        this.use = use;
     }
 
     @NonNull
@@ -41,7 +44,12 @@ public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.ViewHold
         holder.username.setText(user.getUsername());
         holder.name.setText(user.getName());
         holder.container.setOnClickListener(view -> {
-            Intent intent = new Intent(mContext, OtherProfileActivity.class);
+            Intent intent;
+            if (use.equals("PROFILE")) {
+                intent = new Intent(mContext, OtherProfileActivity.class);
+            } else {
+                intent = new Intent(mContext, ChatActivity.class);
+            }
             intent.putExtra("userid", user.getId());
             mContext.startActivity(intent);
         });

@@ -15,7 +15,7 @@
         android:background="@android:color/transparent"
         android:paddingVertical="5dp">
 
-        <androidx.appcompat.widget.Toolbar
+        <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/top_menu"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -31,7 +31,7 @@
                 android:textColor="@color/app_name_color"
                 android:textSize="40sp"
                 android:textStyle="bold" />
-        </androidx.appcompat.widget.Toolbar>
+        </com.google.android.material.appbar.MaterialToolbar>
     </com.google.android.material.appbar.AppBarLayout>
 
     <com.google.android.material.divider.MaterialDivider
@@ -48,6 +48,4 @@
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:reverseLayout="true"
         app:stackFromEnd="true" />
-
-
 </RelativeLayout>

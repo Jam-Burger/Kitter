@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".CommentActivity">
+    tools:context=".CommentsActivity">
 
     <RelativeLayout
         android:id="@+id/header"
@@ -57,7 +57,7 @@
         android:paddingHorizontal="10dp">
 
         <ImageView
-            android:id="@+id/btn_send_comment"
+            android:id="@+id/btn_send_message"
             android:layout_width="@dimen/icon_size"
             android:layout_height="@dimen/icon_size"
             android:layout_alignParentEnd="true"
@@ -69,7 +69,7 @@
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_toLeftOf="@id/btn_send_comment"
+            android:layout_toLeftOf="@id/btn_send_message"
             android:hint="Add Comment">
 
             <com.google.android.material.textfield.TextInputEditText

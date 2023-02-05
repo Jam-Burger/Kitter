@@ -6,7 +6,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -27,7 +26,6 @@ public class OtherProfileActivity extends AppCompatActivity {
     public MyKittAdapter myKittAdapter;
     ImageView backgroundImage, profileImage;
     TextView name, username, bio;
-    Toolbar toolbar;
     DocumentReference userdata;
     ImageView picturesButton, kittsButton;
     RecyclerView recyclerViewMyPosts;
@@ -89,12 +87,8 @@ public class OtherProfileActivity extends AppCompatActivity {
             username.setText(txt_username);
             name.setText(user.getName());
             bio.setText(user.getBio());
-            try {
-                Glide.with(this).load(user.getProfileImageUrl()).into(profileImage);
-                Glide.with(this).load(user.getBackgroundImageUrl()).into(backgroundImage);
-            } catch (Exception ignored) {
-
-            }
+            Glide.with(this).load(user.getProfileImageUrl()).into(profileImage);
+            Glide.with(this).load(user.getBackgroundImageUrl()).into(backgroundImage);
         });
     }
 

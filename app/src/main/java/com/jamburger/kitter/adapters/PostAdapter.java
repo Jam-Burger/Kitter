@@ -16,7 +16,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.jamburger.kitter.CommentActivity;
+import com.jamburger.kitter.CommentsActivity;
 import com.jamburger.kitter.MainActivity;
 import com.jamburger.kitter.OtherProfileActivity;
 import com.jamburger.kitter.R;
@@ -103,7 +103,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         holder.save.setOnClickListener(v -> updateIfSaved(holder, post));
 
         holder.comment.setOnClickListener(view -> {
-            Intent intent = new Intent(mContext, CommentActivity.class);
+            Intent intent = new Intent(mContext, CommentsActivity.class);
             intent.putExtra("postid", post.getPostid());
             mContext.startActivity(intent);
         });

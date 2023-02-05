@@ -19,6 +19,12 @@
         android:theme="@style/Theme.Kitter"
         tools:targetApi="31">
         <activity
+            android:name=".ChatActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ChatHomeActivity"
+            android:exported="false" />
+        <activity
             android:name=".OtherProfileActivity"
             android:exported="false" />
         <activity
@@ -31,7 +37,7 @@
             android:name=".EditInfoActivity"
             android:exported="false" />
         <activity
-            android:name=".CommentActivity"
+            android:name=".CommentsActivity"
             android:exported="false" />
         <activity
             android:name=".PostActivity"

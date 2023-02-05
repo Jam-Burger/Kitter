@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class CommentActivity extends AppCompatActivity {
+public class CommentsActivity extends AppCompatActivity {
     RecyclerView recyclerViewComments;
     EditText commentText;
     ImageView sendButton, closeButton;
@@ -35,11 +35,11 @@ public class CommentActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_comment);
+        setContentView(R.layout.activity_comments);
 
         recyclerViewComments = findViewById(R.id.recyclerview_comments);
         commentText = findViewById(R.id.et_comment);
-        sendButton = findViewById(R.id.btn_send_comment);
+        sendButton = findViewById(R.id.btn_send_message);
         closeButton = findViewById(R.id.btn_close);
 
         comments = new ArrayList<>();

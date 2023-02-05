@@ -124,4 +124,9 @@ public class MainActivity extends AppCompatActivity {
             return null;
         }
     }
+
+    public static String dateIdToTime(String dateId) {
+        String[] strings = dateId.split("-", 6);
+        return strings[3] + ":" + strings[4];
+    }
 }

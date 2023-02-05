@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.jamburger.kitter.ChatHomeActivity;
 import com.jamburger.kitter.PostActivity;
 import com.jamburger.kitter.R;
 import com.jamburger.kitter.adapters.PostAdapter;
@@ -50,6 +51,11 @@ public class HomeFragment extends Fragment {
                     intent = new Intent(requireActivity(), PostActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     intent.putExtra("type", "text");
+                    startActivity(intent);
+                    break;
+                case R.id.nav_chat:
+                    intent = new Intent(requireActivity(), ChatHomeActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(intent);
                     break;
             }

@@ -3,6 +3,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="">
+
+    <item
+        android:id="@+id/nav_chat"
+        android:icon="@drawable/ic_message"
+        android:title=""
+        app:showAsAction="ifRoom" />
     <item
         android:icon="@drawable/ic_add"
         android:title=""
