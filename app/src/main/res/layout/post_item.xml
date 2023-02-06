@@ -55,10 +55,22 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/img_post"
             android:fontFamily="@font/lato"
-            android:padding="10dp"
+            android:layout_margin="10dp"
             android:textColor="@color/app_name_color"
             android:textSize="@dimen/big_txt" />
     </RelativeLayout>
+
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/animation_like"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_alignStart="@id/footer"
+        android:layout_alignTop="@id/footer"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="-5dp"
+        android:visibility="gone"
+        app:lottie_speed="2"
+        app:lottie_url="https://assets9.lottiefiles.com/datafiles/hvAaKBDVLhuV5Wl/data.json" />
 
     <RelativeLayout
         android:id="@+id/footer"
@@ -68,18 +80,20 @@
         android:paddingHorizontal="20dp"
         android:paddingVertical="10dp">
 
+
         <ImageView
             android:id="@+id/btn_like"
             android:layout_width="@dimen/icon_size"
             android:layout_height="@dimen/icon_size"
             android:src="@drawable/ic_heart_outlined" />
 
+
         <ImageView
             android:id="@+id/btn_comment"
             android:layout_width="@dimen/icon_size"
             android:layout_height="@dimen/icon_size"
-            android:layout_marginLeft="20dp"
-            android:layout_toRightOf="@id/btn_like"
+            android:layout_marginStart="20dp"
+            android:layout_toEndOf="@id/btn_like"
             android:src="@drawable/ic_comment" />
 
         <ImageView

@@ -11,6 +11,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.airbnb.lottie.LottieAnimationView;
 import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
@@ -88,19 +89,8 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
             lastClickTime = clickTime;
         });
 
-        DocumentReference postReference = db.collection("Posts").document(post.getPostid());
-        userReference.get().addOnSuccessListener(documentSnapshot -> {
-            holder.isSaved = false;
-            user = documentSnapshot.toObject(User.class);
-            for (DocumentReference dr : user.getSaved()) {
-                if (dr.equals(postReference)) {
-                    holder.isSaved = true;
-                    break;
-                }
-            }
-            holder.update();
-        });
-        holder.save.setOnClickListener(v -> updateIfSaved(holder, post));
+        holder.checkIfSaved();
+        holder.save.setOnClickListener(v -> holder.savePost());
 
         holder.comment.setOnClickListener(view -> {
             Intent intent = new Intent(mContext, CommentsActivity.class);
@@ -114,28 +104,6 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         });
     }
 
-    private void updateIfSaved(ViewHolder holder, Post post) {
-        DocumentReference postReference = db.collection("Posts").document(post.getPostid());
-        userReference.get().addOnSuccessListener(documentSnapshot -> {
-            holder.isSaved = false;
-            user = documentSnapshot.toObject(User.class);
-            for (DocumentReference dr : user.getSaved()) {
-                if (dr.equals(postReference)) {
-                    holder.isSaved = true;
-                    break;
-                }
-            }
-            holder.isSaved = !holder.isSaved;
-            if (holder.isSaved) {
-                userReference.update("saved", FieldValue.arrayUnion(postReference));
-                user.getSaved().add(postReference);
-            } else {
-                userReference.update("saved", FieldValue.arrayRemove(postReference));
-                user.getSaved().remove(postReference);
-            }
-            holder.update();
-        });
-    }
 
 
     @Override
@@ -147,6 +115,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         public ImageView profileImage, like, comment, save, postImage;
         public TextView username, noOfLikes, caption, kitt, time;
         public View header;
+        LottieAnimationView likeAnimation;
         public static DocumentReference userReference;
         protected boolean isLiked, isSaved;
         public Post post;
@@ -159,6 +128,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
             header = itemView.findViewById(R.id.header);
 
             like = itemView.findViewById(R.id.btn_like);
+            likeAnimation = itemView.findViewById(R.id.animation_like);
             save = itemView.findViewById(R.id.btn_save);
             comment = itemView.findViewById(R.id.btn_comment);
 
@@ -170,7 +140,10 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
 
         void update() {
             if (isLiked) like.setImageResource(R.drawable.ic_heart);
-            else like.setImageResource(R.drawable.ic_heart_outlined);
+            else {
+                like.setImageResource(R.drawable.ic_heart_outlined);
+                likeAnimation.setVisibility(View.INVISIBLE);
+            }
             int n = post.getLikes().size();
             if (n > 0) {
                 noOfLikes.setVisibility(View.VISIBLE);
@@ -184,10 +157,30 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         }
 
         public void likePost() {
-            checkIfLiked();
             isLiked = !isLiked;
+            if (isLiked) {
+                likeAnimation.setVisibility(View.VISIBLE);
+                likeAnimation.playAnimation();
+            } else {
+                likeAnimation.setVisibility(View.INVISIBLE);
+            }
             updateLikesData();
             update();
+        }
+
+        public void savePost() {
+            isSaved = !isSaved;
+            updateSavedData();
+            update();
+        }
+
+        private void updateSavedData() {
+            DocumentReference postReference = FirebaseFirestore.getInstance().collection("Posts").document(post.getPostid());
+            if (isSaved) {
+                userReference.update("saved", FieldValue.arrayUnion(postReference));
+            } else {
+                userReference.update("saved", FieldValue.arrayRemove(postReference));
+            }
         }
 
         private void checkIfLiked() {
@@ -209,6 +202,21 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                 postReference.update("likes", FieldValue.arrayRemove(userReference));
                 post.getLikes().remove(userReference);
             }
+        }
+
+        public void checkIfSaved() {
+            DocumentReference postReference = FirebaseFirestore.getInstance().collection("Posts").document(post.getPostid());
+            userReference.get().addOnSuccessListener(documentSnapshot -> {
+                isSaved = false;
+                User user = documentSnapshot.toObject(User.class);
+                for (DocumentReference dr : user.getSaved()) {
+                    if (dr.equals(postReference)) {
+                        isSaved = true;
+                        break;
+                    }
+                }
+                update();
+            });
         }
     }
 }

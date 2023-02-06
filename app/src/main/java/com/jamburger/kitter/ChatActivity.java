@@ -1,6 +1,8 @@
 package com.jamburger.kitter;
 
+import android.content.Context;
 import android.os.Bundle;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -29,7 +31,8 @@ import java.util.List;
 import java.util.Locale;
 
 public class ChatActivity extends AppCompatActivity {
-    User me, fellow;
+    User fellow;
+    String myUID, fellowUID;
     TextView username;
     EditText message;
     List<Message> messages;
@@ -44,7 +47,8 @@ public class ChatActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
 
-        getChatData();
+        myUID = FirebaseAuth.getInstance().getUid();
+        fellowUID = getIntent().getStringExtra("userid");
 
         username = findViewById(R.id.txt_username);
         profileImage = findViewById(R.id.img_profile);
@@ -52,10 +56,20 @@ public class ChatActivity extends AppCompatActivity {
         sendButton = findViewById(R.id.btn_send_message);
         recyclerViewMessages = findViewById(R.id.recyclerview_messages);
 
-        messages = new ArrayList<>();
-        messageAdapter = new MessageAdapter(this, messages);
-        recyclerViewMessages.setHasFixedSize(true);
-        recyclerViewMessages.setAdapter(messageAdapter);
+
+        CollectionReference users = FirebaseFirestore.getInstance().collection("Users");
+        users.document(fellowUID).get().addOnSuccessListener(documentSnapshot -> {
+            fellow = documentSnapshot.toObject(User.class);
+            assert fellow != null;
+            username.setText(fellow.getUsername());
+            Glide.with(this).load(fellow.getProfileImageUrl()).into(profileImage);
+
+            messages = new ArrayList<>();
+            messageAdapter = new MessageAdapter(this, messages, fellow.getProfileImageUrl());
+            recyclerViewMessages.setHasFixedSize(true);
+            recyclerViewMessages.setAdapter(messageAdapter);
+            getChatData();
+        });
 
         sendButton.setOnClickListener(v -> {
             String messageString = message.getText().toString();
@@ -63,10 +77,7 @@ public class ChatActivity extends AppCompatActivity {
                 SimpleDateFormat sdf = new SimpleDateFormat(getResources().getString(R.string.post_time_format), Locale.getDefault());
                 String messageId = sdf.format(new Date());
                 message.setText("");
-                Message newMessage = new Message(messageId, messageString, me.getId());
-                messages.add(newMessage);
-                messageAdapter.notifyItemInserted(messages.size() - 1);
-                recyclerViewMessages.scrollToPosition(messages.size() - 1);
+                Message newMessage = new Message(messageId, messageString, myUID);
                 chatReference.child(messageId).setValue(newMessage);
             }
         });
@@ -81,9 +92,9 @@ public class ChatActivity extends AppCompatActivity {
                     Message message = messageSnapshot.getValue(Message.class);
                     messages.add(message);
                 }
-                messageAdapter.notifyDataSetChanged();
                 if (messages.size() > 0)
-                    recyclerViewMessages.scrollToPosition(messages.size() - 1);
+                    recyclerViewMessages.getLayoutManager().smoothScrollToPosition(recyclerViewMessages, new RecyclerView.State(), messages.size() - 1);
+                messageAdapter.notifyDataSetChanged();
             }
 
             @Override
@@ -91,14 +102,9 @@ public class ChatActivity extends AppCompatActivity {
 
             }
         });
-
     }
 
     private void getChatData() {
-        String myUID = FirebaseAuth.getInstance().getUid();
-        assert myUID != null;
-        String fellowUID = getIntent().getStringExtra("userid");
-
         chatsReference = FirebaseDatabase.getInstance().getReference().child("chats");
         chatsReference.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
@@ -107,7 +113,7 @@ public class ChatActivity extends AppCompatActivity {
                     String key = data.getKey();
                     assert key != null;
                     String[] ids = key.split("&");
-                    if ((ids[0].equals(myUID) && ids[1].equals(fellowUID)) || (ids[1].equals(myUID) && ids[0].equals(fellowUID))) {
+                    if (key.equals(chatId) || (ids[1].equals(myUID) && ids[0].equals(fellowUID))) {
                         chatId = key;
                         break;
                     }
@@ -116,14 +122,15 @@ public class ChatActivity extends AppCompatActivity {
                 readMessages();
             }
         });
+    }
 
-        CollectionReference users = FirebaseFirestore.getInstance().collection("Users");
-        users.document(myUID).get().addOnSuccessListener(documentSnapshot -> me = documentSnapshot.toObject(User.class));
-        users.document(fellowUID).get().addOnSuccessListener(documentSnapshot -> {
-            fellow = documentSnapshot.toObject(User.class);
-            assert fellow != null;
-            username.setText(fellow.getUsername());
-            Glide.with(this).load(fellow.getProfileImageUrl()).into(profileImage);
-        });
+    @Override
+    public void onBackPressed() {
+        if (message.isFocused()) {
+            message.clearFocus();
+            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.hideSoftInputFromWindow(message.getWindowToken(), 0);
+        } else
+            super.onBackPressed();
     }
 }
