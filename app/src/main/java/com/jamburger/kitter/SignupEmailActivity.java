@@ -1,7 +1,6 @@
 package com.jamburger.kitter;
 
 import android.app.ProgressDialog;
-import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
@@ -11,7 +10,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.jamburger.kitter.components.User;
 
 public class SignupEmailActivity extends AppCompatActivity {
     EditText email, password, confirmPassword;
@@ -55,18 +53,10 @@ public class SignupEmailActivity extends AppCompatActivity {
         pd.setMessage("Please Wait");
         pd.show();
         auth.createUserWithEmailAndPassword(strEmail, strPassword).addOnSuccessListener(authResult -> {
-            User user = new User(auth.getCurrentUser().getUid(), "", "", strEmail, strPassword, getResources().getString(R.string.default_profile_img_url), getResources().getString(R.string.default_background_img_url));
-            db.collection("Users").document(user.getId()).set(user).addOnSuccessListener(result -> {
-                Intent intent = new Intent(SignupEmailActivity.this, AddInfoActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(intent);
-                pd.dismiss();
+            authResult.getUser().sendEmailVerification().addOnSuccessListener(unused -> {
+                Toast.makeText(SignupEmailActivity.this, "Verification mail sent to " + authResult.getUser().getEmail(), Toast.LENGTH_LONG).show();
                 finish();
             });
-        }).addOnFailureListener(e -> {
-            Toast.makeText(SignupEmailActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
-            pd.dismiss();
         });
-
     }
 }

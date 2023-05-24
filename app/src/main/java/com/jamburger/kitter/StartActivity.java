@@ -3,11 +3,13 @@ package com.jamburger.kitter;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
@@ -61,33 +63,49 @@ public class StartActivity extends AppCompatActivity {
             public void onAnimationEnd(Animation animation) {
                 gsc = GoogleSignIn.getClient(StartActivity.this, GoogleSignInOptions.DEFAULT_SIGN_IN);
                 FirebaseAuth auth = FirebaseAuth.getInstance();
-                if (auth.getCurrentUser() == null) {
+                if (auth.getCurrentUser() == null || !auth.getCurrentUser().isEmailVerified()) {
                     Intent intent = new Intent(StartActivity.this, LoginActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
                     startActivity(intent);
                     finish();
                 } else {
                     DocumentReference userReference = FirebaseFirestore.getInstance().document("Users/" + auth.getUid());
-                    userReference.get().addOnCompleteListener(task -> {
-                        if (task.isSuccessful()) {
-                            User user = task.getResult().toObject(User.class);
-                            Intent intent;
-                            if (user != null) {
-                                if (user.getUsername().isEmpty()) {
-                                    intent = new Intent(StartActivity.this, AddInfoActivity.class);
+                    try {
+                        userReference.get().addOnCompleteListener(task -> {
+                            if (task.isSuccessful()) {
+                                User user = task.getResult().toObject(User.class);
+                                Intent intent;
+                                if (user != null) {
+                                    if (user.getUsername().isEmpty()) {
+                                        intent = new Intent(StartActivity.this, AddInfoActivity.class);
+                                    } else {
+                                        intent = new Intent(StartActivity.this, MainActivity.class);
+                                    }
                                 } else {
-                                    intent = new Intent(StartActivity.this, MainActivity.class);
+                                    user = new User(auth.getUid(), "", "", auth.getCurrentUser().getEmail(), "", getResources().getString(R.string.default_profile_img_url), getResources().getString(R.string.default_background_img_url));
+                                    userReference.set(user);
+                                    intent = new Intent(StartActivity.this, LoginActivity.class);
                                 }
+                                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                startActivity(intent);
+                                finish();
                             } else {
-                                auth.signOut();
-                                gsc.signOut();
-                                intent = new Intent(StartActivity.this, LoginActivity.class);
+                                Log.e("signin", task.getException().getMessage());
                             }
-                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                            startActivity(intent);
-                            finish();
-                        }
-                    });
+                        });
+                    } catch (Exception e) {
+                        User user = new User(auth.getCurrentUser().getUid(), "", "", auth.getCurrentUser().getEmail(), "passwordsss", getResources().getString(R.string.default_profile_img_url), getResources().getString(R.string.default_background_img_url));
+                        FirebaseFirestore.getInstance().collection("Users").document(user.getId()).set(user).addOnCompleteListener(task -> {
+                            if (task.isSuccessful()) {
+                                Intent intent = new Intent(StartActivity.this, AddInfoActivity.class);
+                                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                startActivity(intent);
+                                finish();
+                            } else {
+                                Toast.makeText(StartActivity.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
                 }
             }
 

@@ -18,7 +18,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-
 public class MainActivity extends AppCompatActivity {
     public static final String TAG = "com.jamburger.kitter";
     BottomNavigationView bottomNavigationView;
@@ -73,21 +72,6 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void startFragment(String fragment) {
-        Fragment frag = null;
-        if (fragment.equals("PROFILE")) {
-            frag = new ProfileFragment();
-            currentPage = "PROFILE";
-        } else if (fragment.equals("SEARCH")) {
-            frag = new SearchFragment();
-            currentPage = "SEARCH";
-        } else if (fragment.equals("HOME")) {
-            frag = new HomeFragment();
-            currentPage = "HOME";
-        }
-        if (frag != null) startFragment(frag);
-    }
-
     void startFragment(Fragment fragment) {
         getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, fragment).commit();
     }
@@ -124,6 +108,26 @@ public class MainActivity extends AppCompatActivity {
             return null;
         }
     }
+
+    public void startFragment(String fragment) {
+        Fragment frag = null;
+        switch (fragment) {
+            case "PROFILE":
+                frag = new ProfileFragment();
+                currentPage = "PROFILE";
+                break;
+            case "SEARCH":
+                frag = new SearchFragment();
+                currentPage = "SEARCH";
+                break;
+            case "HOME":
+                frag = new HomeFragment();
+                currentPage = "HOME";
+                break;
+        }
+        if (frag != null) startFragment(frag);
+    }
+
 
     public static String dateIdToTime(String dateId) {
         String[] strings = dateId.split("-", 6);

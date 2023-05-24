@@ -15,7 +15,15 @@
       },
       "oauth_client": [
         {
-          "client_id": "710004170927-ufnkjh5bm012fm6num1iej3p09d4ll7q.apps.googleusercontent.com",
+          "client_id": "710004170927-u4gptfuv4kq1rupdqv81d2rmm0ia6bvu.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.jamburger.kitter",
+            "certificate_hash": "f71082352213de66b092efcea7f9e9a4999fb46b"
+          }
+        },
+        {
+          "client_id": "710004170927-hf1p7mfq7c24u9hh3ns978ptoejbgjt5.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
@@ -28,7 +36,7 @@
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "710004170927-ufnkjh5bm012fm6num1iej3p09d4ll7q.apps.googleusercontent.com",
+              "client_id": "710004170927-hf1p7mfq7c24u9hh3ns978ptoejbgjt5.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

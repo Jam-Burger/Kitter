@@ -209,6 +209,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
             userReference.get().addOnSuccessListener(documentSnapshot -> {
                 isSaved = false;
                 User user = documentSnapshot.toObject(User.class);
+                assert user != null;
                 for (DocumentReference dr : user.getSaved()) {
                     if (dr.equals(postReference)) {
                         isSaved = true;

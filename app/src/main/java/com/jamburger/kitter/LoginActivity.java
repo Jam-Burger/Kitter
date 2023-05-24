@@ -5,6 +5,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.InputType;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
@@ -24,6 +25,7 @@ import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.jamburger.kitter.components.User;
 
@@ -81,9 +83,38 @@ public class LoginActivity extends AppCompatActivity {
         }
         auth.signInWithEmailAndPassword(strEmail, strPassword).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
-                startMainActivity();
+                if (auth.getCurrentUser().isEmailVerified()) {
+                    DocumentReference userReference = FirebaseFirestore.getInstance().document("Users/" + auth.getUid());
+                    userReference.get().addOnCompleteListener(task0 -> {
+                        if (task0.isSuccessful()) {
+                            User user = task0.getResult().toObject(User.class);
+                            if (user == null) {
+                                user = new User(auth.getUid(), "", "", email.getText().toString(), "", getResources().getString(R.string.default_profile_img_url), getResources().getString(R.string.default_background_img_url));
+                                userReference.set(user).addOnCompleteListener(task1 -> {
+                                    if (task1.isSuccessful()) {
+                                        Toast.makeText(LoginActivity.this, auth.getUid(), Toast.LENGTH_SHORT).show();
+                                    } else {
+                                        Toast.makeText(LoginActivity.this, task1.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                                startAddInfoActivity();
+                            } else {
+                                if (user.getUsername().isEmpty()) {
+                                    startAddInfoActivity();
+                                } else {
+                                    startMainActivity();
+                                }
+                            }
+                        } else {
+                            Toast.makeText(this, task0.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                } else {
+                    Toast.makeText(this, "Verify your email first\nLink sent to " + auth.getCurrentUser().getEmail(), Toast.LENGTH_SHORT).show();
+                    auth.getCurrentUser().sendEmailVerification();
+                }
             } else {
-                Toast.makeText(LoginActivity.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -166,8 +197,12 @@ public class LoginActivity extends AppCompatActivity {
 
                     }
                 } catch (ApiException e) {
+                    Log.e("ApiException", e.getMessage());
                     e.printStackTrace();
                 }
+            } else {
+                Log.e("signInAccountTask", signInAccountTask.getException().getMessage());
+                signInAccountTask.getException().printStackTrace();
             }
         }
     }
