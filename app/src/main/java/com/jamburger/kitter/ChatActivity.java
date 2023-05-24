@@ -38,7 +38,7 @@ public class ChatActivity extends AppCompatActivity {
     List<Message> messages;
     MessageAdapter messageAdapter;
     RecyclerView recyclerViewMessages;
-    DatabaseReference chatsReference, chatReference;
+    DatabaseReference chatReference;
     ImageView profileImage, sendButton;
     String chatId;
 
@@ -105,23 +105,10 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     private void getChatData() {
-        chatsReference = FirebaseDatabase.getInstance().getReference().child("chats");
-        chatsReference.get().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                chatId = myUID + "&" + fellowUID;
-                for (DataSnapshot data : task.getResult().getChildren()) {
-                    String key = data.getKey();
-                    assert key != null;
-                    String[] ids = key.split("&");
-                    if (key.equals(chatId) || (ids[1].equals(myUID) && ids[0].equals(fellowUID))) {
-                        chatId = key;
-                        break;
-                    }
-                }
-                chatReference = chatsReference.child(chatId);
-                readMessages();
-            }
-        });
+        boolean less = myUID.compareTo(fellowUID) < 0;
+        chatId = less ? myUID + '&' + fellowUID : fellowUID + '&' + myUID;
+        chatReference = FirebaseDatabase.getInstance().getReference().child("chats").child(chatId);
+        readMessages();
     }
 
     @Override
