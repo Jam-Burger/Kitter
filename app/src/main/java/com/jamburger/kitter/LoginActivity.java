@@ -99,17 +99,18 @@ public class LoginActivity extends AppCompatActivity {
 
     private void doValidUserShit() {
         DocumentReference userReference = FirebaseFirestore.getInstance().document("Users/" + auth.getUid());
+
+        OSDeviceState device = OneSignal.getDeviceState();
+        assert device != null;
+        String playerID = device.getUserId();
+        userReference.update("onesignalPlayerId", playerID);
+
         userReference.get().addOnCompleteListener(task0 -> {
             if (task0.isSuccessful()) {
                 User user = task0.getResult().toObject(User.class);
                 if (user == null) {
                     user = new User(auth.getUid(), "", "", auth.getCurrentUser().getEmail(), getResources().getString(R.string.default_profile_img_url), getResources().getString(R.string.default_background_img_url));
-
-                    OSDeviceState device = OneSignal.getDeviceState();
-                    assert device != null;
-                    String playerID = device.getUserId();
                     user.setOnesignalPlayerId(playerID);
-
                     userReference.set(user).addOnCompleteListener(task1 -> {
                         if (task1.isSuccessful()) {
                             Toast.makeText(LoginActivity.this, auth.getUid(), Toast.LENGTH_SHORT).show();
