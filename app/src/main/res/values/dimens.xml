@@ -5,4 +5,5 @@
     <dimen name="normal_txt">13sp</dimen>
     <dimen name="little_big_txt">15sp</dimen>
     <dimen name="big_txt">18sp</dimen>
+    <dimen name="notification_icon_size">50dp</dimen>
 </resources>

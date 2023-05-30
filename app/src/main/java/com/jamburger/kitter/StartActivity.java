@@ -1,7 +1,12 @@
 package com.jamburger.kitter;
 
+import static com.jamburger.kitter.utilities.Constants.TAG;
+
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -11,8 +16,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
+import androidx.core.content.ContextCompat;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -20,17 +29,23 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.jamburger.kitter.backend.ForceUpdateChecker;
 import com.jamburger.kitter.components.User;
 
-public class StartActivity extends AppCompatActivity {
+public class StartActivity extends AppCompatActivity implements ForceUpdateChecker.OnUpdateNeededListener {
     GoogleSignInClient gsc;
     ImageView logo;
     TextView appName;
+
+    // Declare the launcher at the top of your Activity/Fragment:
+    private final ActivityResultLauncher<String> requestPermissionLauncher = registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
+    });
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start);
+
         logo = findViewById(R.id.img_logo);
         appName = findViewById(R.id.txt_appname);
 
@@ -45,7 +60,26 @@ public class StartActivity extends AppCompatActivity {
         } else {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         }
+        askNotificationPermission();
         letTheShitBegin();
+    }
+
+    private void askNotificationPermission() {
+        // This is only necessary for API level >= 33 (TIRAMISU)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
+                Log.d(TAG, "askNotificationPermission: FCM SDK (and your app) can post notifications.");
+            } else if (shouldShowRequestPermissionRationale(android.Manifest.permission.POST_NOTIFICATIONS)) {
+                // display an educational UI explaining to the user the features that will be enabled
+                //       by them granting the POST_NOTIFICATION permission. This UI should provide the user
+                //       "OK" and "No thanks" buttons. If the user selects "OK," directly request the permission.
+                //       If the user selects "No thanks," allow the user to continue without notifications.
+                Toast.makeText(this, "askNotificationPermission: enabling notifications is cool bruh!", Toast.LENGTH_SHORT).show();
+            } else {
+                // Directly ask for the permission
+                requestPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS);
+            }
+        }
     }
 
     private void letTheShitBegin() {
@@ -61,6 +95,8 @@ public class StartActivity extends AppCompatActivity {
 
             @Override
             public void onAnimationEnd(Animation animation) {
+                boolean required = ForceUpdateChecker.with(StartActivity.this).onUpdateNeeded(StartActivity.this).check();
+                if (required) return;
                 gsc = GoogleSignIn.getClient(StartActivity.this, GoogleSignInOptions.DEFAULT_SIGN_IN);
                 FirebaseAuth auth = FirebaseAuth.getInstance();
                 if (auth.getCurrentUser() == null || !auth.getCurrentUser().isEmailVerified()) {
@@ -82,8 +118,7 @@ public class StartActivity extends AppCompatActivity {
                                         intent = new Intent(StartActivity.this, MainActivity.class);
                                     }
                                 } else {
-                                    user = new User(auth.getUid(), "", "", auth.getCurrentUser().getEmail(), "", getResources().getString(R.string.default_profile_img_url), getResources().getString(R.string.default_background_img_url));
-                                    userReference.set(user);
+                                    Toast.makeText(StartActivity.this, "user is deleted on firestore", Toast.LENGTH_SHORT).show();
                                     intent = new Intent(StartActivity.this, LoginActivity.class);
                                 }
                                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
@@ -91,20 +126,13 @@ public class StartActivity extends AppCompatActivity {
                                 finish();
                             } else {
                                 Log.e("signin", task.getException().getMessage());
+                                FirebaseAuth.getInstance().signOut();
                             }
                         });
                     } catch (Exception e) {
-                        User user = new User(auth.getCurrentUser().getUid(), "", "", auth.getCurrentUser().getEmail(), "passwordsss", getResources().getString(R.string.default_profile_img_url), getResources().getString(R.string.default_background_img_url));
-                        FirebaseFirestore.getInstance().collection("Users").document(user.getId()).set(user).addOnCompleteListener(task -> {
-                            if (task.isSuccessful()) {
-                                Intent intent = new Intent(StartActivity.this, AddInfoActivity.class);
-                                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                startActivity(intent);
-                                finish();
-                            } else {
-                                Toast.makeText(StartActivity.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                            }
-                        });
+                        Log.d(TAG, "onAnimationEnd: " + e);
+                        Toast.makeText(StartActivity.this, "something's wrong again", Toast.LENGTH_SHORT).show();
+                        FirebaseAuth.getInstance().signOut();
                     }
                 }
             }
@@ -114,5 +142,24 @@ public class StartActivity extends AppCompatActivity {
 
             }
         });
+    }
+
+    @Override
+    public void onUpdateNeeded(String updateUrl) {
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle("New version available")
+                .setMessage("Please, update app to new version to continue reposting.")
+                .setCancelable(false)
+                .setPositiveButton("Update",
+                        (dialog1, which) -> redirectStore(updateUrl)).setNegativeButton("No, thanks",
+                        (dialog12, which) -> finish()).create();
+        dialog.show();
+    }
+
+    private void redirectStore(String updateUrl) {
+        final Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(updateUrl));
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+        finish();
     }
 }

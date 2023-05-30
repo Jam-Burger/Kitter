@@ -21,6 +21,7 @@ import com.jamburger.kitter.CommentsActivity;
 import com.jamburger.kitter.MainActivity;
 import com.jamburger.kitter.OtherProfileActivity;
 import com.jamburger.kitter.R;
+import com.jamburger.kitter.backend.NotificationManager;
 import com.jamburger.kitter.components.Post;
 import com.jamburger.kitter.components.User;
 
@@ -45,7 +46,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(mContext).inflate(R.layout.post_item, parent, false);
+        View view = LayoutInflater.from(mContext).inflate(R.layout.adapter_post, parent, false);
         db = FirebaseFirestore.getInstance();
         userReference = db.collection("Users").document(FirebaseAuth.getInstance().getUid());
         userReference.get().addOnSuccessListener(snapshot -> user = snapshot.toObject(User.class));
@@ -78,13 +79,12 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         }
 
         holder.checkIfLiked();
-        holder.update();
 
-        holder.like.setOnClickListener(v -> holder.likePost());
+        holder.like.setOnClickListener(v -> holder.likePost(user));
         holder.postImage.setOnClickListener(view -> {
             long clickTime = System.currentTimeMillis();
             if (clickTime - lastClickTime < DOUBLE_CLICK_TIME_DELTA) {
-                holder.likePost();
+                holder.likePost(user);
             }
             lastClickTime = clickTime;
         });
@@ -156,32 +156,23 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
             else save.setImageResource(R.drawable.ic_save_outlined);
         }
 
-        public void likePost() {
+        public void likePost(User user) {
             isLiked = !isLiked;
             if (isLiked) {
                 likeAnimation.setVisibility(View.VISIBLE);
                 likeAnimation.playAnimation();
+                NotificationManager.sendNotification(post.getCreator(), "Your post liked by " + user.getName());
             } else {
                 likeAnimation.setVisibility(View.INVISIBLE);
             }
             updateLikesData();
-            update();
         }
 
         public void savePost() {
             isSaved = !isSaved;
             updateSavedData();
-            update();
         }
 
-        private void updateSavedData() {
-            DocumentReference postReference = FirebaseFirestore.getInstance().collection("Posts").document(post.getPostid());
-            if (isSaved) {
-                userReference.update("saved", FieldValue.arrayUnion(postReference));
-            } else {
-                userReference.update("saved", FieldValue.arrayRemove(postReference));
-            }
-        }
 
         private void checkIfLiked() {
             isLiked = false;
@@ -191,6 +182,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                     break;
                 }
             }
+            update();
         }
 
         void updateLikesData() {
@@ -202,6 +194,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                 postReference.update("likes", FieldValue.arrayRemove(userReference));
                 post.getLikes().remove(userReference);
             }
+            update();
         }
 
         public void checkIfSaved() {
@@ -216,8 +209,18 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                         break;
                     }
                 }
-                update();
             });
+            update();
+        }
+
+        private void updateSavedData() {
+            DocumentReference postReference = FirebaseFirestore.getInstance().collection("Posts").document(post.getPostid());
+            if (isSaved) {
+                userReference.update("saved", FieldValue.arrayUnion(postReference));
+            } else {
+                userReference.update("saved", FieldValue.arrayRemove(postReference));
+            }
+            update();
         }
     }
 }

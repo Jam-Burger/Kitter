@@ -13,7 +13,7 @@ public class User {
     String bio;
     String profileImageUrl;
     String backgroundImageUrl;
-    String password;
+    String onesignalPlayerId;
     List<DocumentReference> posts;
     List<DocumentReference> saved;
 
@@ -22,12 +22,12 @@ public class User {
 
     }
 
-    public User(String id, String name, String username, String email, String password, String profileImageUrl, String backgroundImageUrl) {
+    public User(String id, String name, String username, String email, String profileImageUrl, String backgroundImageUrl) {
         this.id = id;
         this.name = name;
         this.username = username;
         this.email = email;
-        this.password = password;
+        this.onesignalPlayerId = "";
         this.profileImageUrl = profileImageUrl;
         this.backgroundImageUrl = backgroundImageUrl;
         this.bio = "";
@@ -35,16 +35,16 @@ public class User {
         this.saved = new ArrayList<>();
     }
 
-    public String getPassword() {
-        return password;
+    public String getOnesignalPlayerId() {
+        return onesignalPlayerId;
+    }
+
+    public void setOnesignalPlayerId(String onesignalPlayerId) {
+        this.onesignalPlayerId = onesignalPlayerId;
     }
 
     public List<DocumentReference> getSaved() {
         return saved;
-    }
-
-    public String getEmail() {
-        return email;
     }
 
     public List<DocumentReference> getPosts() {

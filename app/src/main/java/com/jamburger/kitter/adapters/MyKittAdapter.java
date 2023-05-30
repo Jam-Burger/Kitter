@@ -27,7 +27,7 @@ public class MyKittAdapter extends RecyclerView.Adapter<MyKittAdapter.ViewHolder
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(mContext).inflate(R.layout.my_kitt_item, parent, false);
+        View view = LayoutInflater.from(mContext).inflate(R.layout.adapter_my_kitt, parent, false);
         return new MyKittAdapter.ViewHolder(view);
     }
 
