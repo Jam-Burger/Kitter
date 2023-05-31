@@ -1,4 +1,4 @@
-package com.jamburger.kitter;
+package com.jamburger.kitter.activities;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -15,6 +15,7 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.jamburger.kitter.R;
 import com.jamburger.kitter.fragments.DetailsFragment;
 import com.jamburger.kitter.fragments.ProfileImageFragment;
 import com.jamburger.kitter.fragments.UsernameFragment;

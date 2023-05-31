@@ -1,4 +1,4 @@
-package com.jamburger.kitter;
+package com.jamburger.kitter.activities;
 
 import android.os.Bundle;
 import android.widget.ImageView;
@@ -10,6 +10,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.jamburger.kitter.R;
 import com.jamburger.kitter.adapters.PostAdapter;
 import com.jamburger.kitter.components.Post;
 import com.jamburger.kitter.components.User;

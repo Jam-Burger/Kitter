@@ -1,4 +1,4 @@
-package com.jamburger.kitter;
+package com.jamburger.kitter.activities;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -27,6 +27,7 @@ import com.google.firebase.auth.GoogleAuthProvider;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.jamburger.kitter.R;
 import com.jamburger.kitter.components.User;
 import com.onesignal.OSDeviceState;
 import com.onesignal.OneSignal;

@@ -1,4 +1,4 @@
-package com.jamburger.kitter;
+package com.jamburger.kitter.activities;
 
 import android.os.Bundle;
 import android.view.View;
@@ -11,26 +11,26 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.jamburger.kitter.R;
 import com.jamburger.kitter.adapters.MyKittAdapter;
 import com.jamburger.kitter.adapters.MyPictureAdapter;
-import com.jamburger.kitter.components.Post;
 import com.jamburger.kitter.components.User;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class OtherProfileActivity extends AppCompatActivity {
-    public MyPictureAdapter myPictureAdapter;
-    public MyKittAdapter myKittAdapter;
+    MyPictureAdapter myPictureAdapter;
+    MyKittAdapter myKittAdapter;
     ImageView backgroundImage, profileImage;
     TextView name, username, bio;
     DocumentReference userdata;
     ImageView picturesButton, kittsButton;
     RecyclerView recyclerViewMyPosts;
-    List<Post> pictures;
-    List<Post> kitts;
+    List<DocumentReference> pictures;
+    List<DocumentReference> kitts;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,32 +95,20 @@ public class OtherProfileActivity extends AppCompatActivity {
     void readPosts() {
         userdata.get().addOnSuccessListener(userSnapshot -> {
             User user = userSnapshot.toObject(User.class);
-            List<Post> myPosts = new ArrayList<>();
-            if (user.getPosts().size() == 0) return;
-            for (DocumentReference documentReference : user.getPosts()) {
-                documentReference.get().addOnSuccessListener(documentSnapshot -> {
-                    myPosts.add(documentSnapshot.toObject(Post.class));
-                    if (myPosts.size() == user.getPosts().size()) {
-                        FirebaseFirestore.getInstance().collection("Posts").get().addOnSuccessListener(postSnapshots -> {
-                            pictures.clear();
-                            kitts.clear();
-                            for (DocumentSnapshot postSnapshot : postSnapshots) {
-                                Post post = postSnapshot.toObject(Post.class);
-                                for (Post current : myPosts) {
-                                    if (current.getPostid().equals(post.getPostid())) {
-                                        if (post.getKitt().isEmpty()) {
-                                            pictures.add(0, post);
-                                        } else {
-                                            kitts.add(0, post);
-                                        }
-                                    }
-                                }
-                            }
-                            myKittAdapter.notifyDataSetChanged();
-                            myPictureAdapter.notifyDataSetChanged();
-                        });
-                    }
-                });
+            assert user != null;
+
+            if (user.getPictures().size() != 0) {
+                pictures.clear();
+                pictures.addAll(user.getPictures());
+                Collections.reverse(pictures);
+                myPictureAdapter.notifyDataSetChanged();
+            }
+
+            if (user.getKitts().size() != 0) {
+                kitts.clear();
+                kitts.addAll(user.getKitts());
+                Collections.reverse(kitts);
+                myKittAdapter.notifyDataSetChanged();
             }
         });
     }

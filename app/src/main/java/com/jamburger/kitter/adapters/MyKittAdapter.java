@@ -9,17 +9,18 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.jamburger.kitter.MainActivity;
+import com.google.firebase.firestore.DocumentReference;
 import com.jamburger.kitter.R;
+import com.jamburger.kitter.activities.MainActivity;
 import com.jamburger.kitter.components.Post;
 
 import java.util.List;
 
 public class MyKittAdapter extends RecyclerView.Adapter<MyKittAdapter.ViewHolder> {
     Context mContext;
-    List<Post> mPosts;
+    List<DocumentReference> mPosts;
 
-    public MyKittAdapter(Context mContext, List<Post> mPosts) {
+    public MyKittAdapter(Context mContext, List<DocumentReference> mPosts) {
         this.mContext = mContext;
         this.mPosts = mPosts;
     }
@@ -33,9 +34,17 @@ public class MyKittAdapter extends RecyclerView.Adapter<MyKittAdapter.ViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Post post = mPosts.get(position);
-        holder.kitt.setText(post.getKitt());
-        holder.time.setText(MainActivity.dateIdToString(post.getPostid()));
+        DocumentReference postReference = mPosts.get(position);
+        postReference.get().addOnSuccessListener(postSnapshot -> {
+            Post post = postSnapshot.toObject(Post.class);
+            if (!post.getKitt().isEmpty()) {
+                holder.kitt.setText(post.getKitt());
+                holder.time.setText(MainActivity.dateIdToString(post.getPostid()));
+                holder.container.setVisibility(View.VISIBLE);
+            } else {
+                mPosts.remove(postReference);
+            }
+        });
     }
 
     @Override
@@ -44,12 +53,15 @@ public class MyKittAdapter extends RecyclerView.Adapter<MyKittAdapter.ViewHolder
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
+        View container;
         TextView kitt, time;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             kitt = itemView.findViewById(R.id.txt_kitt);
             time = itemView.findViewById(R.id.txt_time);
+            container = itemView.findViewById(R.id.container_my_kitt);
+            container.setVisibility(View.GONE);
         }
     }
 }

@@ -13,9 +13,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.jamburger.kitter.ChatHomeActivity;
-import com.jamburger.kitter.PostActivity;
 import com.jamburger.kitter.R;
+import com.jamburger.kitter.activities.ChatHomeActivity;
+import com.jamburger.kitter.activities.PostActivity;
 import com.jamburger.kitter.adapters.PostAdapter;
 import com.jamburger.kitter.components.Post;
 

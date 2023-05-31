@@ -14,13 +14,16 @@ public class User {
     String profileImageUrl;
     String backgroundImageUrl;
     String onesignalPlayerId;
-    List<DocumentReference> posts;
+    List<DocumentReference> pictures;
+    List<DocumentReference> kitts;
+
     List<DocumentReference> saved;
 
 
     public User() {
 
     }
+
 
     public User(String id, String name, String username, String email, String profileImageUrl, String backgroundImageUrl) {
         this.id = id;
@@ -31,7 +34,8 @@ public class User {
         this.profileImageUrl = profileImageUrl;
         this.backgroundImageUrl = backgroundImageUrl;
         this.bio = "";
-        this.posts = new ArrayList<>();
+        this.pictures = new ArrayList<>();
+        this.kitts = new ArrayList<>();
         this.saved = new ArrayList<>();
     }
 
@@ -47,8 +51,12 @@ public class User {
         return saved;
     }
 
-    public List<DocumentReference> getPosts() {
-        return posts;
+    public List<DocumentReference> getPictures() {
+        return pictures;
+    }
+
+    public List<DocumentReference> getKitts() {
+        return kitts;
     }
 
     public String getId() {
@@ -76,6 +84,9 @@ public class User {
         return bio;
     }
 
+    public String getEmail() {
+        return email;
+    }
 
     public String getProfileImageUrl() {
         return profileImageUrl;

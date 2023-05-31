@@ -12,9 +12,9 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.jamburger.kitter.ChatActivity;
-import com.jamburger.kitter.OtherProfileActivity;
 import com.jamburger.kitter.R;
+import com.jamburger.kitter.activities.ChatActivity;
+import com.jamburger.kitter.activities.OtherProfileActivity;
 import com.jamburger.kitter.components.User;
 
 import java.util.List;

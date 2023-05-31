@@ -1,4 +1,4 @@
-package com.jamburger.kitter;
+package com.jamburger.kitter.activities;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
@@ -28,6 +28,7 @@ import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
+import com.jamburger.kitter.R;
 import com.jamburger.kitter.components.Post;
 import com.jamburger.kitter.fragments.SelectSourceDialogFragment;
 
@@ -38,7 +39,6 @@ import java.util.Date;
 
 public class PostActivity extends AppCompatActivity {
     ImageView imageView;
-
     TextView caption;
     Uri filePath = null;
     StorageReference storageReference;
@@ -168,7 +168,7 @@ public class PostActivity extends AppCompatActivity {
                         startMainActivity();
                     });
                     db.collection("Users").document(user.getUid())
-                            .update("posts", FieldValue.arrayUnion(postRef));
+                            .update("pictures", FieldValue.arrayUnion(postRef));
                 });
             }).addOnFailureListener(e -> {
                 progressDialog.dismiss();
@@ -188,7 +188,7 @@ public class PostActivity extends AppCompatActivity {
                 startMainActivity();
             });
             db.collection("Users").document(user.getUid())
-                    .update("posts", FieldValue.arrayUnion(postRef));
+                    .update("kitts", FieldValue.arrayUnion(postRef));
         }
     }
 

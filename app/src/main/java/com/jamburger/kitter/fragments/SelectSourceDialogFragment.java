@@ -9,7 +9,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
-import com.jamburger.kitter.PostActivity;
+import com.jamburger.kitter.activities.PostActivity;
 
 public class SelectSourceDialogFragment extends DialogFragment {
     public static SelectSourceDialogFragment newInstance() {

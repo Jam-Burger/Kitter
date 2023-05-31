@@ -1,4 +1,4 @@
-package com.jamburger.kitter;
+package com.jamburger.kitter.activities;
 
 import android.os.Bundle;
 
@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.jamburger.kitter.R;
 import com.jamburger.kitter.fragments.HomeFragment;
 import com.jamburger.kitter.fragments.ProfileFragment;
 import com.jamburger.kitter.fragments.SearchFragment;

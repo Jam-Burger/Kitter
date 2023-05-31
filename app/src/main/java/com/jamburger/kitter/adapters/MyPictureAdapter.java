@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.google.firebase.firestore.DocumentReference;
 import com.jamburger.kitter.R;
 import com.jamburger.kitter.components.Post;
 
@@ -17,9 +18,9 @@ import java.util.List;
 
 public class MyPictureAdapter extends RecyclerView.Adapter<MyPictureAdapter.ViewHolder> {
     Context mContext;
-    List<Post> mPosts;
+    List<DocumentReference> mPosts;
 
-    public MyPictureAdapter(Context mContext, List<Post> mPosts) {
+    public MyPictureAdapter(Context mContext, List<DocumentReference> mPosts) {
         this.mContext = mContext;
         this.mPosts = mPosts;
     }
@@ -33,8 +34,16 @@ public class MyPictureAdapter extends RecyclerView.Adapter<MyPictureAdapter.View
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Post post = mPosts.get(position);
-        Glide.with(mContext).load(post.getImageUrl()).into(holder.myPostImage);
+        DocumentReference postReference = mPosts.get(position);
+        postReference.get().addOnSuccessListener(postSnapshot -> {
+            Post post = postSnapshot.toObject(Post.class);
+            if (!post.getImageUrl().isEmpty()) {
+                Glide.with(mContext).load(post.getImageUrl()).into(holder.myPostImage);
+                holder.container.setVisibility(View.VISIBLE);
+            } else {
+                mPosts.remove(postReference);
+            }
+        });
     }
 
     @Override
@@ -43,10 +52,14 @@ public class MyPictureAdapter extends RecyclerView.Adapter<MyPictureAdapter.View
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
+        View container;
         ImageView myPostImage;
+
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             myPostImage = itemView.findViewById(R.id.img_mypost);
+            container = itemView.findViewById(R.id.container_my_picture);
+            container.setVisibility(View.GONE);
         }
     }
 }

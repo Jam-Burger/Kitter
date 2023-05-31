@@ -12,8 +12,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
-import com.jamburger.kitter.MainActivity;
 import com.jamburger.kitter.R;
+import com.jamburger.kitter.activities.MainActivity;
 import com.jamburger.kitter.components.Message;
 
 import java.util.List;

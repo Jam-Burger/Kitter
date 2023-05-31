@@ -13,8 +13,8 @@ import androidx.core.app.NotificationCompat;
 
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
-import com.jamburger.kitter.MainActivity;
 import com.jamburger.kitter.R;
+import com.jamburger.kitter.activities.MainActivity;
 
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
     final String channelID = "jamburger.kitter.channel";

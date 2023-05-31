@@ -1,4 +1,4 @@
-package com.jamburger.kitter;
+package com.jamburger.kitter.activities;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -20,6 +20,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.jamburger.kitter.R;
 import com.jamburger.kitter.adapters.MessageAdapter;
 import com.jamburger.kitter.components.Message;
 import com.jamburger.kitter.components.User;

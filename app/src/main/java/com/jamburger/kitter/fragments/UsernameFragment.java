@@ -12,8 +12,8 @@ import androidx.fragment.app.Fragment;
 
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.jamburger.kitter.AddInfoActivity;
 import com.jamburger.kitter.R;
+import com.jamburger.kitter.activities.AddInfoActivity;
 import com.jamburger.kitter.components.User;
 
 import java.util.ArrayList;

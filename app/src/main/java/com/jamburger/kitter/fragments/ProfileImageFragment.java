@@ -15,8 +15,8 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
-import com.jamburger.kitter.AddInfoActivity;
 import com.jamburger.kitter.R;
+import com.jamburger.kitter.activities.AddInfoActivity;
 
 public class ProfileImageFragment extends Fragment {
     Button chooseButton;

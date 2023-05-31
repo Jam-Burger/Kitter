@@ -1,4 +1,4 @@
-package com.jamburger.kitter;
+package com.jamburger.kitter.activities;
 
 import static com.jamburger.kitter.utilities.Constants.TAG;
 
@@ -29,6 +29,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.jamburger.kitter.R;
 import com.jamburger.kitter.backend.ForceUpdateChecker;
 import com.jamburger.kitter.components.User;
 
@@ -127,12 +128,14 @@ public class StartActivity extends AppCompatActivity implements ForceUpdateCheck
                             } else {
                                 Log.e("signin", task.getException().getMessage());
                                 FirebaseAuth.getInstance().signOut();
+                                gsc.signOut();
                             }
                         });
                     } catch (Exception e) {
                         Log.d(TAG, "onAnimationEnd: " + e);
                         Toast.makeText(StartActivity.this, "something's wrong again", Toast.LENGTH_SHORT).show();
                         FirebaseAuth.getInstance().signOut();
+                        gsc.signOut();
                     }
                 }
             }

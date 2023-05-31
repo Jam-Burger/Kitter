@@ -30,40 +30,40 @@
             android:value="false" />
 
         <activity
-            android:name=".ChatActivity"
+            android:name=".activities.ChatActivity"
             android:exported="false" />
         <activity
-            android:name=".ChatHomeActivity"
+            android:name=".activities.ChatHomeActivity"
             android:exported="false" />
         <activity
-            android:name=".OtherProfileActivity"
+            android:name=".activities.OtherProfileActivity"
             android:exported="false" />
         <activity
-            android:name=".SavedPostsActivity"
+            android:name=".activities.SavedPostsActivity"
             android:exported="false" />
         <activity
-            android:name=".AddInfoActivity"
+            android:name=".activities.AddInfoActivity"
             android:exported="false" />
         <activity
-            android:name=".EditInfoActivity"
+            android:name=".activities.EditInfoActivity"
             android:exported="false" />
         <activity
-            android:name=".CommentsActivity"
+            android:name=".activities.CommentsActivity"
             android:exported="false" />
         <activity
-            android:name=".PostActivity"
+            android:name=".activities.PostActivity"
             android:exported="false" />
         <activity
-            android:name=".MainActivity"
+            android:name=".activities.MainActivity"
             android:exported="false" />
         <activity
-            android:name=".SignupEmailActivity"
+            android:name=".activities.SignupEmailActivity"
             android:exported="false" />
         <activity
-            android:name=".LoginActivity"
+            android:name=".activities.LoginActivity"
             android:exported="false" />
         <activity
-            android:name=".StartActivity"
+            android:name=".activities.StartActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
