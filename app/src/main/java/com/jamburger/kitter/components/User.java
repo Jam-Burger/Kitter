@@ -16,8 +16,9 @@ public class User {
     String onesignalPlayerId;
     List<DocumentReference> pictures;
     List<DocumentReference> kitts;
-
     List<DocumentReference> saved;
+    List<DocumentReference> following;
+    List<DocumentReference> followers;
 
 
     public User() {
@@ -37,6 +38,8 @@ public class User {
         this.pictures = new ArrayList<>();
         this.kitts = new ArrayList<>();
         this.saved = new ArrayList<>();
+        this.following = new ArrayList<>();
+        this.followers = new ArrayList<>();
     }
 
     public String getOnesignalPlayerId() {
@@ -45,6 +48,14 @@ public class User {
 
     public void setOnesignalPlayerId(String onesignalPlayerId) {
         this.onesignalPlayerId = onesignalPlayerId;
+    }
+
+    public List<DocumentReference> getFollowing() {
+        return following;
+    }
+
+    public List<DocumentReference> getFollowers() {
+        return followers;
     }
 
     public List<DocumentReference> getSaved() {

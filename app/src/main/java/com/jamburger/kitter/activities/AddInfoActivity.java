@@ -11,6 +11,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
@@ -29,7 +30,7 @@ public class AddInfoActivity extends AppCompatActivity {
 
     public ImageView nextButton;
     public HashMap<String, Object> data;
-    public Uri profileImagePath = null;
+    public Uri profileImageUri = null;
 
     public TextView headerText;
     Fragments current;
@@ -59,7 +60,7 @@ public class AddInfoActivity extends AppCompatActivity {
             getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, new DetailsFragment(this)).commit();
             current = Fragments.DETAILS;
         } else if (current == Fragments.DETAILS) {
-            if (profileImagePath != null)
+            if (profileImageUri != null)
                 updateDataWithImage();
             else
                 updateData();
@@ -67,6 +68,12 @@ public class AddInfoActivity extends AppCompatActivity {
     }
 
     void updateData() {
+        UserProfileChangeRequest request = new UserProfileChangeRequest.Builder()
+                .setDisplayName(data.get("name").toString())
+                .setPhotoUri(profileImageUri)
+                .build();
+        FirebaseAuth.getInstance().getCurrentUser().updateProfile(request);
+
         userReference.update(data).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 Intent intent = new Intent(this, MainActivity.class);
@@ -87,7 +94,7 @@ public class AddInfoActivity extends AppCompatActivity {
         String postId = sdf.format(new Date());
         StorageReference ref = storageReference.child("Profile Pictures/" + postId);
 
-        ref.putFile(profileImagePath).addOnCompleteListener(task0 -> {
+        ref.putFile(profileImageUri).addOnCompleteListener(task0 -> {
             if (task0.isSuccessful()) {
                 storageReference.child("Profile Pictures/").child(postId).getDownloadUrl().addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {

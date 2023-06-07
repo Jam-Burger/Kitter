@@ -32,37 +32,174 @@
 
             <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="300dp">
+                android:layout_height="170dp">
 
                 <ImageView
                     android:id="@+id/img_background"
                     android:layout_width="match_parent"
-                    android:layout_height="240dp"
+                    android:layout_height="120dp"
                     android:scaleType="centerCrop" />
 
                 <de.hdodenhof.circleimageview.CircleImageView
                     android:id="@+id/img_profile"
-                    android:layout_width="120dp"
-                    android:layout_height="120dp"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:layout_alignParentStart="true"
                     android:layout_alignParentBottom="true"
-                    android:layout_centerHorizontal="true"
-                    android:scaleType="centerCrop" />
+                    android:layout_marginStart="10dp"
+                    android:scaleType="centerCrop"
+                    app:civ_border_color="@color/inverted"
+                    app:civ_border_width=".5dp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_below="@id/img_background"
+                    android:layout_alignParentBottom="true"
+                    android:layout_toEndOf="@id/img_profile"
+                    android:baselineAligned="false"
+                    android:gravity="bottom"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="20dp"
+                    android:weightSum="3">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/txt_post_count"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/lato"
+                            android:text="0"
+                            android:textColor="@color/text_very_strong"
+                            android:textSize="@dimen/big_txt"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/roboto"
+                            android:text="Posts"
+                            android:textColor="@color/text_strong"
+                            android:textSize="@dimen/normal_txt" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/txt_followers_count"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/lato"
+                            android:text="0"
+                            android:textColor="@color/text_very_strong"
+                            android:textSize="@dimen/big_txt"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/roboto"
+                            android:text="Followers"
+                            android:textColor="@color/text_strong"
+                            android:textSize="@dimen/normal_txt" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/txt_following_count"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/lato"
+                            android:text="0"
+                            android:textColor="@color/text_very_strong"
+                            android:textSize="@dimen/big_txt"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/roboto"
+                            android:text="Following"
+                            android:textColor="@color/text_strong"
+                            android:textSize="@dimen/normal_txt" />
+                    </LinearLayout>
+                </LinearLayout>
+
             </RelativeLayout>
 
-            <TextView
-                android:id="@+id/txt_name"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
-                android:textColor="@color/inverted"
-                android:textSize="@dimen/little_big_txt"
-                android:textStyle="bold" />
+                android:gravity="start"
+                android:orientation="vertical"
+                android:paddingHorizontal="10dp"
+                android:paddingTop="5dp">
 
-            <TextView
-                android:id="@+id/txt_bio"
-                android:textSize="@dimen/little_big_txt"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+                <TextView
+                    android:id="@+id/txt_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/text_very_strong"
+                    android:textSize="@dimen/little_big_txt"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/txt_bio"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:maxWidth="250dp"
+                    android:textColor="@color/text_light"
+                    android:textSize="@dimen/little_big_txt" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="start"
+                android:orientation="horizontal"
+                android:paddingHorizontal="10dp"
+                android:weightSum="2">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_follow"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_marginHorizontal="5dp"
+                    android:layout_weight="1"
+                    android:backgroundTint="@color/button_blue"
+                    android:maxHeight="10dp"
+                    android:text="Follow"
+                    android:textAllCaps="false"
+                    android:textSize="@dimen/normal_txt" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btn_message"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:layout_marginHorizontal="5dp"
+                    android:layout_weight="1"
+                    android:backgroundTint="@color/button_gray"
+                    android:text="Message"
+                    android:textAllCaps="false"
+                    android:textSize="@dimen/normal_txt" />
+            </LinearLayout>
 
             <com.google.android.material.divider.MaterialDivider
                 android:layout_width="wrap_content"
@@ -94,7 +231,7 @@
                         android:id="@+id/indicator_pictures"
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
-                        android:background="@color/save" />
+                        android:background="@color/light_blue" />
                 </LinearLayout>
 
                 <View
@@ -121,7 +258,7 @@
                         android:id="@+id/indicator_kitts"
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
-                        android:background="@color/save"
+                        android:background="@color/light_blue"
                         android:visibility="invisible" />
                 </LinearLayout>
             </LinearLayout>

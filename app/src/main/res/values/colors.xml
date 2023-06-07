@@ -6,10 +6,13 @@
     <color name="white">#FFFFFFFF</color>
     <color name="app_name_color">#D7000000</color>
     <color name="inverted">@color/black</color>
-    <color name="save">#3790FF</color>
+    <color name="light_blue">#3790FF</color>
     <color name="like">#FF2323</color>
     <color name="item_color_active">@color/inverted</color>
     <color name="item_color_inactive">#E2717171</color>
+    <color name="text_very_strong">@color/inverted</color>
     <color name="text_strong">#323232</color>
     <color name="text_light">#4A4A4A</color>
+    <color name="button_gray">#B8B8B8</color>
+    <color name="button_blue">#237BE8</color>
 </resources>

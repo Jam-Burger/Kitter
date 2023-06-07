@@ -21,9 +21,9 @@ import com.jamburger.kitter.R;
 import com.jamburger.kitter.activities.CommentsActivity;
 import com.jamburger.kitter.activities.MainActivity;
 import com.jamburger.kitter.activities.OtherProfileActivity;
-import com.jamburger.kitter.backend.NotificationManager;
 import com.jamburger.kitter.components.Post;
 import com.jamburger.kitter.components.User;
+import com.jamburger.kitter.utilities.NotificationManager;
 
 import java.util.List;
 
@@ -161,7 +161,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
             if (isLiked) {
                 likeAnimation.setVisibility(View.VISIBLE);
                 likeAnimation.playAnimation();
-                NotificationManager.sendNotification(post.getCreator(), "Your post liked by " + user.getName());
+                NotificationManager.sendNotification(post.getCreator(), "Your post liked by " + FirebaseAuth.getInstance().getCurrentUser().getDisplayName());
             } else {
                 likeAnimation.setVisibility(View.INVISIBLE);
             }

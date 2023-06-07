@@ -56,9 +56,9 @@ import java.util.Locale;
 
 public class ProfileFragment extends Fragment {
     ImageView backgroundImage, profileImage, backgroundImageEditButton;
-    TextView name, username, bio;
+    TextView name, username, bio, noOfPosts, noOfFollowers, noOfFollowing;
     Toolbar toolbar;
-    DocumentReference userdata;
+    DocumentReference userdataReference;
     MyPictureAdapter myPictureAdapter;
     MyKittAdapter myKittAdapter;
     FirebaseFirestore db;
@@ -85,7 +85,7 @@ public class ProfileFragment extends Fragment {
         super.onCreate(savedInstanceState);
         user = FirebaseAuth.getInstance().getCurrentUser();
         db = FirebaseFirestore.getInstance();
-        userdata = db.collection("Users").document(user.getUid());
+        userdataReference = db.collection("Users").document(user.getUid());
         googleSignInClient = GoogleSignIn.getClient(requireActivity(), GoogleSignInOptions.DEFAULT_SIGN_IN);
     }
 
@@ -99,6 +99,10 @@ public class ProfileFragment extends Fragment {
         name = view.findViewById(R.id.txt_name);
         username = view.findViewById(R.id.txt_username);
         bio = view.findViewById(R.id.txt_bio);
+
+        noOfPosts = view.findViewById(R.id.txt_post_count);
+        noOfFollowers = view.findViewById(R.id.txt_followers_count);
+        noOfFollowing = view.findViewById(R.id.txt_following_count);
 
         picturesButton = view.findViewById(R.id.btn_my_pictures);
         kittsButton = view.findViewById(R.id.btn_my_kitts);
@@ -266,13 +270,19 @@ public class ProfileFragment extends Fragment {
     }
 
     void fillUserData() {
-        userdata.get().addOnSuccessListener(documentSnapshot -> {
+        userdataReference.get().addOnSuccessListener(documentSnapshot -> {
             User user = documentSnapshot.toObject(User.class);
             assert user != null;
             String txt_username = "@" + user.getUsername();
+
             username.setText(txt_username);
             name.setText(user.getName());
             bio.setText(user.getBio());
+
+            noOfPosts.setText(String.valueOf(user.getPictures().size() + user.getKitts().size()));
+            noOfFollowers.setText(String.valueOf(user.getFollowers().size()));
+            noOfFollowing.setText(String.valueOf(user.getFollowing().size()));
+
             try {
                 Glide.with(requireActivity()).load(user.getProfileImageUrl()).into(profileImage);
                 Glide.with(requireActivity()).load(user.getBackgroundImageUrl()).into(backgroundImage);
@@ -283,7 +293,7 @@ public class ProfileFragment extends Fragment {
     }
 
     void readPosts() {
-        userdata.get().addOnSuccessListener(userSnapshot -> {
+        userdataReference.get().addOnSuccessListener(userSnapshot -> {
             User user = userSnapshot.toObject(User.class);
             assert user != null;
             if (user.getPictures().size() != 0) {

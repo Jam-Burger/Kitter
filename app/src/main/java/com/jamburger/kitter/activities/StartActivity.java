@@ -30,8 +30,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.jamburger.kitter.R;
-import com.jamburger.kitter.backend.ForceUpdateChecker;
 import com.jamburger.kitter.components.User;
+import com.jamburger.kitter.utilities.ForceUpdateChecker;
 
 public class StartActivity extends AppCompatActivity implements ForceUpdateChecker.OnUpdateNeededListener {
     GoogleSignInClient gsc;
@@ -71,13 +71,8 @@ public class StartActivity extends AppCompatActivity implements ForceUpdateCheck
             if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
                 Log.d(TAG, "askNotificationPermission: FCM SDK (and your app) can post notifications.");
             } else if (shouldShowRequestPermissionRationale(android.Manifest.permission.POST_NOTIFICATIONS)) {
-                // display an educational UI explaining to the user the features that will be enabled
-                //       by them granting the POST_NOTIFICATION permission. This UI should provide the user
-                //       "OK" and "No thanks" buttons. If the user selects "OK," directly request the permission.
-                //       If the user selects "No thanks," allow the user to continue without notifications.
                 Toast.makeText(this, "askNotificationPermission: enabling notifications is cool bruh!", Toast.LENGTH_SHORT).show();
             } else {
-                // Directly ask for the permission
                 requestPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS);
             }
         }

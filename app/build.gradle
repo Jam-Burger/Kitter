@@ -12,7 +12,7 @@ android {
         minSdk 21
         targetSdk 33
         versionCode 3
-        versionName '3.2.0'
+        versionName '3.4.0'
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -45,11 +45,11 @@ dependencies {
 
     implementation 'com.google.firebase:firebase-analytics'
     implementation 'com.google.firebase:firebase-auth'
-    implementation 'com.google.firebase:firebase-database:20.2.1'
-    implementation 'com.google.firebase:firebase-firestore:24.6.0'
-    implementation 'com.google.firebase:firebase-storage:20.2.0'
+    implementation 'com.google.firebase:firebase-database'
+    implementation 'com.google.firebase:firebase-firestore'
+    implementation 'com.google.firebase:firebase-storage'
     implementation 'com.google.firebase:firebase-functions'
-    implementation 'com.google.firebase:firebase-messaging:23.1.2'
+    implementation 'com.google.firebase:firebase-messaging'
     implementation platform('com.google.firebase:firebase-bom:32.0.0')
 
     implementation 'com.onesignal:OneSignal:[4.0.0, 4.99.99]'

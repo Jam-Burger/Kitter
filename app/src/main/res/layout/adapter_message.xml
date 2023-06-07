@@ -14,14 +14,14 @@
         android:layout_marginStart="-8dp"
         android:layout_marginTop="-4dp"
         android:src="@drawable/ic_filter"
-        app:tint="@color/save" />
+        app:tint="@color/light_blue" />
 
     <View
         android:layout_width="10dp"
         android:layout_height="10dp"
         android:layout_alignStart="@id/message_card"
         android:layout_alignTop="@id/message_card"
-        android:background="@color/save" />
+        android:background="@color/light_blue" />
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/img_profile"
@@ -39,7 +39,7 @@
         android:layout_marginStart="4dp"
         android:orientation="vertical"
         android:layout_toEndOf="@id/img_profile"
-        app:cardBackgroundColor="@color/save"
+        app:cardBackgroundColor="@color/light_blue"
         android:outlineProvider="none"
         app:cardCornerRadius="10dp">
 

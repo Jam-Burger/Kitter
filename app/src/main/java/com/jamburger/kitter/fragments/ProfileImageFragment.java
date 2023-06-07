@@ -28,7 +28,7 @@ public class ProfileImageFragment extends Fragment {
             if (data != null && data.getData() != null) {
                 Uri uri = data.getData();
                 Glide.with(this).load(uri).into(profileImage);
-                parent.profileImagePath = uri;
+                parent.profileImageUri = uri;
             }
         }
     });

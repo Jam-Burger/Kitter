@@ -1,4 +1,4 @@
-package com.jamburger.kitter.backend;
+package com.jamburger.kitter.utilities;
 
 import static com.jamburger.kitter.utilities.Constants.TAG;
 

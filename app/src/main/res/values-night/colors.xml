@@ -4,4 +4,5 @@
     <color name="inverted">@color/white</color>
     <color name="text_strong">#D5D5D5</color>
     <color name="text_light">#BFBFBF</color>
+    <color name="button_gray">#2E2E2E</color>
 </resources>

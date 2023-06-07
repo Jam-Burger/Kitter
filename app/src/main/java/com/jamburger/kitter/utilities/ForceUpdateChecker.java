@@ -1,4 +1,4 @@
-package com.jamburger.kitter.backend;
+package com.jamburger.kitter.utilities;
 
 import android.content.Context;
 import android.content.pm.PackageManager;

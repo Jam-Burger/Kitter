@@ -17,6 +17,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.UserProfileChangeRequest;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -121,6 +122,11 @@ public class EditInfoActivity extends AppCompatActivity {
     }
 
     private void updateData() {
+        UserProfileChangeRequest request = new UserProfileChangeRequest.Builder()
+                .setDisplayName(data.get("name").toString())
+                .setPhotoUri(profileImageUri)
+                .build();
+        FirebaseAuth.getInstance().getCurrentUser().updateProfile(request);
         userReference.update(data).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 finish();
