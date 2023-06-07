@@ -13,9 +13,10 @@
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/img_profile"
-            android:layout_width="@dimen/profile_img_icon_size"
-            android:layout_height="@dimen/profile_img_icon_size"
-            android:layout_margin="10dp"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
+            android:layout_marginHorizontal="10dp"
+            android:layout_marginVertical="7dp"
             android:scaleType="centerCrop"
             app:civ_border_color="@color/app_name_color"
             app:civ_border_width=".1dp" />
@@ -23,7 +24,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="5dp"
+            android:layout_marginStart="5dp"
             android:orientation="vertical">
 
             <TextView
@@ -32,7 +33,7 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/varela_round"
                 android:textColor="@color/text_strong"
-                android:textSize="@dimen/normal_txt"
+                android:textSize="@dimen/text_normal"
                 android:textStyle="bold" />
         </LinearLayout>
     </LinearLayout>
@@ -57,7 +58,7 @@
             android:fontFamily="@font/lato"
             android:layout_margin="10dp"
             android:textColor="@color/app_name_color"
-            android:textSize="@dimen/big_txt" />
+            android:textSize="@dimen/text_big" />
     </RelativeLayout>
 
     <com.airbnb.lottie.LottieAnimationView
@@ -109,6 +110,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/btn_like"
             android:layout_marginTop="5dp"
+            android:textSize="@dimen/text_normal"
             android:textColor="@color/text_strong"
             android:textStyle="bold"
             android:visibility="gone" />
@@ -117,18 +119,27 @@
             android:id="@+id/caption"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textColor="@color/text_light"
             android:layout_below="@id/txt_likes"
+            android:textColor="@color/text_normal"
+            android:textSize="@dimen/text_normal"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/txt_comment_count"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/caption"
+            android:textColor="@color/text_light"
+            android:textSize="@dimen/text_little_small"
             android:visibility="gone" />
 
         <TextView
             android:id="@+id/txt_time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/caption"
-            android:alpha=".7"
-            android:textColor="@color/text_light"
-            android:textSize="12sp" />
+            android:layout_below="@id/txt_comment_count"
+            android:textColor="@color/text_very_light"
+            android:textSize="@dimen/text_small" />
     </RelativeLayout>
 
     <com.google.android.material.divider.MaterialDivider

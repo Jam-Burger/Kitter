@@ -8,7 +8,6 @@ import java.util.List;
 public class Post {
     String creator, postid, imageUrl, caption, kitt;
     List<DocumentReference> likes;
-    List<Comment> comments;
 
     public Post(String creator, String postid, String imageUrl, String caption) {
         this.creator = creator;
@@ -16,7 +15,6 @@ public class Post {
         this.imageUrl = imageUrl;
         this.caption = caption;
         this.likes = new ArrayList<>();
-        this.comments = new ArrayList<>();
         this.kitt = "";
     }
 
@@ -30,15 +28,6 @@ public class Post {
     public void setKitt(String kitt) {
         this.kitt = kitt;
     }
-
-    public List<Comment> getComments() {
-        return comments;
-    }
-
-    public void setComments(List<Comment> comments) {
-        this.comments = comments;
-    }
-
 
     public List<DocumentReference> getLikes() {
         return likes;

@@ -34,7 +34,7 @@
             android:fontFamily="@font/varela_round"
             android:textColor="@color/text_strong"
             android:text="gavi_"
-            android:textSize="@dimen/normal_txt"
+            android:textSize="@dimen/text_normal"
             android:textStyle="bold" />
 
         <TextView
@@ -44,6 +44,6 @@
             android:textColor="@color/text_light"
             android:text="gavi pablo"
             android:fontFamily="@font/lato"
-            android:textSize="@dimen/normal_txt" />
+            android:textSize="@dimen/text_normal" />
     </LinearLayout>
 </RelativeLayout>

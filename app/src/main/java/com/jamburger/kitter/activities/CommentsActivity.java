@@ -2,6 +2,7 @@ package com.jamburger.kitter.activities;
 
 import android.os.Bundle;
 import android.view.MotionEvent;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 
@@ -9,13 +10,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.jamburger.kitter.R;
 import com.jamburger.kitter.adapters.CommentAdapter;
 import com.jamburger.kitter.components.Comment;
-import com.jamburger.kitter.components.Post;
 import com.jamburger.kitter.utilities.KeyboardManager;
 
 import java.text.SimpleDateFormat;
@@ -29,7 +31,7 @@ public class CommentsActivity extends AppCompatActivity {
     ImageView sendButton, closeButton;
     CommentAdapter commentAdapter;
     List<Comment> comments;
-    DocumentReference postReference;
+    DatabaseReference commentsReference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,7 +48,7 @@ public class CommentsActivity extends AppCompatActivity {
         recyclerViewComments.setHasFixedSize(true);
         recyclerViewComments.setAdapter(commentAdapter);
         String postId = getIntent().getExtras().getString("postid");
-        postReference = FirebaseFirestore.getInstance().collection("Posts").document(postId);
+        commentsReference = FirebaseDatabase.getInstance().getReference().child("comments").child(postId);
 
         readComments();
         boolean openKeyboard = getIntent().getExtras().getBoolean("openKeyboard");
@@ -62,12 +64,12 @@ public class CommentsActivity extends AppCompatActivity {
 
             SimpleDateFormat sdf = new SimpleDateFormat(getResources().getString(R.string.post_time_format));
             String commentId = sdf.format(new Date());
-            Comment comment = new Comment(userReference, commentString, commentId);
+            Comment comment = new Comment(userReference.getId(), commentString, commentId);
 
             KeyboardManager.closeKeyboard(this);
             commentText.clearFocus();
             commentText.setText("");
-            postReference.update("comments", FieldValue.arrayUnion(comment)).addOnSuccessListener(unused -> {
+            commentsReference.child(commentId).setValue(comment).addOnSuccessListener(unused -> {
                 comments.add(comment);
                 commentAdapter.notifyDataSetChanged();
             });
@@ -78,15 +80,22 @@ public class CommentsActivity extends AppCompatActivity {
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent event) {
-        KeyboardManager.closeKeyboard(this);
+        View focused = getCurrentFocus();
+        if (focused != null) {
+            KeyboardManager.closeKeyboard(this);
+        }
         return super.dispatchTouchEvent(event);
     }
 
     private void readComments() {
-        postReference.get().addOnSuccessListener(documentSnapshot -> {
-            Post post = documentSnapshot.toObject(Post.class);
-            comments.addAll(post.getComments());
-            commentAdapter.notifyDataSetChanged();
+        commentsReference.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                comments.clear();
+                for (DataSnapshot commentSnapshot : task.getResult().getChildren()) {
+                    comments.add(commentSnapshot.getValue(Comment.class));
+                }
+                commentAdapter.notifyDataSetChanged();
+            }
         });
     }
 }

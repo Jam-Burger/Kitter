@@ -1,9 +1,7 @@
 package com.jamburger.kitter.components;
 
-import com.google.firebase.firestore.DocumentReference;
-
 public class Comment {
-    DocumentReference publisher;
+    String publisherId;
     String text;
 
     String commentId;
@@ -13,8 +11,8 @@ public class Comment {
 
     }
 
-    public Comment(DocumentReference publisher, String text, String commentId) {
-        this.publisher = publisher;
+    public Comment(String publisherId, String text, String commentId) {
+        this.publisherId = publisherId;
         this.text = text;
         this.commentId = commentId;
     }
@@ -27,12 +25,12 @@ public class Comment {
         this.text = text;
     }
 
-    public DocumentReference getPublisher() {
-        return publisher;
+    public String getPublisherId() {
+        return publisherId;
     }
 
-    public void setPublisher(DocumentReference publisher) {
-        this.publisher = publisher;
+    public void setPublisherId(String publisherId) {
+        this.publisherId = publisherId;
     }
 
     public String getCommentId() {

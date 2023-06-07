@@ -13,6 +13,8 @@
     <color name="text_very_strong">@color/inverted</color>
     <color name="text_strong">#323232</color>
     <color name="text_light">#4A4A4A</color>
+    <color name="text_normal">#3E3E3E</color>
     <color name="button_gray">#B8B8B8</color>
     <color name="button_blue">#237BE8</color>
+    <color name="text_very_light">#B24A4A4A</color>
 </resources>

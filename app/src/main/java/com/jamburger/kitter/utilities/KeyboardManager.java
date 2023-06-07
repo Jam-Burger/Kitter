@@ -22,4 +22,9 @@ public class KeyboardManager {
             manager.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
     }
+
+    public static boolean isKeyboardOpened(Activity activity) {
+        InputMethodManager manager = (InputMethodManager) activity.getSystemService(INPUT_METHOD_SERVICE);
+        return manager.isAcceptingText();
+    }
 }

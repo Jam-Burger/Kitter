@@ -59,7 +59,7 @@
                 android:text="ok"
                 android:paddingHorizontal="3dp"
                 android:textColor="@color/black"
-                android:textSize="@dimen/big_txt" />
+                android:textSize="@dimen/text_big" />
 
             <TextView
                 android:id="@+id/txt_time"
