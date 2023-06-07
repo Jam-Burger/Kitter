@@ -1,10 +1,7 @@
 package com.jamburger.kitter.activities;
 
-import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
-import android.view.inputmethod.InputMethodManager;
+import android.view.MotionEvent;
 import android.widget.EditText;
 import android.widget.ImageView;
 
@@ -19,6 +16,7 @@ import com.jamburger.kitter.R;
 import com.jamburger.kitter.adapters.CommentAdapter;
 import com.jamburger.kitter.components.Comment;
 import com.jamburger.kitter.components.Post;
+import com.jamburger.kitter.utilities.KeyboardManager;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -51,15 +49,22 @@ public class CommentsActivity extends AppCompatActivity {
         postReference = FirebaseFirestore.getInstance().collection("Posts").document(postId);
 
         readComments();
+        boolean openKeyboard = getIntent().getExtras().getBoolean("openKeyboard");
+        if (openKeyboard) {
+            commentText.requestFocus();
+            KeyboardManager.openKeyboard(this);
+        }
+
         sendButton.setOnClickListener(v -> {
             String commentString = commentText.getText().toString();
+            if (commentString.isEmpty()) return;
             DocumentReference userReference = FirebaseFirestore.getInstance().collection("Users").document(FirebaseAuth.getInstance().getUid());
 
             SimpleDateFormat sdf = new SimpleDateFormat(getResources().getString(R.string.post_time_format));
             String commentId = sdf.format(new Date());
             Comment comment = new Comment(userReference, commentString, commentId);
 
-            closeKeyboard();
+            KeyboardManager.closeKeyboard(this);
             commentText.clearFocus();
             commentText.setText("");
             postReference.update("comments", FieldValue.arrayUnion(comment)).addOnSuccessListener(unused -> {
@@ -67,20 +72,14 @@ public class CommentsActivity extends AppCompatActivity {
                 commentAdapter.notifyDataSetChanged();
             });
         });
-        closeButton.setOnClickListener(view -> {
-            Intent intent = new Intent(this, MainActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-            startActivity(intent);
-            finish();
-        });
+        closeButton.setOnClickListener(view -> finish());
     }
 
-    private void closeKeyboard() {
-        View view = this.getCurrentFocus();
-        if (view != null) {
-            InputMethodManager manager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-            manager.hideSoftInputFromWindow(view.getWindowToken(), 0);
-        }
+
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent event) {
+        KeyboardManager.closeKeyboard(this);
+        return super.dispatchTouchEvent(event);
     }
 
     private void readComments() {

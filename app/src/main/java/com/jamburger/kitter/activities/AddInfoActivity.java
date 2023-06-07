@@ -21,10 +21,7 @@ import com.jamburger.kitter.fragments.DetailsFragment;
 import com.jamburger.kitter.fragments.ProfileImageFragment;
 import com.jamburger.kitter.fragments.UsernameFragment;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.Locale;
 
 public class AddInfoActivity extends AppCompatActivity {
 
@@ -90,8 +87,7 @@ public class AddInfoActivity extends AppCompatActivity {
         progressDialog.setTitle("Saving Profile...");
         progressDialog.show();
 
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss", Locale.CHINA);
-        String postId = sdf.format(new Date());
+        String postId = userReference.getId();
         StorageReference ref = storageReference.child("Profile Pictures/" + postId);
 
         ref.putFile(profileImageUri).addOnCompleteListener(task0 -> {

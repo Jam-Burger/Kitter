@@ -1,4 +1,4 @@
-<!--<?xml version="1.0" encoding="utf-8"?>-->
+<?xml version="1.0" encoding="utf-8"?>
 
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -27,8 +27,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:layout_marginLeft="10dp"
-            android:layout_toRightOf="@id/img_profile"
+            android:layout_marginStart="10dp"
+            android:layout_toEndOf="@id/img_profile"
             android:fontFamily="@font/varela_round"
             android:textColor="@color/inverted"
             android:textSize="20sp" />
@@ -62,7 +62,7 @@
             android:layout_height="@dimen/icon_size"
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
-            android:layout_marginLeft="10dp"
+            android:layout_marginStart="10dp"
             android:paddingTop="3dp"
             android:src="@drawable/ic_send" />
 
@@ -70,7 +70,7 @@
             style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_toLeftOf="@id/btn_send_message"
+            android:layout_toStartOf="@id/btn_send_message"
             android:hint="Message"
             app:boxCornerRadiusBottomEnd="40dp"
             app:boxCornerRadiusBottomStart="40dp"

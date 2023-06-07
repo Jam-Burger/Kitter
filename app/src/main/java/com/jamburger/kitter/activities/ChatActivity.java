@@ -1,8 +1,6 @@
 package com.jamburger.kitter.activities;
 
-import android.content.Context;
 import android.os.Bundle;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -57,7 +55,6 @@ public class ChatActivity extends AppCompatActivity {
         sendButton = findViewById(R.id.btn_send_message);
         recyclerViewMessages = findViewById(R.id.recyclerview_messages);
 
-
         CollectionReference users = FirebaseFirestore.getInstance().collection("Users");
         users.document(fellowUID).get().addOnSuccessListener(documentSnapshot -> {
             fellow = documentSnapshot.toObject(User.class);
@@ -71,7 +68,6 @@ public class ChatActivity extends AppCompatActivity {
             recyclerViewMessages.setAdapter(messageAdapter);
             getChatData();
         });
-
         sendButton.setOnClickListener(v -> {
             String messageString = message.getText().toString();
             if (!messageString.isEmpty()) {
@@ -112,13 +108,5 @@ public class ChatActivity extends AppCompatActivity {
         readMessages();
     }
 
-    @Override
-    public void onBackPressed() {
-        if (message.isFocused()) {
-            message.clearFocus();
-            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-            imm.hideSoftInputFromWindow(message.getWindowToken(), 0);
-        } else
-            super.onBackPressed();
-    }
+    // TODO: finish issue of close keyboard
 }

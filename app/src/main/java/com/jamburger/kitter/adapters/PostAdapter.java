@@ -80,11 +80,11 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
 
         holder.checkIfLiked();
 
-        holder.like.setOnClickListener(v -> holder.likePost(user));
+        holder.like.setOnClickListener(v -> holder.likePost());
         holder.postImage.setOnClickListener(view -> {
             long clickTime = System.currentTimeMillis();
             if (clickTime - lastClickTime < DOUBLE_CLICK_TIME_DELTA) {
-                holder.likePost(user);
+                holder.likePost();
             }
             lastClickTime = clickTime;
         });
@@ -95,6 +95,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         holder.comment.setOnClickListener(view -> {
             Intent intent = new Intent(mContext, CommentsActivity.class);
             intent.putExtra("postid", post.getPostid());
+            intent.putExtra("openKeyboard", true);
             mContext.startActivity(intent);
         });
         holder.header.setOnClickListener(view -> {
@@ -156,7 +157,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
             else save.setImageResource(R.drawable.ic_save_outlined);
         }
 
-        public void likePost(User user) {
+        public void likePost() {
             isLiked = !isLiked;
             if (isLiked) {
                 likeAnimation.setVisibility(View.VISIBLE);

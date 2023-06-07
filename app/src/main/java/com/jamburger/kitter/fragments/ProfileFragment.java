@@ -47,12 +47,9 @@ import com.jamburger.kitter.adapters.MyKittAdapter;
 import com.jamburger.kitter.adapters.MyPictureAdapter;
 import com.jamburger.kitter.components.User;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 public class ProfileFragment extends Fragment {
     ImageView backgroundImage, profileImage, backgroundImageEditButton;
@@ -241,10 +238,8 @@ public class ProfileFragment extends Fragment {
             progressDialog.setTitle("Uploading...");
             progressDialog.show();
 
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss", Locale.CHINA);
-            String postId = sdf.format(new Date());
+            String postId = user.getUid();
             StorageReference ref = storageReference.child("Background Pictures/" + postId);
-
             ref.putFile(filePath).addOnSuccessListener(snapshot -> {
                 Toast.makeText(requireActivity(), "Image Uploaded!!", Toast.LENGTH_SHORT).show();
                 storageReference.child("Background Pictures").child(postId).getDownloadUrl().addOnSuccessListener(uri -> {

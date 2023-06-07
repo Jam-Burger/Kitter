@@ -26,9 +26,7 @@ import com.google.firebase.storage.StorageReference;
 import com.jamburger.kitter.R;
 import com.jamburger.kitter.components.User;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -129,6 +127,10 @@ public class EditInfoActivity extends AppCompatActivity {
         FirebaseAuth.getInstance().getCurrentUser().updateProfile(request);
         userReference.update(data).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
+                Intent intentMain = new Intent(this, MainActivity.class);
+                intentMain.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                intentMain.putExtra("page", "PROFILE");
+                startActivity(intentMain);
                 finish();
             }
         });
@@ -160,8 +162,7 @@ public class EditInfoActivity extends AppCompatActivity {
         progressDialog.setTitle("Saving Profile...");
         progressDialog.show();
 
-        SimpleDateFormat sdf = new SimpleDateFormat(getResources().getString(R.string.post_time_format));
-        String postId = sdf.format(new Date());
+        String postId = user.getId();
         StorageReference ref = storageReference.child("Profile Pictures/" + postId);
 
         ref.putFile(profileImageUri).addOnSuccessListener(snapshot -> {
