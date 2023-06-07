@@ -113,7 +113,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:fontFamily="@font/roboto"
+                            android:fontFamily="@font/varela_round"
                             android:text="Posts"
                             android:textColor="@color/text_strong"
                             android:textSize="@dimen/normal_txt" />
@@ -139,7 +139,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:fontFamily="@font/roboto"
+                            android:fontFamily="@font/varela_round"
                             android:text="Followers"
                             android:textColor="@color/text_strong"
                             android:textSize="@dimen/normal_txt" />
@@ -165,7 +165,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:fontFamily="@font/roboto"
+                            android:fontFamily="@font/varela_round"
                             android:text="Following"
                             android:textColor="@color/text_strong"
                             android:textSize="@dimen/normal_txt" />
@@ -186,6 +186,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="@color/text_very_strong"
+                    android:fontFamily="@font/varela_round"
                     android:textSize="@dimen/little_big_txt"
                     android:textStyle="bold" />
 
@@ -195,6 +196,7 @@
                     android:layout_height="wrap_content"
                     android:maxWidth="250dp"
                     android:textColor="@color/text_light"
+                    android:fontFamily="@font/lato"
                     android:textSize="@dimen/little_big_txt" />
             </LinearLayout>
 
