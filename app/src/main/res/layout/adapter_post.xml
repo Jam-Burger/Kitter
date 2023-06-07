@@ -30,7 +30,7 @@
                 android:id="@+id/txt_username"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:fontFamily="@font/montserrat"
+                android:fontFamily="@font/varela_round"
                 android:textColor="@color/text_strong"
                 android:textSize="@dimen/normal_txt"
                 android:textStyle="bold" />

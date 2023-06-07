@@ -31,7 +31,7 @@
             android:id="@+id/txt_username"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:fontFamily="@font/montserrat"
+            android:fontFamily="@font/varela_round"
             android:textColor="@color/text_strong"
             android:text="gavi_"
             android:textSize="@dimen/normal_txt"
@@ -43,6 +43,7 @@
             android:layout_height="wrap_content"
             android:textColor="@color/text_light"
             android:text="gavi pablo"
+            android:fontFamily="@font/lato"
             android:textSize="@dimen/normal_txt" />
     </LinearLayout>
 </RelativeLayout>

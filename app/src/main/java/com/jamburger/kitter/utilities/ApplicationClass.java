@@ -23,9 +23,9 @@ public class ApplicationClass extends Application {
 
         Map<String, Object> remoteConfigDefaults = new HashMap<>();
         remoteConfigDefaults.put(ForceUpdateChecker.KEY_UPDATE_REQUIRED, false);
-        remoteConfigDefaults.put(ForceUpdateChecker.KEY_CURRENT_VERSION, "3.0.1");
-        remoteConfigDefaults.put(ForceUpdateChecker.KEY_UPDATE_URL,
-                "https://play.google.com/store/apps/details?id=com.sembozdemir.renstagram");
+        remoteConfigDefaults.put(ForceUpdateChecker.KEY_CURRENT_VERSION, "3.4.0");
+        remoteConfigDefaults.put(ForceUpdateChecker.KEY_PROJECT_URL,
+                "https://github.com/Jam-Burger/Kitter");
 
         firebaseRemoteConfig.setDefaultsAsync(remoteConfigDefaults);
         firebaseRemoteConfig.fetch(60) // fetch every minutes

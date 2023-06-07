@@ -12,7 +12,7 @@ import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 public class ForceUpdateChecker {
     public static final String KEY_UPDATE_REQUIRED = "force_update_required";
     public static final String KEY_CURRENT_VERSION = "force_update_current_version";
-    public static final String KEY_UPDATE_URL = "force_update_store_url";
+    public static final String KEY_PROJECT_URL = "project_github_url";
     private static final String TAG = ForceUpdateChecker.class.getSimpleName();
     private final OnUpdateNeededListener onUpdateNeededListener;
     private final Context context;
@@ -32,7 +32,7 @@ public class ForceUpdateChecker {
         if (remoteConfig.getBoolean(KEY_UPDATE_REQUIRED)) {
             String currentVersion = remoteConfig.getString(KEY_CURRENT_VERSION);
             String appVersion = getAppVersion(context);
-            String updateUrl = remoteConfig.getString(KEY_UPDATE_URL);
+            String updateUrl = remoteConfig.getString(KEY_PROJECT_URL);
             if (!TextUtils.equals(currentVersion, appVersion) && onUpdateNeededListener != null) {
                 onUpdateNeededListener.onUpdateNeeded(updateUrl);
                 return true;
