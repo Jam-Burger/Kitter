@@ -1,5 +1,6 @@
 package com.jamburger.kitter.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -42,8 +43,8 @@ public class OtherProfileActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_other_profile);
 
-        String uid = getIntent().getStringExtra("userid");
-        userdataReference = FirebaseFirestore.getInstance().collection("Users").document(uid);
+        String userid = getIntent().getStringExtra("userid");
+        userdataReference = FirebaseFirestore.getInstance().collection("Users").document(userid);
         myUserdataReference = FirebaseFirestore.getInstance().collection("Users").document(FirebaseAuth.getInstance().getUid());
 
         backgroundImage = findViewById(R.id.img_background);
@@ -92,7 +93,9 @@ public class OtherProfileActivity extends AppCompatActivity {
             updateFollowButton();
         });
         messageButton.setOnClickListener(v -> {
-
+            Intent intent = new Intent(this, OtherProfileActivity.class);
+            intent.putExtra("userid", userid);
+            startActivity(intent);
         });
         picturesButton.setOnClickListener(v -> {
             recyclerViewMyPosts.setAdapter(myPictureAdapter);
@@ -128,7 +131,6 @@ public class OtherProfileActivity extends AppCompatActivity {
             username.setText(txt_username);
             name.setText(user.getName());
             bio.setText(user.getBio());
-
 
             noOfPosts.setText(String.valueOf(user.getPictures().size() + user.getKitts().size()));
             noOfFollowers.setText(String.valueOf(user.getFollowers().size()));

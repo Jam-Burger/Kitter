@@ -12,6 +12,8 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.jamburger.kitter.R;
 import com.jamburger.kitter.activities.OtherProfileActivity;
 import com.jamburger.kitter.components.Comment;
@@ -38,7 +40,8 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Comment comment = mComments.get(position);
-        comment.getPublisher().get().addOnSuccessListener(snapshot -> {
+        DocumentReference publisherReference = FirebaseFirestore.getInstance().collection("Users").document(comment.getPublisherId());
+        publisherReference.get().addOnSuccessListener(snapshot -> {
             User user = snapshot.toObject(User.class);
             Glide.with(mContext).load(user.getProfileImageUrl()).into(holder.profileImage);
             holder.username.setText(user.getUsername());

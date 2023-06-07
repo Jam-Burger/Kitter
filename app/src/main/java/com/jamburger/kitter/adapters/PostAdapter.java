@@ -14,6 +14,11 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.airbnb.lottie.LottieAnimationView;
 import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -33,6 +38,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
     List<Post> mPosts;
     FirebaseFirestore db;
     DocumentReference userReference;
+
     User user;
     private static final long DOUBLE_CLICK_TIME_DELTA = 300; //milliseconds
 
@@ -70,6 +76,27 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         holder.caption.setText(post.getCaption());
         holder.kitt.setText(post.getKitt());
 
+        DatabaseReference commentsReference = FirebaseDatabase.getInstance().getReference().child("comments").child(post.getPostid());
+        commentsReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                long commentCount = snapshot.getChildrenCount();
+                if (commentCount >= 2) {
+                    String commentsCountText = "View all " + commentCount + " comments";
+                    holder.commentCount.setText(commentsCountText);
+                    holder.commentCount.setVisibility(View.VISIBLE);
+                } else {
+                    holder.commentCount.setText("");
+                    holder.commentCount.setVisibility(View.GONE);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
         if (post.getKitt().isEmpty()) {
             holder.kitt.setVisibility(View.GONE);
             holder.caption.setVisibility(View.VISIBLE);
@@ -92,12 +119,20 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         holder.checkIfSaved();
         holder.save.setOnClickListener(v -> holder.savePost());
 
+        holder.commentCount.setOnClickListener(view -> {
+            Intent intent = new Intent(mContext, CommentsActivity.class);
+            intent.putExtra("postid", post.getPostid());
+            intent.putExtra("openKeyboard", false);
+            mContext.startActivity(intent);
+        });
+
         holder.comment.setOnClickListener(view -> {
             Intent intent = new Intent(mContext, CommentsActivity.class);
             intent.putExtra("postid", post.getPostid());
             intent.putExtra("openKeyboard", true);
             mContext.startActivity(intent);
         });
+
         holder.header.setOnClickListener(view -> {
             Intent intent = new Intent(mContext, OtherProfileActivity.class);
             intent.putExtra("userid", post.getCreator());
@@ -114,10 +149,10 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public ImageView profileImage, like, comment, save, postImage;
-        public TextView username, noOfLikes, caption, kitt, time;
         public View header;
         LottieAnimationView likeAnimation;
         public static DocumentReference userReference;
+        public TextView username, noOfLikes, caption, kitt, commentCount, time;
         protected boolean isLiked, isSaved;
         public Post post;
 
@@ -136,6 +171,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
             noOfLikes = itemView.findViewById(R.id.txt_likes);
             username = itemView.findViewById(R.id.txt_username);
             caption = itemView.findViewById(R.id.caption);
+            commentCount = itemView.findViewById(R.id.txt_comment_count);
             kitt = itemView.findViewById(R.id.txt_kitt);
         }
 

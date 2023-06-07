@@ -2,7 +2,6 @@ package com.jamburger.kitter.utilities;
 
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.text.TextUtils;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -27,23 +26,30 @@ public class ForceUpdateChecker {
         return new Builder(context);
     }
 
-    public boolean check() {
-        final FirebaseRemoteConfig remoteConfig = FirebaseRemoteConfig.getInstance();
-        if (remoteConfig.getBoolean(KEY_UPDATE_REQUIRED)) {
-            String currentVersion = remoteConfig.getString(KEY_CURRENT_VERSION);
-            String appVersion = getAppVersion(context);
-            String updateUrl = remoteConfig.getString(KEY_PROJECT_URL);
-            if (!TextUtils.equals(currentVersion, appVersion) && onUpdateNeededListener != null) {
-                onUpdateNeededListener.onUpdateNeeded(updateUrl);
-                return true;
+    static int versionCompare(String v1, String v2) {
+        int ver1 = 0, ver2 = 0;
+        for (int i = 0, j = 0; (i < v1.length() || j < v2.length()); ) {
+            while (i < v1.length() && v1.charAt(i) != '.') {
+                ver1 = ver1 * 10 + (v1.charAt(i) - '0');
+                i++;
             }
+
+            while (j < v2.length() && v2.charAt(j) != '.') {
+                ver2 = ver2 * 10 + (v2.charAt(j) - '0');
+                j++;
+            }
+
+            if (ver1 > ver2) return 1;
+            if (ver2 > ver1) return -1;
+            ver1 = ver2 = 0;
+            i++;
+            j++;
         }
-        return false;
+        return 0;
     }
 
     private String getAppVersion(Context context) {
         String result = "";
-
         try {
             result = context.getPackageManager()
                     .getPackageInfo(context.getPackageName(), 0)
@@ -82,5 +88,19 @@ public class ForceUpdateChecker {
             ForceUpdateChecker forceUpdateChecker = build();
             return forceUpdateChecker.check();
         }
+    }
+
+    public boolean check() {
+        final FirebaseRemoteConfig remoteConfig = FirebaseRemoteConfig.getInstance();
+        if (remoteConfig.getBoolean(KEY_UPDATE_REQUIRED)) {
+            String currentValidVersion = remoteConfig.getString(KEY_CURRENT_VERSION);
+            String appVersion = getAppVersion(context);
+            String updateUrl = remoteConfig.getString(KEY_PROJECT_URL);
+            if (versionCompare(appVersion, currentValidVersion) < 0 && onUpdateNeededListener != null) {
+                onUpdateNeededListener.onUpdateNeeded(updateUrl);
+                return true;
+            }
+        }
+        return false;
     }
 }

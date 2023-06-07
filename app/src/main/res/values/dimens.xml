@@ -2,8 +2,10 @@
 <resources>
     <dimen name="icon_size">30dp</dimen>
     <dimen name="profile_img_icon_size">45dp</dimen>
-    <dimen name="normal_txt">13sp</dimen>
-    <dimen name="little_big_txt">15sp</dimen>
-    <dimen name="big_txt">18sp</dimen>
+    <dimen name="text_small">10sp</dimen>
+    <dimen name="text_little_small">12sp</dimen>
+    <dimen name="text_normal">14sp</dimen>
+    <dimen name="text_little_big">16sp</dimen>
+    <dimen name="text_big">18sp</dimen>
     <dimen name="notification_icon_size">50dp</dimen>
 </resources>

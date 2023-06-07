@@ -107,7 +107,7 @@
                             android:fontFamily="@font/lato"
                             android:text="0"
                             android:textColor="@color/text_very_strong"
-                            android:textSize="@dimen/big_txt"
+                            android:textSize="@dimen/text_big"
                             android:textStyle="bold" />
 
                         <TextView
@@ -116,7 +116,7 @@
                             android:fontFamily="@font/varela_round"
                             android:text="Posts"
                             android:textColor="@color/text_strong"
-                            android:textSize="@dimen/normal_txt" />
+                            android:textSize="@dimen/text_normal" />
                     </LinearLayout>
 
                     <LinearLayout
@@ -133,7 +133,7 @@
                             android:fontFamily="@font/lato"
                             android:text="0"
                             android:textColor="@color/text_very_strong"
-                            android:textSize="@dimen/big_txt"
+                            android:textSize="@dimen/text_big"
                             android:textStyle="bold" />
 
                         <TextView
@@ -142,7 +142,7 @@
                             android:fontFamily="@font/varela_round"
                             android:text="Followers"
                             android:textColor="@color/text_strong"
-                            android:textSize="@dimen/normal_txt" />
+                            android:textSize="@dimen/text_normal" />
                     </LinearLayout>
 
                     <LinearLayout
@@ -159,7 +159,7 @@
                             android:fontFamily="@font/lato"
                             android:text="0"
                             android:textColor="@color/text_very_strong"
-                            android:textSize="@dimen/big_txt"
+                            android:textSize="@dimen/text_big"
                             android:textStyle="bold" />
 
                         <TextView
@@ -168,7 +168,7 @@
                             android:fontFamily="@font/varela_round"
                             android:text="Following"
                             android:textColor="@color/text_strong"
-                            android:textSize="@dimen/normal_txt" />
+                            android:textSize="@dimen/text_normal" />
                     </LinearLayout>
                 </LinearLayout>
             </RelativeLayout>
@@ -187,7 +187,7 @@
                     android:layout_height="wrap_content"
                     android:textColor="@color/text_very_strong"
                     android:fontFamily="@font/varela_round"
-                    android:textSize="@dimen/little_big_txt"
+                    android:textSize="@dimen/text_little_big"
                     android:textStyle="bold" />
 
                 <TextView
@@ -197,7 +197,7 @@
                     android:maxWidth="250dp"
                     android:textColor="@color/text_light"
                     android:fontFamily="@font/lato"
-                    android:textSize="@dimen/little_big_txt" />
+                    android:textSize="@dimen/text_little_big" />
             </LinearLayout>
 
             <com.google.android.material.divider.MaterialDivider
