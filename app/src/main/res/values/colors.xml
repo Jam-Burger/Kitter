@@ -9,6 +9,7 @@
     <color name="light_blue">#3790FF</color>
     <color name="like">#FF2323</color>
     <color name="item_color_active">@color/inverted</color>
+    <color name="ic_kitter_background">#E099E0</color>
     <color name="item_color_inactive">#E2717171</color>
     <color name="text_very_strong">@color/inverted</color>
     <color name="text_strong">#323232</color>
@@ -17,4 +18,5 @@
     <color name="button_gray">#B8B8B8</color>
     <color name="button_blue">#237BE8</color>
     <color name="text_very_light">#B24A4A4A</color>
+    <color name="red">#FF4A4A</color>
 </resources>

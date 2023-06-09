@@ -7,4 +7,5 @@
     <color name="text_normal">#CACACA</color>
     <color name="button_gray">#2E2E2E</color>
     <color name="text_very_light">#B2E1E1E1</color>
+    <color name="red">#FF4545</color>
 </resources>
