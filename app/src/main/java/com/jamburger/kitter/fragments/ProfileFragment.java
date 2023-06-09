@@ -1,37 +1,27 @@
 package com.jamburger.kitter.fragments;
 
-import static android.content.Context.MODE_PRIVATE;
-
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatDelegate;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.google.android.gms.auth.api.signin.GoogleSignInClient;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
@@ -39,10 +29,8 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.jamburger.kitter.R;
-import com.jamburger.kitter.activities.EditInfoActivity;
-import com.jamburger.kitter.activities.LoginActivity;
-import com.jamburger.kitter.activities.MainActivity;
 import com.jamburger.kitter.activities.SavedPostsActivity;
+import com.jamburger.kitter.activities.SettingsActivity;
 import com.jamburger.kitter.adapters.MyKittAdapter;
 import com.jamburger.kitter.adapters.MyPictureAdapter;
 import com.jamburger.kitter.components.User;
@@ -60,7 +48,6 @@ public class ProfileFragment extends Fragment {
     MyKittAdapter myKittAdapter;
     FirebaseFirestore db;
     FirebaseUser user;
-    GoogleSignInClient googleSignInClient;
     ImageView picturesButton, kittsButton;
     RecyclerView recyclerViewMyPosts;
     List<DocumentReference> pictures;
@@ -83,7 +70,6 @@ public class ProfileFragment extends Fragment {
         user = FirebaseAuth.getInstance().getCurrentUser();
         db = FirebaseFirestore.getInstance();
         userdataReference = db.collection("Users").document(user.getUid());
-        googleSignInClient = GoogleSignIn.getClient(requireActivity(), GoogleSignInOptions.DEFAULT_SIGN_IN);
     }
 
     @SuppressLint("NonConstantResourceId")
@@ -104,54 +90,15 @@ public class ProfileFragment extends Fragment {
         picturesButton = view.findViewById(R.id.btn_my_pictures);
         kittsButton = view.findViewById(R.id.btn_my_kitts);
 
-        SharedPreferences sharedPreferences = requireActivity().getSharedPreferences("sharedPrefs", MODE_PRIVATE);
-        final SharedPreferences.Editor editor = sharedPreferences.edit();
-        final boolean isDarkModeOn = sharedPreferences.getBoolean("isDarkModeOn", true);
         toolbar = view.findViewById(R.id.top_menu);
 
-        MenuItem themeItem = toolbar.getMenu().findItem(R.id.nav_change_theme);
-        if (isDarkModeOn) {
-            themeItem.setTitle("Dark Mode");
-            themeItem.setIcon(R.drawable.ic_dark);
-        } else {
-            themeItem.setTitle("Light Mode");
-            themeItem.setIcon(R.drawable.ic_light);
-        }
         toolbar.setOnMenuItemClickListener(item -> {
             switch (item.getItemId()) {
-                case R.id.nav_edit:
-                    startActivity(new Intent(requireActivity(), EditInfoActivity.class));
-                    break;
                 case R.id.nav_saved:
                     startActivity(new Intent(requireActivity(), SavedPostsActivity.class));
                     break;
-                case R.id.nav_change_password:
-                    showRecoverPasswordDialog();
-                    break;
-                case R.id.nav_change_theme:
-                    Intent intentMain = new Intent(requireActivity(), MainActivity.class);
-                    intentMain.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    intentMain.putExtra("page", "PROFILE");
-                    requireActivity().finish();
-                    startActivity(intentMain);
-                    if (isDarkModeOn) {
-                        editor.putBoolean("isDarkModeOn", false).apply();
-                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-                    } else {
-                        editor.putBoolean("isDarkModeOn", true).apply();
-                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
-                    }
-                    break;
-                case R.id.nav_logout:
-                    googleSignInClient.signOut().addOnCompleteListener(task -> {
-                        if (task.isSuccessful()) {
-                            FirebaseAuth.getInstance().signOut();
-                            Intent intentLogin = new Intent(requireActivity(), LoginActivity.class);
-                            intentLogin.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                            startActivity(intentLogin);
-                            requireActivity().finish();
-                        }
-                    });
+                case R.id.nav_settings:
+                    startActivity(new Intent(requireActivity(), SettingsActivity.class));
                     break;
             }
             return true;
@@ -191,44 +138,6 @@ public class ProfileFragment extends Fragment {
         });
 
         return view;
-    }
-
-    void showRecoverPasswordDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setTitle("Change Password");
-        String email = user.getEmail();
-
-        final LinearLayout linearLayout = new LinearLayout(getContext());
-        final TextView emailEt = new TextView(getContext());
-        final String txt = "We will send change password link to :\n" + email;
-        emailEt.setText(txt);
-        emailEt.setMinEms(16);
-        linearLayout.setPadding(50, 20, 50, 0);
-        linearLayout.addView(emailEt);
-        builder.setView(linearLayout);
-
-        builder.setPositiveButton("Confirm", (dialog, which) -> {
-            beginRecovery(email);
-        });
-
-        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss());
-        builder.create().show();
-    }
-
-    private void beginRecovery(String email) {
-        ProgressDialog loadingBar = new ProgressDialog(getContext());
-        loadingBar.setMessage("Sending Email....");
-        loadingBar.setCanceledOnTouchOutside(false);
-        loadingBar.show();
-
-        FirebaseAuth.getInstance().sendPasswordResetEmail(email).addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                Toast.makeText(requireContext(), "Link sent on " + email, Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(requireContext(), task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-            }
-            loadingBar.dismiss();
-        });
     }
 
     private void postImage(Uri filePath) {

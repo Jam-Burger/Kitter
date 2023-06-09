@@ -8,4 +8,5 @@
     <dimen name="text_little_big">16sp</dimen>
     <dimen name="text_big">18sp</dimen>
     <dimen name="notification_icon_size">50dp</dimen>
+    <dimen name="setting_icon_size">25dp</dimen>
 </resources>

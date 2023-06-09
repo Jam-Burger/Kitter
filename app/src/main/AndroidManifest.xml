@@ -11,17 +11,20 @@
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
+        android:name=".utilities.ApplicationClass"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
+        android:enableOnBackInvokedCallback="true"
         android:fullBackupContent="@xml/backup_rules"
         android:icon="@mipmap/ic_kitter"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_kitter_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Kitter"
-        android:name=".utilities.ApplicationClass"
-        android:enableOnBackInvokedCallback="true"
         tools:targetApi="33">
+        <activity
+            android:name=".activities.SettingsActivity"
+            android:exported="false" />
 
         <meta-data
             android:name="firebase_messaging_auto_init_enabled"
@@ -71,6 +74,7 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
             <meta-data
                 android:name="android.app.jamburger"
                 android:value="" />

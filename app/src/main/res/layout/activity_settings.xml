@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".activities.SettingsActivity">
+
+    <RelativeLayout
+        android:id="@+id/header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="10dp">
+
+        <ImageView
+            android:id="@+id/btn_close"
+            android:layout_width="@dimen/icon_size"
+            android:layout_height="@dimen/icon_size"
+            android:layout_centerVertical="true"
+            android:src="@drawable/ic_close"
+            app:tint="@color/inverted" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:layout_toEndOf="@id/btn_close"
+            android:text="Settings"
+            android:textColor="@color/inverted"
+            android:textSize="25sp" />
+    </RelativeLayout>
+
+    <com.google.android.material.divider.MaterialDivider
+        style="@style/Settings.Divider"
+        android:layout_marginTop="0dp" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:id="@+id/settings_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="10dp"
+            android:paddingVertical="5dp">
+
+            <TextView
+                style="@style/Settings.Header"
+                android:text="Account" />
+
+            <TextView
+                android:id="@+id/setting_edit_info"
+                style="@style/Settings.Option.Iconed"
+                android:text="Edit Info"
+                app:drawableStartCompat="@drawable/ic_edit" />
+
+            <com.google.android.material.divider.MaterialDivider style="@style/Settings.Divider" />
+
+            <TextView
+                style="@style/Settings.Header"
+                android:text="Privacy and Security" />
+
+            <TextView
+                android:id="@+id/setting_change_password"
+                style="@style/Settings.Option.Iconed"
+                android:text="Change Password"
+                app:drawableStartCompat="@drawable/ic_password" />
+
+            <TextView
+                android:id="@+id/setting_block_accounts"
+                style="@style/Settings.Option.Iconed"
+                android:text="Blocked Accounts"
+                app:drawableStartCompat="@drawable/ic_block" />
+
+            <com.google.android.material.divider.MaterialDivider style="@style/Settings.Divider" />
+
+
+            <TextView
+                style="@style/Settings.Header"
+                android:text="Appearance" />
+
+            <TextView
+                android:id="@+id/setting_theme"
+                style="@style/Settings.Option.Iconed"
+                android:text="Dark Mode"
+                app:drawableStartCompat="@drawable/ic_dark" />
+
+            <com.google.android.material.divider.MaterialDivider style="@style/Settings.Divider" />
+
+            <TextView
+                style="@style/Settings.Header"
+                android:text="Login" />
+
+            <TextView
+                android:id="@+id/setting_new_account"
+                style="@style/Settings.Option.NonIconed"
+                android:text="Create a new account"
+                android:textColor="@color/light_blue" />
+
+            <TextView
+                android:id="@+id/setting_logout"
+                style="@style/Settings.Option.NonIconed"
+                android:text="Log out"
+                android:textColor="@color/red" />
+
+            <com.google.android.material.divider.MaterialDivider style="@style/Settings.Divider" />
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>
