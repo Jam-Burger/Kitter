@@ -14,11 +14,12 @@ public class User {
     String profileImageUrl;
     String backgroundImageUrl;
     String onesignalPlayerId;
-    List<DocumentReference> pictures;
-    List<DocumentReference> kitts;
+    boolean isPrivate;
+    List<DocumentReference> posts;
     List<DocumentReference> saved;
     List<DocumentReference> following;
     List<DocumentReference> followers;
+    List<DocumentReference> blockedAccounts;
 
 
     public User() {
@@ -35,11 +36,12 @@ public class User {
         this.profileImageUrl = profileImageUrl;
         this.backgroundImageUrl = backgroundImageUrl;
         this.bio = "";
-        this.pictures = new ArrayList<>();
-        this.kitts = new ArrayList<>();
+        this.posts = new ArrayList<>();
         this.saved = new ArrayList<>();
         this.following = new ArrayList<>();
         this.followers = new ArrayList<>();
+        this.blockedAccounts = new ArrayList<>();
+        this.isPrivate = false;
     }
 
     public String getOnesignalPlayerId() {
@@ -58,52 +60,43 @@ public class User {
         return followers;
     }
 
+    public List<DocumentReference> getBlockedAccounts() {
+        return blockedAccounts;
+    }
+
     public List<DocumentReference> getSaved() {
         return saved;
     }
 
-    public List<DocumentReference> getPictures() {
-        return pictures;
-    }
-
-    public List<DocumentReference> getKitts() {
-        return kitts;
+    public List<DocumentReference> getPosts() {
+        return posts;
     }
 
     public String getId() {
         return id;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public boolean isPrivate() {
+        return isPrivate;
     }
 
     public String getName() {
         return name;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public String getUsername() {
         return username;
     }
 
-
     public String getBio() {
         return bio;
     }
-
     public String getEmail() {
         return email;
     }
-
     public String getProfileImageUrl() {
         return profileImageUrl;
     }
-
-
     public String getBackgroundImageUrl() {
         return backgroundImageUrl;
     }

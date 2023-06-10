@@ -10,7 +10,9 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.jamburger.kitter.R;
@@ -28,7 +30,6 @@ public class HomeFragment extends Fragment {
     PostAdapter postAdapter;
     Toolbar toolbar;
     List<Post> posts;
-
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -72,14 +73,26 @@ public class HomeFragment extends Fragment {
 
 
     void readPosts() {
-        CollectionReference postsReference = FirebaseFirestore.getInstance().collection("Posts");
-        postsReference.get().addOnSuccessListener(postSnapshots -> {
+//        DocumentReference userReference = FirebaseFirestore.getInstance().collection("Users").document(FirebaseAuth.getInstance().getUid());
+//        userReference.get().addOnSuccessListener(userSnapshot -> {
+//            User user = userSnapshot.toObject(User.class);
+//
+//        });
+
+        CollectionReference feedReference = FirebaseFirestore.getInstance().collection("Users").document(FirebaseAuth.getInstance().getUid()).collection("feed");
+        feedReference.get().addOnSuccessListener(feedSnapshots -> {
             posts.clear();
-            for (DocumentSnapshot postSnapshot : postSnapshots) {
-                Post post = postSnapshot.toObject(Post.class);
-                posts.add(post);
+            for (DocumentSnapshot feedSnapshot : feedSnapshots) {
+                DocumentReference postReference = feedSnapshot.getDocumentReference("postReference");
+                boolean isVisited = Boolean.TRUE.equals(feedSnapshot.getBoolean("visited"));
+                assert postReference != null;
+
+                postReference.get().addOnSuccessListener(postSnapshot -> {
+                    Post post = postSnapshot.toObject(Post.class);
+                    posts.add(post);
+                    postAdapter.notifyDataSetChanged();
+                });
             }
-            postAdapter.notifyDataSetChanged();
         });
     }
 }

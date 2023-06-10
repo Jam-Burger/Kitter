@@ -19,11 +19,13 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.jamburger.kitter.R;
 import com.jamburger.kitter.adapters.MyKittAdapter;
 import com.jamburger.kitter.adapters.MyPictureAdapter;
+import com.jamburger.kitter.components.Post;
 import com.jamburger.kitter.components.User;
 
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class OtherProfileActivity extends AppCompatActivity {
     MyPictureAdapter myPictureAdapter;
@@ -73,25 +75,18 @@ public class OtherProfileActivity extends AppCompatActivity {
         ((GridLayoutManager) recyclerViewMyPosts.getLayoutManager()).setSpanCount(3);
         recyclerViewMyPosts.setAdapter(myPictureAdapter);
 
+        if (myUserdataReference.equals(userdataReference)) {
+            followButton.setVisibility(View.GONE);
+            messageButton.setVisibility(View.GONE);
+        }
+
         fillUserData();
         readPosts();
 
         View picturesIndicator = findViewById(R.id.indicator_pictures);
         View kittsIndicator = findViewById(R.id.indicator_kitts);
 
-        followButton.setOnClickListener(v -> {
-            amFollowing = !amFollowing;
-            if (amFollowing) {
-                myUserdataReference.update("following", FieldValue.arrayUnion(userdataReference));
-                userdataReference.update("followers", FieldValue.arrayUnion(myUserdataReference));
-                noOfFollowers.setText(String.valueOf(Integer.parseInt(noOfFollowers.getText().toString()) + 1));
-            } else {
-                myUserdataReference.update("following", FieldValue.arrayRemove(userdataReference));
-                userdataReference.update("followers", FieldValue.arrayRemove(myUserdataReference));
-                noOfFollowers.setText(String.valueOf(Integer.parseInt(noOfFollowers.getText().toString()) - 1));
-            }
-            updateFollowButton();
-        });
+        followButton.setOnClickListener(v -> toggleFollow());
         messageButton.setOnClickListener(v -> {
             Intent intent = new Intent(this, OtherProfileActivity.class);
             intent.putExtra("userid", userid);
@@ -109,6 +104,37 @@ public class OtherProfileActivity extends AppCompatActivity {
             picturesIndicator.setVisibility(View.INVISIBLE);
             kittsIndicator.setVisibility(View.VISIBLE);
         });
+    }
+
+    private void toggleFollow() {
+        amFollowing = !amFollowing;
+        if (amFollowing) {
+            myUserdataReference.update("following", FieldValue.arrayUnion(userdataReference));
+            userdataReference.update("followers", FieldValue.arrayUnion(myUserdataReference));
+            noOfFollowers.setText(String.valueOf(Integer.parseInt(noOfFollowers.getText().toString()) + 1));
+
+            List<DocumentReference> posts = new ArrayList<>();
+            posts.addAll(pictures);
+            posts.addAll(kitts);
+            for (DocumentReference postReference : posts) {
+                Map<String, Object> map = new HashMap<>();
+                map.put("postReference", postReference);
+                map.put("visited", false);
+                myUserdataReference.collection("feed").document(postReference.getId()).set(map);
+            }
+        } else {
+            myUserdataReference.update("following", FieldValue.arrayRemove(userdataReference));
+            userdataReference.update("followers", FieldValue.arrayRemove(myUserdataReference));
+            noOfFollowers.setText(String.valueOf(Integer.parseInt(noOfFollowers.getText().toString()) - 1));
+
+            List<DocumentReference> posts = new ArrayList<>();
+            posts.addAll(pictures);
+            posts.addAll(kitts);
+            for (DocumentReference postReference : posts) {
+                myUserdataReference.collection("feed").document(postReference.getId()).delete();
+            }
+        }
+        updateFollowButton();
     }
 
 
@@ -132,7 +158,7 @@ public class OtherProfileActivity extends AppCompatActivity {
             name.setText(user.getName());
             bio.setText(user.getBio());
 
-            noOfPosts.setText(String.valueOf(user.getPictures().size() + user.getKitts().size()));
+            noOfPosts.setText(String.valueOf(user.getPosts().size()));
             noOfFollowers.setText(String.valueOf(user.getFollowers().size()));
             noOfFollowing.setText(String.valueOf(user.getFollowing().size()));
 
@@ -148,19 +174,21 @@ public class OtherProfileActivity extends AppCompatActivity {
         userdataReference.get().addOnSuccessListener(userSnapshot -> {
             User user = userSnapshot.toObject(User.class);
             assert user != null;
-
-            if (user.getPictures().size() != 0) {
-                pictures.clear();
-                pictures.addAll(user.getPictures());
-                Collections.reverse(pictures);
-                myPictureAdapter.notifyDataSetChanged();
-            }
-
-            if (user.getKitts().size() != 0) {
-                kitts.clear();
-                kitts.addAll(user.getKitts());
-                Collections.reverse(kitts);
-                myKittAdapter.notifyDataSetChanged();
+            pictures.clear();
+            kitts.clear();
+            for (DocumentReference postReference : user.getPosts()) {
+                postReference.get().addOnSuccessListener(postSnapshot -> {
+                    Post post = postSnapshot.toObject(Post.class);
+                    assert post != null;
+                    if (!post.getImageUrl().isEmpty()) {
+                        pictures.add(0, postReference);
+                        myPictureAdapter.notifyDataSetChanged();
+                    }
+                    if (!post.getKitt().isEmpty()) {
+                        kitts.add(0, postReference);
+                        myKittAdapter.notifyDataSetChanged();
+                    }
+                });
             }
         });
     }

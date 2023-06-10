@@ -33,10 +33,10 @@ import com.jamburger.kitter.activities.SavedPostsActivity;
 import com.jamburger.kitter.activities.SettingsActivity;
 import com.jamburger.kitter.adapters.MyKittAdapter;
 import com.jamburger.kitter.adapters.MyPictureAdapter;
+import com.jamburger.kitter.components.Post;
 import com.jamburger.kitter.components.User;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class ProfileFragment extends Fragment {
@@ -183,7 +183,7 @@ public class ProfileFragment extends Fragment {
             name.setText(user.getName());
             bio.setText(user.getBio());
 
-            noOfPosts.setText(String.valueOf(user.getPictures().size() + user.getKitts().size()));
+            noOfPosts.setText(String.valueOf(user.getPosts().size()));
             noOfFollowers.setText(String.valueOf(user.getFollowers().size()));
             noOfFollowing.setText(String.valueOf(user.getFollowing().size()));
 
@@ -200,18 +200,21 @@ public class ProfileFragment extends Fragment {
         userdataReference.get().addOnSuccessListener(userSnapshot -> {
             User user = userSnapshot.toObject(User.class);
             assert user != null;
-            if (user.getPictures().size() != 0) {
-                pictures.clear();
-                pictures.addAll(user.getPictures());
-                Collections.reverse(pictures);
-                myPictureAdapter.notifyDataSetChanged();
-            }
-
-            if (user.getKitts().size() != 0) {
-                kitts.clear();
-                kitts.addAll(user.getKitts());
-                Collections.reverse(kitts);
-                myKittAdapter.notifyDataSetChanged();
+            pictures.clear();
+            kitts.clear();
+            for (DocumentReference postReference : user.getPosts()) {
+                postReference.get().addOnSuccessListener(postSnapshot -> {
+                    Post post = postSnapshot.toObject(Post.class);
+                    assert post != null;
+                    if (!post.getImageUrl().isEmpty()) {
+                        pictures.add(0, postReference);
+                        myPictureAdapter.notifyDataSetChanged();
+                    }
+                    if (!post.getKitt().isEmpty()) {
+                        kitts.add(0, postReference);
+                        myKittAdapter.notifyDataSetChanged();
+                    }
+                });
             }
         });
     }

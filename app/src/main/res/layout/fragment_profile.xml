@@ -221,7 +221,7 @@
                     <ImageView
                         android:id="@+id/btn_my_pictures"
                         android:layout_width="match_parent"
-                        android:layout_height="@dimen/icon_size"
+                        android:layout_height="@dimen/icon_size_normal"
                         android:layout_marginVertical="5dp"
                         android:paddingVertical="2dp"
                         android:src="@drawable/ic_grid" />
@@ -248,7 +248,7 @@
                     <ImageView
                         android:id="@+id/btn_my_kitts"
                         android:layout_width="match_parent"
-                        android:layout_height="@dimen/icon_size"
+                        android:layout_height="@dimen/icon_size_normal"
                         android:layout_marginVertical="5dp"
                         android:paddingVertical="2dp"
                         android:src="@drawable/ic_text" />

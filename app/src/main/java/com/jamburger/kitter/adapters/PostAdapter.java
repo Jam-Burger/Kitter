@@ -1,5 +1,7 @@
 package com.jamburger.kitter.adapters;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
 import android.content.Intent;
 import android.view.LayoutInflater;
@@ -28,7 +30,6 @@ import com.jamburger.kitter.activities.MainActivity;
 import com.jamburger.kitter.activities.OtherProfileActivity;
 import com.jamburger.kitter.components.Post;
 import com.jamburger.kitter.components.User;
-import com.jamburger.kitter.utilities.NotificationManager;
 
 import java.util.List;
 
@@ -38,8 +39,6 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
     List<Post> mPosts;
     FirebaseFirestore db;
     DocumentReference userReference;
-
-    User user;
     private static final long DOUBLE_CLICK_TIME_DELTA = 300; //milliseconds
 
     long lastClickTime = 0;
@@ -55,7 +54,6 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         View view = LayoutInflater.from(mContext).inflate(R.layout.adapter_post, parent, false);
         db = FirebaseFirestore.getInstance();
         userReference = db.collection("Users").document(FirebaseAuth.getInstance().getUid());
-        userReference.get().addOnSuccessListener(snapshot -> user = snapshot.toObject(User.class));
         ViewHolder.userReference = userReference;
         return new ViewHolder(view);
     }
@@ -65,9 +63,9 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         Post post = mPosts.get(position);
 
         db.collection("Users").document(post.getCreator()).get().addOnSuccessListener(snapshot -> {
-            user = snapshot.toObject(User.class);
-            Glide.with(mContext).load(user.getProfileImageUrl()).into(holder.profileImage);
-            holder.username.setText(user.getUsername());
+            User creator = snapshot.toObject(User.class);
+            Glide.with(mContext).load(creator.getProfileImageUrl()).into(holder.profileImage);
+            holder.username.setText(creator.getUsername());
         });
 
         holder.post = post;
@@ -75,6 +73,17 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         Glide.with(mContext).load(post.getImageUrl()).into(holder.postImage);
         holder.caption.setText(post.getCaption());
         holder.kitt.setText(post.getKitt());
+
+        if (post.getKitt().isEmpty()) {
+            holder.kitt.setVisibility(View.GONE);
+            holder.caption.setVisibility(View.VISIBLE);
+        } else {
+            holder.kitt.setVisibility(View.VISIBLE);
+            holder.caption.setVisibility(View.GONE);
+        }
+
+        holder.checkIfLiked();
+        holder.checkIfSaved();
 
         DatabaseReference commentsReference = FirebaseDatabase.getInstance().getReference().child("comments").child(post.getPostid());
         commentsReference.addValueEventListener(new ValueEventListener() {
@@ -97,27 +106,16 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
             }
         });
 
-        if (post.getKitt().isEmpty()) {
-            holder.kitt.setVisibility(View.GONE);
-            holder.caption.setVisibility(View.VISIBLE);
-        } else {
-            holder.kitt.setVisibility(View.VISIBLE);
-            holder.caption.setVisibility(View.GONE);
-        }
 
-        holder.checkIfLiked();
-
-        holder.like.setOnClickListener(v -> holder.likePost());
         holder.postImage.setOnClickListener(view -> {
             long clickTime = System.currentTimeMillis();
             if (clickTime - lastClickTime < DOUBLE_CLICK_TIME_DELTA) {
-                holder.likePost();
+                holder.toggleLike();
             }
             lastClickTime = clickTime;
         });
-
-        holder.checkIfSaved();
-        holder.save.setOnClickListener(v -> holder.savePost());
+        holder.like.setOnClickListener(v -> holder.toggleLike());
+        holder.save.setOnClickListener(v -> holder.toggleSave());
 
         holder.commentCount.setOnClickListener(view -> {
             Intent intent = new Intent(mContext, CommentsActivity.class);
@@ -173,14 +171,21 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
             caption = itemView.findViewById(R.id.caption);
             commentCount = itemView.findViewById(R.id.txt_comment_count);
             kitt = itemView.findViewById(R.id.txt_kitt);
+
+            likeAnimation.addAnimatorListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationStart(@NonNull Animator animation, boolean isReverse) {
+
+                }
+
+                @Override
+                public void onAnimationEnd(@NonNull Animator animation, boolean isReverse) {
+                    likeAnimation.setVisibility(View.INVISIBLE);
+                }
+            });
         }
 
         void update() {
-            if (isLiked) like.setImageResource(R.drawable.ic_heart);
-            else {
-                like.setImageResource(R.drawable.ic_heart_outlined);
-                likeAnimation.setVisibility(View.INVISIBLE);
-            }
             int n = post.getLikes().size();
             if (n > 0) {
                 noOfLikes.setVisibility(View.VISIBLE);
@@ -189,36 +194,34 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
             } else {
                 noOfLikes.setVisibility(View.GONE);
             }
+
+            if (isLiked) like.setImageResource(R.drawable.ic_heart);
+            else like.setImageResource(R.drawable.ic_heart_outlined);
+
             if (isSaved) save.setImageResource(R.drawable.ic_save);
             else save.setImageResource(R.drawable.ic_save_outlined);
         }
 
-        public void likePost() {
+        public void toggleLike() {
             isLiked = !isLiked;
             if (isLiked) {
-                likeAnimation.setVisibility(View.VISIBLE);
                 likeAnimation.playAnimation();
-                NotificationManager.sendNotification(post.getCreator(), "Your post liked by " + FirebaseAuth.getInstance().getCurrentUser().getDisplayName());
+                likeAnimation.setVisibility(View.VISIBLE);
+//                NotificationManager.sendNotification(post.getCreator(), "Your post liked by " + FirebaseAuth.getInstance().getCurrentUser().getDisplayName());
             } else {
                 likeAnimation.setVisibility(View.INVISIBLE);
             }
             updateLikesData();
         }
 
-        public void savePost() {
+        public void toggleSave() {
             isSaved = !isSaved;
             updateSavedData();
         }
 
 
         private void checkIfLiked() {
-            isLiked = false;
-            for (DocumentReference s : post.getLikes()) {
-                if (s.equals(userReference)) {
-                    isLiked = true;
-                    break;
-                }
-            }
+            isLiked = post.getLikes().contains(userReference);
             update();
         }
 
@@ -237,17 +240,11 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         public void checkIfSaved() {
             DocumentReference postReference = FirebaseFirestore.getInstance().collection("Posts").document(post.getPostid());
             userReference.get().addOnSuccessListener(documentSnapshot -> {
-                isSaved = false;
                 User user = documentSnapshot.toObject(User.class);
                 assert user != null;
-                for (DocumentReference dr : user.getSaved()) {
-                    if (dr.equals(postReference)) {
-                        isSaved = true;
-                        break;
-                    }
-                }
+                isSaved = user.getSaved().contains(postReference);
+                update();
             });
-            update();
         }
 
         private void updateSavedData() {

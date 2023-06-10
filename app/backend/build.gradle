@@ -1,0 +1,15 @@
+plugins {
+    id 'java-library'
+    id 'application'
+}
+application {
+    mainClassName = 'com.jamburger.kitter.backend.AdminBackend'
+}
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_9
+    targetCompatibility = JavaVersion.VERSION_1_9
+}
+dependencies {
+    implementation 'com.google.firebase:firebase-admin:9.1.1'
+    implementation 'com.google.cloud:google-cloud-firestore:3.7.0'
+}

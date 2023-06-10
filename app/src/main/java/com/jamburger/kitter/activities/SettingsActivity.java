@@ -22,11 +22,17 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.jamburger.kitter.R;
+import com.jamburger.kitter.components.User;
 
 public class SettingsActivity extends AppCompatActivity {
     ViewGroup settingsList;
     GoogleSignInClient googleSignInClient;
+    DocumentReference userReference;
+    SharedPreferences.Editor editor;
+    boolean isDarkModeOn;
 
     @SuppressLint("NonConstantResourceId")
     @Override
@@ -35,22 +41,44 @@ public class SettingsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_settings);
 
         googleSignInClient = GoogleSignIn.getClient(this, GoogleSignInOptions.DEFAULT_SIGN_IN);
-
-        SharedPreferences sharedPreferences = getSharedPreferences("sharedPrefs", MODE_PRIVATE);
-        final SharedPreferences.Editor editor = sharedPreferences.edit();
-        final boolean isDarkModeOn = sharedPreferences.getBoolean("isDarkModeOn", true);
+        userReference = FirebaseFirestore.getInstance().collection("Users").document(FirebaseAuth.getInstance().getUid());
 
         settingsList = findViewById(R.id.settings_list);
 
-        TextView themeItem = findViewById(R.id.setting_theme);
-        if (isDarkModeOn) {
-            themeItem.setText("Dark Mode");
-            themeItem.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_dark, 0, 0, 0);
-        } else {
-            themeItem.setText("Light Mode");
-            themeItem.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_light, 0, 0, 0);
-        }
+        updateUserData();
+        updateThemeOption();
+        setOptionCLickListener();
+        findViewById(R.id.btn_close).setOnClickListener(v -> finish());
+    }
 
+    private void updateUserData() {
+        userReference.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                User user = task.getResult().toObject(User.class);
+                assert user != null;
+                ((TextView) findViewById(R.id.txt_account_privacy)).setText(user.isPrivate() ? "Private" : "Public");
+                ((TextView) findViewById(R.id.txt_blocked_count)).setText(String.valueOf(user.getBlockedAccounts().size()));
+            }
+        });
+    }
+
+    private void updateThemeOption() {
+        SharedPreferences sharedPreferences = getSharedPreferences("sharedPrefs", MODE_PRIVATE);
+        isDarkModeOn = sharedPreferences.getBoolean("isDarkModeOn", true);
+        editor = sharedPreferences.edit();
+
+        TextView themeOption = findViewById(R.id.setting_theme);
+        if (isDarkModeOn) {
+            themeOption.setText("Dark mode");
+            themeOption.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_dark, 0, R.drawable.ic_next, 0);
+        } else {
+            themeOption.setText("Light mode");
+            themeOption.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_light, 0, R.drawable.ic_next, 0);
+        }
+    }
+
+
+    void setOptionCLickListener() {
         for (int i = 0; i < settingsList.getChildCount(); i++) {
             View option = settingsList.getChildAt(i);
             if (!option.isClickable()) continue;
@@ -75,29 +103,27 @@ public class SettingsActivity extends AppCompatActivity {
                             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
                         } else {
                             editor.putBoolean("isDarkModeOn", true).apply();
-                                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                        }
+                        break;
+                    case R.id.setting_add_account:
+                        break;
+                    case R.id.setting_logout:
+                        googleSignInClient.signOut().addOnCompleteListener(task -> {
+                            if (task.isSuccessful()) {
+                                FirebaseAuth.getInstance().signOut();
+                                Intent intentLogin = new Intent(this, LoginActivity.class);
+                                intentLogin.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                startActivity(intentLogin);
+                                finish();
                             }
-                            break;
-                        case R.id.setting_new_account:
-                            break;
-                        case R.id.setting_logout:
-                            googleSignInClient.signOut().addOnCompleteListener(task -> {
-                                if (task.isSuccessful()) {
-                                    FirebaseAuth.getInstance().signOut();
-                                    Intent intentLogin = new Intent(this, LoginActivity.class);
-                                    intentLogin.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                    startActivity(intentLogin);
-                                    finish();
-                                }
-                            });
-                            break;
-                        default:
-                            Log.i(TAG, "nothing selected");
-                    }
-                });
+                        });
+                        break;
+                    default:
+                        Log.i(TAG, "nothing selected");
+                }
+            });
         }
-
-        findViewById(R.id.btn_close).setOnClickListener(v -> finish());
     }
 
     void showRecoverPasswordDialog() {

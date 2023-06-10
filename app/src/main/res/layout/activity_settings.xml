@@ -15,8 +15,8 @@
 
         <ImageView
             android:id="@+id/btn_close"
-            android:layout_width="@dimen/icon_size"
-            android:layout_height="@dimen/icon_size"
+            android:layout_width="@dimen/icon_size_normal"
+            android:layout_height="@dimen/icon_size_normal"
             android:layout_centerVertical="true"
             android:src="@drawable/ic_close"
             app:tint="@color/inverted" />
@@ -32,8 +32,9 @@
     </RelativeLayout>
 
     <com.google.android.material.divider.MaterialDivider
-        style="@style/Settings.Divider"
-        android:layout_marginTop="0dp" />
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="7dp" />
 
     <ScrollView
         android:layout_width="match_parent"
@@ -63,20 +64,54 @@
                 style="@style/Settings.Header"
                 android:text="Privacy and Security" />
 
+            <RelativeLayout
+                android:id="@+id/setting_account_privacy"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    style="@style/Settings.Option.Iconed"
+                    android:layout_width="wrap_content"
+                    android:text="Account privacy"
+                    app:drawableEndCompat="@android:color/transparent"
+                    app:drawableStartCompat="@drawable/ic_lock" />
+
+                <TextView
+                    android:id="@+id/txt_account_privacy"
+                    style="@style/Settings.Option.Value"
+                    android:text="Public"
+                    app:drawableEndCompat="@drawable/ic_next" />
+
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/setting_block_accounts"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    style="@style/Settings.Option.Iconed"
+                    android:layout_width="wrap_content"
+                    android:text="Blocked accounts"
+                    app:drawableEndCompat="@android:color/transparent"
+                    app:drawableStartCompat="@drawable/ic_block" />
+
+
+                <TextView
+                    android:id="@+id/txt_blocked_count"
+                    style="@style/Settings.Option.Value"
+                    android:text="0"
+                    app:drawableEndCompat="@drawable/ic_next" />
+
+            </RelativeLayout>
+
             <TextView
                 android:id="@+id/setting_change_password"
                 style="@style/Settings.Option.Iconed"
-                android:text="Change Password"
+                android:text="Change password"
                 app:drawableStartCompat="@drawable/ic_password" />
 
-            <TextView
-                android:id="@+id/setting_block_accounts"
-                style="@style/Settings.Option.Iconed"
-                android:text="Blocked Accounts"
-                app:drawableStartCompat="@drawable/ic_block" />
-
             <com.google.android.material.divider.MaterialDivider style="@style/Settings.Divider" />
-
 
             <TextView
                 style="@style/Settings.Header"
@@ -95,9 +130,9 @@
                 android:text="Login" />
 
             <TextView
-                android:id="@+id/setting_new_account"
+                android:id="@+id/setting_add_account"
                 style="@style/Settings.Option.NonIconed"
-                android:text="Create a new account"
+                android:text="Add account"
                 android:textColor="@color/light_blue" />
 
             <TextView

@@ -11,8 +11,8 @@ android {
         applicationId "com.jamburger.kitter"
         minSdk 21
         targetSdk 33
-        versionCode 4
-        versionName '3.7.0'
+        versionCode 5
+        versionName '4.1.0'
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -30,7 +30,6 @@ android {
 }
 
 dependencies {
-    implementation 'com.google.firebase:firebase-config:21.4.0'
     testImplementation 'junit:junit:4.13.2'
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
@@ -50,6 +49,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-storage'
     implementation 'com.google.firebase:firebase-functions'
     implementation 'com.google.firebase:firebase-messaging'
+    implementation 'com.google.firebase:firebase-config:21.4.0'
     implementation platform('com.google.firebase:firebase-bom:32.0.0')
 
     implementation 'com.onesignal:OneSignal:[4.0.0, 4.99.99]'

@@ -18,8 +18,8 @@
 
         <ImageView
             android:id="@+id/btn_close"
-            android:layout_width="@dimen/icon_size"
-            android:layout_height="@dimen/icon_size"
+            android:layout_width="@dimen/icon_size_normal"
+            android:layout_height="@dimen/icon_size_normal"
             android:layout_centerVertical="true"
             android:contentDescription="close button"
             android:src="@drawable/ic_close"
@@ -38,8 +38,8 @@
 
         <ImageView
             android:id="@+id/btn_post"
-            android:layout_width="@dimen/icon_size"
-            android:layout_height="@dimen/icon_size"
+            android:layout_width="@dimen/icon_size_normal"
+            android:layout_height="@dimen/icon_size_normal"
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
             android:contentDescription="post button"

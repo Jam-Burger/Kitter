@@ -168,7 +168,7 @@ public class PostActivity extends AppCompatActivity {
                         startMainActivity();
                     });
                     db.collection("Users").document(user.getUid())
-                            .update("pictures", FieldValue.arrayUnion(postRef));
+                            .update("posts", FieldValue.arrayUnion(postRef));
                 });
             }).addOnFailureListener(e -> {
                 progressDialog.dismiss();
@@ -188,7 +188,7 @@ public class PostActivity extends AppCompatActivity {
                 startMainActivity();
             });
             db.collection("Users").document(user.getUid())
-                    .update("kitts", FieldValue.arrayUnion(postRef));
+                    .update("posts", FieldValue.arrayUnion(postRef));
         }
     }
 

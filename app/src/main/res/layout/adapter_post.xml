@@ -13,8 +13,8 @@
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/img_profile"
-            android:layout_width="35dp"
-            android:layout_height="35dp"
+            android:layout_width="@dimen/post_profile_image_size"
+            android:layout_height="@dimen/post_profile_image_size"
             android:layout_marginHorizontal="10dp"
             android:layout_marginVertical="7dp"
             android:scaleType="centerCrop"
@@ -84,23 +84,23 @@
 
         <ImageView
             android:id="@+id/btn_like"
-            android:layout_width="@dimen/icon_size"
-            android:layout_height="@dimen/icon_size"
+            android:layout_width="@dimen/icon_size_normal"
+            android:layout_height="@dimen/icon_size_normal"
             android:src="@drawable/ic_heart_outlined" />
 
 
         <ImageView
             android:id="@+id/btn_comment"
-            android:layout_width="@dimen/icon_size"
-            android:layout_height="@dimen/icon_size"
+            android:layout_width="@dimen/icon_size_normal"
+            android:layout_height="@dimen/icon_size_normal"
             android:layout_marginStart="20dp"
             android:layout_toEndOf="@id/btn_like"
             android:src="@drawable/ic_comment" />
 
         <ImageView
             android:id="@+id/btn_save"
-            android:layout_width="@dimen/icon_size"
-            android:layout_height="@dimen/icon_size"
+            android:layout_width="@dimen/icon_size_normal"
+            android:layout_height="@dimen/icon_size_normal"
             android:layout_alignParentRight="true"
             android:src="@drawable/ic_save_outlined" />
 
