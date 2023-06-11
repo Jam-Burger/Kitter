@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    app:cardBackgroundColor="#F3656565"
+    app:cardCornerRadius="20dp">
+
+    <TextView
+        android:id="@+id/kitt_mypost"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="15dp"
+        android:layout_marginVertical="10dp"
+        android:fontFamily="@font/lato"
+        android:gravity="center"
+        android:maxWidth="200dp"
+        android:minWidth="100dp"
+        android:minHeight="50dp"
+        android:text="heyyy sdfjsghsghk hsdhgsgus gie wy"
+        android:textColor="@color/white"
+        android:textSize="@dimen/text_big"
+        android:textStyle="bold" />
+</androidx.cardview.widget.CardView>
