@@ -7,7 +7,8 @@
     android:padding="5dp"
     android:gravity="bottom"
     android:id="@+id/container"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:visibility="invisible">
 
     <TextView
         android:id="@+id/txt_kitt"

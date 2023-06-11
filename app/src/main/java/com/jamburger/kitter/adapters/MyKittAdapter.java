@@ -61,6 +61,7 @@ public class MyKittAdapter extends RecyclerView.Adapter<MyKittAdapter.ViewHolder
             assert post != null;
             holder.kitt.setText(post.getKitt());
             holder.time.setText(MainActivity.dateIdToString(post.getPostid()));
+            holder.container.setVisibility(View.VISIBLE);
             previewTextView.setText(holder.kitt.getText().toString());
         });
 
