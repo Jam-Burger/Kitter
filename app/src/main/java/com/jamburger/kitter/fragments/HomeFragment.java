@@ -21,15 +21,11 @@ import com.jamburger.kitter.activities.PostActivity;
 import com.jamburger.kitter.adapters.PostAdapter;
 import com.jamburger.kitter.components.Post;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class HomeFragment extends Fragment {
 
     RecyclerView recyclerViewPosts;
     PostAdapter postAdapter;
     Toolbar toolbar;
-    List<Post> posts;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -63,8 +59,7 @@ public class HomeFragment extends Fragment {
             return true;
         });
 
-        posts = new ArrayList<>();
-        postAdapter = new PostAdapter(requireContext(), posts);
+        postAdapter = new PostAdapter(requireContext());
         recyclerViewPosts.setHasFixedSize(true);
         recyclerViewPosts.setAdapter(postAdapter);
         readPosts();
@@ -79,19 +74,15 @@ public class HomeFragment extends Fragment {
 //
 //        });
 
+
         CollectionReference feedReference = FirebaseFirestore.getInstance().collection("Users").document(FirebaseAuth.getInstance().getUid()).collection("feed");
         feedReference.get().addOnSuccessListener(feedSnapshots -> {
-            posts.clear();
+            postAdapter.clearPosts();
             for (DocumentSnapshot feedSnapshot : feedSnapshots) {
                 DocumentReference postReference = feedSnapshot.getDocumentReference("postReference");
                 boolean isVisited = Boolean.TRUE.equals(feedSnapshot.getBoolean("visited"));
                 assert postReference != null;
-
-                postReference.get().addOnSuccessListener(postSnapshot -> {
-                    Post post = postSnapshot.toObject(Post.class);
-                    posts.add(post);
-                    postAdapter.notifyDataSetChanged();
-                });
+                postReference.get().addOnSuccessListener(postSnapshot -> postAdapter.addPost(postSnapshot.toObject(Post.class)));
             }
         });
     }

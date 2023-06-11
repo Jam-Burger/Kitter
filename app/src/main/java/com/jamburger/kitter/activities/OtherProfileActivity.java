@@ -22,7 +22,6 @@ import com.jamburger.kitter.adapters.MyPictureAdapter;
 import com.jamburger.kitter.components.Post;
 import com.jamburger.kitter.components.User;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,11 +32,9 @@ public class OtherProfileActivity extends AppCompatActivity {
     ImageView backgroundImage, profileImage;
     TextView name, username, bio, noOfPosts, noOfFollowers, noOfFollowing;
     Button followButton, messageButton;
-    DocumentReference userdataReference, myUserdataReference;
+    DocumentReference userReference, myReference;
     ImageView picturesButton, kittsButton;
     RecyclerView recyclerViewMyPosts;
-    List<DocumentReference> pictures;
-    List<DocumentReference> kitts;
     boolean amFollowing;
 
     @Override
@@ -46,8 +43,8 @@ public class OtherProfileActivity extends AppCompatActivity {
         setContentView(R.layout.activity_other_profile);
 
         String userid = getIntent().getStringExtra("userid");
-        userdataReference = FirebaseFirestore.getInstance().collection("Users").document(userid);
-        myUserdataReference = FirebaseFirestore.getInstance().collection("Users").document(FirebaseAuth.getInstance().getUid());
+        userReference = FirebaseFirestore.getInstance().collection("Users").document(userid);
+        myReference = FirebaseFirestore.getInstance().collection("Users").document(FirebaseAuth.getInstance().getUid());
 
         backgroundImage = findViewById(R.id.img_background);
         profileImage = findViewById(R.id.img_profile);
@@ -64,18 +61,15 @@ public class OtherProfileActivity extends AppCompatActivity {
         picturesButton = findViewById(R.id.btn_my_pictures);
         kittsButton = findViewById(R.id.btn_my_kitts);
 
-        pictures = new ArrayList<>();
-        myPictureAdapter = new MyPictureAdapter(this, pictures);
-
-        kitts = new ArrayList<>();
-        myKittAdapter = new MyKittAdapter(this, kitts);
+        myPictureAdapter = new MyPictureAdapter(this);
+        myKittAdapter = new MyKittAdapter(this);
 
         recyclerViewMyPosts = findViewById(R.id.recyclerview_my_posts);
         recyclerViewMyPosts.setHasFixedSize(true);
         ((GridLayoutManager) recyclerViewMyPosts.getLayoutManager()).setSpanCount(3);
         recyclerViewMyPosts.setAdapter(myPictureAdapter);
 
-        if (myUserdataReference.equals(userdataReference)) {
+        if (myReference.equals(userReference)) {
             followButton.setVisibility(View.GONE);
             messageButton.setVisibility(View.GONE);
         }
@@ -109,30 +103,34 @@ public class OtherProfileActivity extends AppCompatActivity {
     private void toggleFollow() {
         amFollowing = !amFollowing;
         if (amFollowing) {
-            myUserdataReference.update("following", FieldValue.arrayUnion(userdataReference));
-            userdataReference.update("followers", FieldValue.arrayUnion(myUserdataReference));
             noOfFollowers.setText(String.valueOf(Integer.parseInt(noOfFollowers.getText().toString()) + 1));
 
-            List<DocumentReference> posts = new ArrayList<>();
-            posts.addAll(pictures);
-            posts.addAll(kitts);
-            for (DocumentReference postReference : posts) {
-                Map<String, Object> map = new HashMap<>();
-                map.put("postReference", postReference);
-                map.put("visited", false);
-                myUserdataReference.collection("feed").document(postReference.getId()).set(map);
-            }
+            myReference.update("following", FieldValue.arrayUnion(userReference));
+            userReference.update("followers", FieldValue.arrayUnion(myReference)).addOnSuccessListener(unused -> readPosts());
+            userReference.get().addOnSuccessListener(userSnapshot -> {
+                User user = userSnapshot.toObject(User.class);
+                assert user != null;
+                List<DocumentReference> posts = user.getPosts();
+                for (DocumentReference postReference : posts) {
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("postReference", postReference);
+                    map.put("visited", false);
+                    myReference.collection("feed").document(postReference.getId()).set(map);
+                }
+            });
         } else {
-            myUserdataReference.update("following", FieldValue.arrayRemove(userdataReference));
-            userdataReference.update("followers", FieldValue.arrayRemove(myUserdataReference));
             noOfFollowers.setText(String.valueOf(Integer.parseInt(noOfFollowers.getText().toString()) - 1));
 
-            List<DocumentReference> posts = new ArrayList<>();
-            posts.addAll(pictures);
-            posts.addAll(kitts);
-            for (DocumentReference postReference : posts) {
-                myUserdataReference.collection("feed").document(postReference.getId()).delete();
-            }
+            myReference.update("following", FieldValue.arrayRemove(userReference));
+            userReference.update("followers", FieldValue.arrayRemove(myReference)).addOnSuccessListener(unused -> readPosts());
+            userReference.get().addOnSuccessListener(userSnapshot -> {
+                User user = userSnapshot.toObject(User.class);
+                assert user != null;
+                List<DocumentReference> posts = user.getPosts();
+                for (DocumentReference postReference : posts) {
+                    myReference.collection("feed").document(postReference.getId()).delete();
+                }
+            });
         }
         updateFollowButton();
     }
@@ -149,7 +147,7 @@ public class OtherProfileActivity extends AppCompatActivity {
     }
 
     void fillUserData() {
-        userdataReference.get().addOnSuccessListener(documentSnapshot -> {
+        userReference.get().addOnSuccessListener(documentSnapshot -> {
             User user = documentSnapshot.toObject(User.class);
             assert user != null;
             String txt_username = "@" + user.getUsername();
@@ -162,7 +160,7 @@ public class OtherProfileActivity extends AppCompatActivity {
             noOfFollowers.setText(String.valueOf(user.getFollowers().size()));
             noOfFollowing.setText(String.valueOf(user.getFollowing().size()));
 
-            amFollowing = user.getFollowers().contains(myUserdataReference);
+            amFollowing = user.getFollowers().contains(myReference);
             updateFollowButton();
 
             Glide.with(this).load(user.getProfileImageUrl()).into(profileImage);
@@ -171,22 +169,20 @@ public class OtherProfileActivity extends AppCompatActivity {
     }
 
     void readPosts() {
-        userdataReference.get().addOnSuccessListener(userSnapshot -> {
+        userReference.get().addOnSuccessListener(userSnapshot -> {
             User user = userSnapshot.toObject(User.class);
             assert user != null;
-            pictures.clear();
-            kitts.clear();
+            myPictureAdapter.clearPosts();
+            myKittAdapter.clearPosts();
             for (DocumentReference postReference : user.getPosts()) {
                 postReference.get().addOnSuccessListener(postSnapshot -> {
                     Post post = postSnapshot.toObject(Post.class);
                     assert post != null;
                     if (!post.getImageUrl().isEmpty()) {
-                        pictures.add(0, postReference);
-                        myPictureAdapter.notifyDataSetChanged();
+                        myPictureAdapter.addPost(postReference);
                     }
                     if (!post.getKitt().isEmpty()) {
-                        kitts.add(0, postReference);
-                        myKittAdapter.notifyDataSetChanged();
+                        myKittAdapter.addPost(postReference);
                     }
                 });
             }

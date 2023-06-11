@@ -30,12 +30,15 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.jamburger.kitter.R;
 import com.jamburger.kitter.components.Post;
+import com.jamburger.kitter.components.User;
 import com.jamburger.kitter.fragments.SelectSourceDialogFragment;
 
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 public class PostActivity extends AppCompatActivity {
     ImageView imageView;
@@ -167,8 +170,7 @@ public class PostActivity extends AppCompatActivity {
                         progressDialog.dismiss();
                         startMainActivity();
                     });
-                    db.collection("Users").document(user.getUid())
-                            .update("posts", FieldValue.arrayUnion(postRef));
+                    updateUserPostsAndFeed(postRef);
                 });
             }).addOnFailureListener(e -> {
                 progressDialog.dismiss();
@@ -187,9 +189,25 @@ public class PostActivity extends AppCompatActivity {
             postRef.set(post).addOnCompleteListener(task -> {
                 startMainActivity();
             });
-            db.collection("Users").document(user.getUid())
-                    .update("posts", FieldValue.arrayUnion(postRef));
+            updateUserPostsAndFeed(postRef);
         }
+    }
+
+    void updateUserPostsAndFeed(DocumentReference postReference) {
+        DocumentReference userReference = db.collection("Users").document(user.getUid());
+        userReference.update("posts", FieldValue.arrayUnion(postReference));
+
+        Map<String, Object> map = new HashMap<>();
+        map.put("postReference", postReference);
+        map.put("visited", false);
+        userReference.collection("feed").document(postReference.getId()).set(map);
+        userReference.get().addOnSuccessListener(userSnapshot -> {
+            User me = userSnapshot.toObject(User.class);
+            assert me != null;
+            for (DocumentReference follower : me.getFollowers()) {
+                follower.collection("feed").document(postReference.getId()).set(map);
+            }
+        });
     }
 
     public void startMainActivity() {

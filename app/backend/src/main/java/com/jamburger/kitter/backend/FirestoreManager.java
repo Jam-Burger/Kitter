@@ -18,11 +18,11 @@ import java.util.concurrent.Executors;
 
 public class FirestoreManager {
     private static final int NUM_THREADS = 10;
-    static Firestore db = FirestoreClient.getFirestore();
+    private static final Firestore db = FirestoreClient.getFirestore();
 
     public static void manageUsers() throws ExecutionException, InterruptedException {
-        Query query = db.collection("Users");
         ExecutorService executorService = Executors.newFixedThreadPool(NUM_THREADS);
+        Query query = db.collection("Users");
         QuerySnapshot querySnapshot = query.get().get();
         for (DocumentSnapshot documentSnapshot : querySnapshot.getDocuments()) {
             executorService.submit(() -> {
@@ -44,6 +44,21 @@ public class FirestoreManager {
                 }
 
             });
+        }
+        executorService.shutdown();
+    }
+
+    public static void deleteAllPosts() throws ExecutionException, InterruptedException {
+        ExecutorService executorService = Executors.newFixedThreadPool(20);
+        for (DocumentSnapshot user : db.collection("Users").get().get().getDocuments()) {
+            executorService.submit(() -> user.getReference().update("posts", new ArrayList<DocumentReference>()).get());
+            executorService.submit(() -> user.getReference().update("saved", new ArrayList<DocumentReference>()).get());
+            for (DocumentSnapshot feed : user.getReference().collection("feed").get().get()) {
+                executorService.submit(() -> feed.getReference().delete().get());
+            }
+        }
+        for (DocumentSnapshot post : db.collection("Posts").get().get().getDocuments()) {
+            executorService.submit(() -> post.getReference().delete().get());
         }
         executorService.shutdown();
     }

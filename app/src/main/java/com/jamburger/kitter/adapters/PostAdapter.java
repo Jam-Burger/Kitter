@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,21 +32,34 @@ import com.jamburger.kitter.activities.OtherProfileActivity;
 import com.jamburger.kitter.components.Post;
 import com.jamburger.kitter.components.User;
 
-import java.util.List;
+import java.util.Comparator;
+import java.util.TreeSet;
 
 
 public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
     Context mContext;
-    List<Post> mPosts;
+    TreeSet<Post> mPosts;
     FirebaseFirestore db;
     DocumentReference userReference;
     private static final long DOUBLE_CLICK_TIME_DELTA = 300; //milliseconds
 
     long lastClickTime = 0;
 
-    public PostAdapter(Context mContext, List<Post> mPosts) {
+    public PostAdapter(Context mContext) {
         this.mContext = mContext;
-        this.mPosts = mPosts;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            mPosts = new TreeSet<>(Comparator.comparing(Post::getPostid));
+        }
+    }
+
+    public void addPost(Post post) {
+        mPosts.add(post);
+        notifyDataSetChanged();
+    }
+
+    public void clearPosts() {
+        mPosts.clear();
+        notifyDataSetChanged();
     }
 
     @NonNull
@@ -60,7 +74,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Post post = mPosts.get(position);
+        Post post = mPosts.toArray(new Post[0])[position];
 
         db.collection("Users").document(post.getCreator()).get().addOnSuccessListener(snapshot -> {
             User creator = snapshot.toObject(User.class);

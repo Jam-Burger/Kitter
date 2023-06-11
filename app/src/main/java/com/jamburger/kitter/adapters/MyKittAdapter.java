@@ -1,6 +1,7 @@
 package com.jamburger.kitter.adapters;
 
 import android.content.Context;
+import android.os.Build;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,15 +15,28 @@ import com.jamburger.kitter.R;
 import com.jamburger.kitter.activities.MainActivity;
 import com.jamburger.kitter.components.Post;
 
-import java.util.List;
+import java.util.Comparator;
+import java.util.TreeSet;
 
 public class MyKittAdapter extends RecyclerView.Adapter<MyKittAdapter.ViewHolder> {
     Context mContext;
-    List<DocumentReference> mPosts;
+    TreeSet<DocumentReference> mPosts;
 
-    public MyKittAdapter(Context mContext, List<DocumentReference> mPosts) {
+    public MyKittAdapter(Context mContext) {
         this.mContext = mContext;
-        this.mPosts = mPosts;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            mPosts = new TreeSet<>(Comparator.comparing(DocumentReference::getId).reversed());
+        }
+    }
+
+    public void addPost(DocumentReference post) {
+        mPosts.add(post);
+        notifyDataSetChanged();
+    }
+
+    public void clearPosts() {
+        mPosts.clear();
+        notifyDataSetChanged();
     }
 
     @NonNull
@@ -34,7 +48,7 @@ public class MyKittAdapter extends RecyclerView.Adapter<MyKittAdapter.ViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        DocumentReference postReference = mPosts.get(position);
+        DocumentReference postReference = mPosts.toArray(new DocumentReference[0])[position];
         postReference.get().addOnSuccessListener(postSnapshot -> {
             Post post = postSnapshot.toObject(Post.class);
             if (!post.getKitt().isEmpty()) {

@@ -185,8 +185,8 @@
                     android:id="@+id/txt_name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textColor="@color/text_very_strong"
                     android:fontFamily="@font/varela_round"
+                    android:textColor="@color/text_very_strong"
                     android:textSize="@dimen/text_little_big"
                     android:textStyle="bold" />
 
@@ -194,9 +194,9 @@
                     android:id="@+id/txt_bio"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:fontFamily="@font/lato"
                     android:maxWidth="250dp"
                     android:textColor="@color/text_light"
-                    android:fontFamily="@font/lato"
                     android:textSize="@dimen/text_little_big" />
             </LinearLayout>
 
@@ -269,9 +269,7 @@
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recyclerview_my_posts"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
-                app:spanCount="1" />
+                android:layout_height="wrap_content" />
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 </RelativeLayout>

@@ -36,9 +36,6 @@ import com.jamburger.kitter.adapters.MyPictureAdapter;
 import com.jamburger.kitter.components.Post;
 import com.jamburger.kitter.components.User;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class ProfileFragment extends Fragment {
     ImageView backgroundImage, profileImage, backgroundImageEditButton;
     TextView name, username, bio, noOfPosts, noOfFollowers, noOfFollowing;
@@ -50,8 +47,7 @@ public class ProfileFragment extends Fragment {
     FirebaseUser user;
     ImageView picturesButton, kittsButton;
     RecyclerView recyclerViewMyPosts;
-    List<DocumentReference> pictures;
-    List<DocumentReference> kitts;
+    GridLayoutManager layoutManager;
 
     ActivityResultLauncher<Intent> myActivityResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
         if (result.getResultCode() == Activity.RESULT_OK) {
@@ -104,16 +100,15 @@ public class ProfileFragment extends Fragment {
             return true;
         });
 
-        pictures = new ArrayList<>();
-        myPictureAdapter = new MyPictureAdapter(getContext(), pictures);
+        myPictureAdapter = new MyPictureAdapter(getContext());
+        myKittAdapter = new MyKittAdapter(getContext());
 
-        kitts = new ArrayList<>();
-        myKittAdapter = new MyKittAdapter(getContext(), kitts);
+        layoutManager = new GridLayoutManager(getContext(), 3);
 
         recyclerViewMyPosts = view.findViewById(R.id.recyclerview_my_posts);
         recyclerViewMyPosts.setHasFixedSize(true);
-        ((GridLayoutManager) recyclerViewMyPosts.getLayoutManager()).setSpanCount(3);
         recyclerViewMyPosts.setAdapter(myPictureAdapter);
+        recyclerViewMyPosts.setLayoutManager(layoutManager);
 
         fillUserData();
         readPosts();
@@ -122,13 +117,13 @@ public class ProfileFragment extends Fragment {
         View kittsIndicator = view.findViewById(R.id.indicator_kitts);
         picturesButton.setOnClickListener(v -> {
             recyclerViewMyPosts.setAdapter(myPictureAdapter);
-            ((GridLayoutManager) recyclerViewMyPosts.getLayoutManager()).setSpanCount(3);
+            layoutManager.setSpanCount(3);
             picturesIndicator.setVisibility(View.VISIBLE);
             kittsIndicator.setVisibility(View.INVISIBLE);
         });
         kittsButton.setOnClickListener(v -> {
             recyclerViewMyPosts.setAdapter(myKittAdapter);
-            ((GridLayoutManager) recyclerViewMyPosts.getLayoutManager()).setSpanCount(1);
+            layoutManager.setSpanCount(1);
             picturesIndicator.setVisibility(View.INVISIBLE);
             kittsIndicator.setVisibility(View.VISIBLE);
         });
@@ -200,19 +195,17 @@ public class ProfileFragment extends Fragment {
         userdataReference.get().addOnSuccessListener(userSnapshot -> {
             User user = userSnapshot.toObject(User.class);
             assert user != null;
-            pictures.clear();
-            kitts.clear();
+            myPictureAdapter.clearPosts();
+            myKittAdapter.clearPosts();
             for (DocumentReference postReference : user.getPosts()) {
                 postReference.get().addOnSuccessListener(postSnapshot -> {
                     Post post = postSnapshot.toObject(Post.class);
                     assert post != null;
                     if (!post.getImageUrl().isEmpty()) {
-                        pictures.add(0, postReference);
-                        myPictureAdapter.notifyDataSetChanged();
+                        myPictureAdapter.addPost(postReference);
                     }
                     if (!post.getKitt().isEmpty()) {
-                        kitts.add(0, postReference);
-                        myKittAdapter.notifyDataSetChanged();
+                        myKittAdapter.addPost(postReference);
                     }
                 });
             }
