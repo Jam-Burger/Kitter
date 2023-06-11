@@ -19,4 +19,5 @@
     <color name="button_gray">#B8B8B8</color>
     <color name="button_blue">#237BE8</color>
     <color name="red">#FF4A4A</color>
+    <color name="transparent">#00000000</color>
 </resources>

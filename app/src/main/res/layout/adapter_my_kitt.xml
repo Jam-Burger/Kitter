@@ -6,7 +6,7 @@
     android:background="#41808080"
     android:padding="5dp"
     android:gravity="bottom"
-    android:id="@+id/container_my_kitt"
+    android:id="@+id/container"
     android:orientation="vertical">
 
     <TextView

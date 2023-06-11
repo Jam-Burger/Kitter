@@ -1,5 +1,6 @@
 package com.jamburger.kitter.adapters;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.os.Build;
 import android.view.LayoutInflater;
@@ -49,14 +50,22 @@ public class MyPictureAdapter extends RecyclerView.Adapter<MyPictureAdapter.View
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         DocumentReference postReference = mPosts.toArray(new DocumentReference[0])[position];
+
+        Dialog dialog = new Dialog(mContext);
+        dialog.setContentView(R.layout.dialog_my_picture_preview);
+        ImageView previewImageView = dialog.findViewById(R.id.img_mypost);
+
         postReference.get().addOnSuccessListener(postSnapshot -> {
             Post post = postSnapshot.toObject(Post.class);
-            if (!post.getImageUrl().isEmpty()) {
-                Glide.with(mContext).load(post.getImageUrl()).into(holder.myPostImage);
-                holder.container.setVisibility(View.VISIBLE);
-            } else {
-                mPosts.remove(postReference);
-            }
+            assert post != null;
+            Glide.with(mContext).load(post.getImageUrl()).into(holder.myPostImage);
+            Glide.with(dialog.getContext()).load(post.getImageUrl()).into(previewImageView);
+        });
+
+
+        holder.myPostImage.setOnLongClickListener(v -> {
+            dialog.show();
+            return true;
         });
     }
 
@@ -66,14 +75,11 @@ public class MyPictureAdapter extends RecyclerView.Adapter<MyPictureAdapter.View
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        View container;
         ImageView myPostImage;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             myPostImage = itemView.findViewById(R.id.img_mypost);
-            container = itemView.findViewById(R.id.container_my_picture);
-            container.setVisibility(View.GONE);
         }
     }
 }

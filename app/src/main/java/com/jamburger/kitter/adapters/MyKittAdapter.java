@@ -1,5 +1,6 @@
 package com.jamburger.kitter.adapters;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.os.Build;
 import android.view.LayoutInflater;
@@ -49,15 +50,23 @@ public class MyKittAdapter extends RecyclerView.Adapter<MyKittAdapter.ViewHolder
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         DocumentReference postReference = mPosts.toArray(new DocumentReference[0])[position];
+
+        Dialog dialog = new Dialog(mContext);
+        dialog.getWindow().setBackgroundDrawableResource(R.color.transparent);
+        dialog.setContentView(R.layout.dialog_my_kitt_preview);
+        TextView previewTextView = dialog.findViewById(R.id.kitt_mypost);
+
         postReference.get().addOnSuccessListener(postSnapshot -> {
             Post post = postSnapshot.toObject(Post.class);
-            if (!post.getKitt().isEmpty()) {
-                holder.kitt.setText(post.getKitt());
-                holder.time.setText(MainActivity.dateIdToString(post.getPostid()));
-                holder.container.setVisibility(View.VISIBLE);
-            } else {
-                mPosts.remove(postReference);
-            }
+            assert post != null;
+            holder.kitt.setText(post.getKitt());
+            holder.time.setText(MainActivity.dateIdToString(post.getPostid()));
+            previewTextView.setText(holder.kitt.getText().toString());
+        });
+
+        holder.container.setOnLongClickListener(v -> {
+            dialog.show();
+            return true;
         });
     }
 
@@ -67,15 +76,14 @@ public class MyKittAdapter extends RecyclerView.Adapter<MyKittAdapter.ViewHolder
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        View container;
         TextView kitt, time;
+        View container;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             kitt = itemView.findViewById(R.id.txt_kitt);
             time = itemView.findViewById(R.id.txt_time);
-            container = itemView.findViewById(R.id.container_my_kitt);
-            container.setVisibility(View.GONE);
+            container = itemView.findViewById(R.id.container);
         }
     }
 }
