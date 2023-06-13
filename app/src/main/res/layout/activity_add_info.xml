@@ -13,15 +13,13 @@
 
         <TextView
             android:id="@+id/txt_header"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textColor="@color/inverted"
-            android:textSize="25sp" />
+            style="@style/Header.Title"
+            android:text="Add Info" />
 
         <ImageView
             android:id="@+id/btn_next"
-            android:layout_width="@dimen/icon_size_normal"
-            android:layout_height="@dimen/icon_size_normal"
+            android:layout_width="@dimen/icon_size_big"
+            android:layout_height="@dimen/icon_size_big"
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
             android:src="@drawable/ic_arrow" />

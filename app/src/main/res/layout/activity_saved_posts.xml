@@ -15,22 +15,17 @@
 
         <ImageView
             android:id="@+id/btn_close"
-            android:layout_width="@dimen/icon_size_normal"
-            android:layout_height="@dimen/icon_size_normal"
+            android:layout_width="@dimen/icon_size_big"
+            android:layout_height="@dimen/icon_size_big"
             android:layout_centerVertical="true"
             android:src="@drawable/ic_close"
             android:tint="@color/inverted"
             tools:ignore="UseAppTint" />
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
+            style="@style/Header.Title"
             android:layout_toEndOf="@id/btn_close"
-            android:paddingBottom="5dp"
-            android:text="Saved"
-            android:textColor="@color/inverted"
-            android:textSize="25sp" />
+            android:text="Saved" />
     </RelativeLayout>
 
     <com.google.android.material.divider.MaterialDivider
