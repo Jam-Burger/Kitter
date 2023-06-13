@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".fragments.ProfileFragment">
 
     <com.google.android.material.appbar.AppBarLayout
@@ -66,8 +66,7 @@
                     android:layout_marginBottom="5dp"
                     android:background="@drawable/ic_circle"
                     android:padding="8dp"
-                    android:src="@drawable/ic_edit_image"
-                    app:tint="@color/black" />
+                    android:src="@drawable/ic_edit_image" />
 
                 <de.hdodenhof.circleimageview.CircleImageView
                     android:id="@+id/img_profile"

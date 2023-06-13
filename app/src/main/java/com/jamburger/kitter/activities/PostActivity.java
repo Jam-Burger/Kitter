@@ -32,7 +32,7 @@ import com.jamburger.kitter.R;
 import com.jamburger.kitter.components.Post;
 import com.jamburger.kitter.components.User;
 import com.jamburger.kitter.fragments.SelectSourceDialogFragment;
-import com.jamburger.kitter.utilities.DateFormatter;
+import com.jamburger.kitter.utilities.DateTimeFormatter;
 
 import java.io.File;
 import java.io.IOException;
@@ -108,7 +108,7 @@ public class PostActivity extends AppCompatActivity {
     }
 
     private File createImageFile() throws IOException {
-        String timeStamp = DateFormatter.getCurrentTime();
+        String timeStamp = DateTimeFormatter.getCurrentTime();
         String imageFileName = "JPEG_" + timeStamp + "_";
         File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
         File image = File.createTempFile(
@@ -154,7 +154,7 @@ public class PostActivity extends AppCompatActivity {
             progressDialog.setTitle("Uploading...");
             progressDialog.show();
 
-            String postId = DateFormatter.getCurrentTime();
+            String postId = DateTimeFormatter.getCurrentTime();
             StorageReference ref = storageReference.child("Posts/" + postId);
 
             ref.putFile(filePath).addOnSuccessListener(snapshot -> {
@@ -179,7 +179,7 @@ public class PostActivity extends AppCompatActivity {
                 progressDialog.setMessage("Uploaded " + (int) progress + "%");
             });
         } else {
-            String postId = DateFormatter.getCurrentTime();
+            String postId = DateTimeFormatter.getCurrentTime();
             Post post = new Post(user.getUid(), postId, "", "");
             post.setKitt(caption.getText().toString());
             DocumentReference postRef = db.collection("Posts").document(postId);

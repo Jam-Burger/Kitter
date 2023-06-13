@@ -22,7 +22,7 @@
             android:layout_height="@dimen/icon_size_big"
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
-            android:src="@drawable/ic_arrow" />
+            android:src="@drawable/ic_foreward" />
     </RelativeLayout>
 
     <com.google.android.material.divider.MaterialDivider

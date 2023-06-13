@@ -22,7 +22,7 @@
             android:layout_height="@dimen/icon_size_big"
             android:layout_centerVertical="true"
             android:contentDescription="close button"
-            android:src="@drawable/ic_close"
+            android:src="@drawable/ic_back"
             android:tint="@color/inverted"
             tools:ignore="UseAppTint" />
 
@@ -43,7 +43,7 @@
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
             android:contentDescription="post button"
-            android:src="@drawable/ic_arrow"
+            android:src="@drawable/ic_foreward"
             tools:ignore="UseAppTint" />
     </RelativeLayout>
 

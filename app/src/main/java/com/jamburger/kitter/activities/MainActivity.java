@@ -16,21 +16,8 @@ import com.jamburger.kitter.fragments.SearchFragment;
 public class MainActivity extends AppCompatActivity {
     BottomNavigationView bottomNavigationView;
     FirebaseUser user;
-    String currentPage;
-
-    @Override
-    public void onBackPressed() {
-        if (currentPage.equals("HOME")) {
-            super.onBackPressed();
-        } else {
-            currentPage = "HOME";
-            bottomNavigationView.setSelectedItemId(R.id.nav_home);
-        }
-    }
-
-    void startFragment(Fragment fragment) {
-        getSupportFragmentManager().beginTransaction().replace(R.id.frame_container, fragment).commit();
-    }
+    Fragment currentPage;
+    private Fragment homeFragment, searchFragment, profileFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,50 +27,56 @@ public class MainActivity extends AppCompatActivity {
 
         user = FirebaseAuth.getInstance().getCurrentUser();
 
-        String page = getIntent().getStringExtra("page");
-        if (page != null) {
-            if (page.equals("PROFILE")) {
-                currentPage = "PROFILE";
-                bottomNavigationView.setSelectedItemId(R.id.nav_profile);
-            }
-        } else {
-            currentPage = "HOME";
-        }
+        homeFragment = new HomeFragment();
+        searchFragment = new SearchFragment();
+        profileFragment = new ProfileFragment();
+
 
         bottomNavigationView.setOnItemSelectedListener(item -> {
             switch (item.getItemId()) {
                 case R.id.nav_home:
-                    currentPage = "HOME";
+                    currentPage = homeFragment;
                     break;
                 case R.id.nav_search:
-                    currentPage = "SEARCH";
+                    currentPage = searchFragment;
                     break;
                 case R.id.nav_profile:
-                    currentPage = "PROFILE";
+                    currentPage = profileFragment;
                     break;
             }
-            startFragment(currentPage);
+            updateFragment();
             return true;
         });
-        startFragment(currentPage);
+
+        String page = getIntent().getStringExtra("page");
+        if (page != null) {
+            if (page.equals("PROFILE")) {
+                currentPage = profileFragment;
+                bottomNavigationView.setSelectedItemId(R.id.nav_profile);
+                updateFragment();
+            }
+        } else {
+            currentPage = homeFragment;
+            updateFragment();
+        }
     }
 
-    public void startFragment(String fragment) {
-        Fragment frag = null;
-        switch (fragment) {
-            case "PROFILE":
-                frag = new ProfileFragment();
-                currentPage = "PROFILE";
-                break;
-            case "SEARCH":
-                frag = new SearchFragment();
-                currentPage = "SEARCH";
-                break;
-            case "HOME":
-                frag = new HomeFragment();
-                currentPage = "HOME";
-                break;
+    @Override
+    public void onBackPressed() {
+        if (currentPage.equals(homeFragment)) {
+            super.onBackPressed();
+        } else {
+            currentPage = homeFragment;
+            bottomNavigationView.setSelectedItemId(R.id.nav_home);
         }
-        if (frag != null) startFragment(frag);
+    }
+
+    void updateFragment() {
+        getSupportFragmentManager()
+                .beginTransaction()
+                .setCustomAnimations(R.anim.slide_in, R.anim.slide_out, R.anim.fade_in, R.anim.fade_out)
+                .replace(R.id.frame_container, currentPage)
+                .setReorderingAllowed(true)
+                .commit();
     }
 }

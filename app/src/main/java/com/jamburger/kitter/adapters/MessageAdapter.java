@@ -14,7 +14,7 @@ import com.bumptech.glide.Glide;
 import com.google.firebase.auth.FirebaseAuth;
 import com.jamburger.kitter.R;
 import com.jamburger.kitter.components.Message;
-import com.jamburger.kitter.utilities.DateFormatter;
+import com.jamburger.kitter.utilities.DateTimeFormatter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,7 +59,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
 
         if (holder.getItemViewType() == MESSAGE_LAYOUT) {
             holder.message.setText(message.getText());
-            holder.time.setText(DateFormatter.getHoursMinutes(message.getMessageId()));
+            holder.time.setText(DateTimeFormatter.getHoursMinutes(message.getMessageId()));
 
             if (myUID.equals(message.getSenderId())) {
                 holder.container.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);

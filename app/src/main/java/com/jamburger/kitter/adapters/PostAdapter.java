@@ -30,7 +30,7 @@ import com.jamburger.kitter.activities.CommentsActivity;
 import com.jamburger.kitter.activities.OtherProfileActivity;
 import com.jamburger.kitter.components.Post;
 import com.jamburger.kitter.components.User;
-import com.jamburger.kitter.utilities.DateFormatter;
+import com.jamburger.kitter.utilities.DateTimeFormatter;
 
 import java.util.Comparator;
 import java.util.TreeSet;
@@ -83,7 +83,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         });
 
         holder.post = post;
-        holder.time.setText(DateFormatter.getTimeDifference(post.getPostid()));
+        holder.time.setText(DateTimeFormatter.getTimeDifference(post.getPostid(), false));
         Glide.with(mContext).load(post.getImageUrl()).into(holder.postImage);
         holder.caption.setText(post.getCaption());
         holder.kitt.setText(post.getKitt());

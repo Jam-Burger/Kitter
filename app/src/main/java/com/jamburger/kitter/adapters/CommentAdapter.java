@@ -18,6 +18,7 @@ import com.jamburger.kitter.R;
 import com.jamburger.kitter.activities.OtherProfileActivity;
 import com.jamburger.kitter.components.Comment;
 import com.jamburger.kitter.components.User;
+import com.jamburger.kitter.utilities.DateTimeFormatter;
 
 import java.util.List;
 
@@ -45,6 +46,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
             User user = snapshot.toObject(User.class);
             Glide.with(mContext).load(user.getProfileImageUrl()).into(holder.profileImage);
             holder.username.setText(user.getUsername());
+            holder.time.setText(DateTimeFormatter.getTimeDifference(comment.getCommentId(), true));
             holder.comment.setText(comment.getText());
 
             holder.container.setOnClickListener(view -> {
@@ -62,7 +64,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         ImageView profileImage;
-        TextView username, comment;
+        TextView username, comment, time;
         View container;
 
         public ViewHolder(@NonNull View itemView) {
@@ -70,6 +72,7 @@ public class CommentAdapter extends RecyclerView.Adapter<CommentAdapter.ViewHold
             container = itemView.findViewById(R.id.container);
             profileImage = itemView.findViewById(R.id.img_profile);
             username = itemView.findViewById(R.id.txt_username);
+            time = itemView.findViewById(R.id.txt_time);
             comment = itemView.findViewById(R.id.txt_comment);
         }
     }

@@ -22,7 +22,7 @@ import com.jamburger.kitter.R;
 import com.jamburger.kitter.adapters.MessageAdapter;
 import com.jamburger.kitter.components.Message;
 import com.jamburger.kitter.components.User;
-import com.jamburger.kitter.utilities.DateFormatter;
+import com.jamburger.kitter.utilities.DateTimeFormatter;
 
 public class ChatActivity extends AppCompatActivity {
     User fellow;
@@ -66,7 +66,7 @@ public class ChatActivity extends AppCompatActivity {
         sendButton.setOnClickListener(v -> {
             String messageString = message.getText().toString();
             if (!messageString.isEmpty()) {
-                String messageId = DateFormatter.getCurrentTime();
+                String messageId = DateTimeFormatter.getCurrentTime();
                 message.setText("");
                 Message newMessage = new Message(messageId, messageString, myUID);
                 chatReference.child(messageId).setValue(newMessage);
@@ -82,17 +82,17 @@ public class ChatActivity extends AppCompatActivity {
                 Message lastMessage = null;
                 for (DataSnapshot messageSnapshot : chatSnapshot.getChildren()) {
                     Message nextMessage = messageSnapshot.getValue(Message.class);
-                    String nextDateMonth = DateFormatter.getDateMonth(nextMessage.getMessageId());
+                    String nextDateMonth = DateTimeFormatter.getDateMonth(nextMessage.getMessageId());
 
                     if (lastMessage == null) {
-                        String today = DateFormatter.getDateMonth(DateFormatter.getCurrentTime());
+                        String today = DateTimeFormatter.getDateMonth(DateTimeFormatter.getCurrentTime());
                         if (nextDateMonth.equals(today)) nextDateMonth = "Today";
                         Message timestamp = new Message("@", nextDateMonth, "");
                         messageAdapter.addMessage(timestamp);
                     } else {
-                        String lastDateMonth = DateFormatter.getDateMonth(lastMessage.getMessageId());
+                        String lastDateMonth = DateTimeFormatter.getDateMonth(lastMessage.getMessageId());
                         if (!lastDateMonth.equals(nextDateMonth)) {
-                            String today = DateFormatter.getDateMonth(DateFormatter.getCurrentTime());
+                            String today = DateTimeFormatter.getDateMonth(DateTimeFormatter.getCurrentTime());
                             if (nextDateMonth.equals(today)) nextDateMonth = "Today";
                             Message timestamp = new Message("@", nextDateMonth, "");
                             messageAdapter.addMessage(timestamp);

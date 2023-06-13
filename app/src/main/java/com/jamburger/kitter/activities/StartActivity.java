@@ -4,9 +4,7 @@ import static com.jamburger.kitter.utilities.Constants.TAG;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -16,12 +14,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.app.AppCompatDelegate;
-import androidx.core.content.ContextCompat;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -32,20 +27,19 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.jamburger.kitter.R;
 import com.jamburger.kitter.components.User;
 import com.jamburger.kitter.utilities.ForceUpdateChecker;
+import com.jamburger.kitter.utilities.PermissionManager;
 
 public class StartActivity extends AppCompatActivity implements ForceUpdateChecker.OnUpdateNeededListener {
     GoogleSignInClient gsc;
     ImageView logo;
     TextView appName;
 
-    // Declare the launcher at the top of your Activity/Fragment:
-    private final ActivityResultLauncher<String> requestPermissionLauncher = registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
-    });
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start);
+
+        PermissionManager.askPermissions(this);
 
         logo = findViewById(R.id.img_logo);
         appName = findViewById(R.id.txt_appname);
@@ -61,22 +55,10 @@ public class StartActivity extends AppCompatActivity implements ForceUpdateCheck
         } else {
             AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
         }
-        askNotificationPermission();
+
         letTheShitBegin();
     }
 
-    private void askNotificationPermission() {
-        // This is only necessary for API level >= 33 (TIRAMISU)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
-                Log.d(TAG, "askNotificationPermission: FCM SDK (and your app) can post notifications.");
-            } else if (shouldShowRequestPermissionRationale(android.Manifest.permission.POST_NOTIFICATIONS)) {
-                Toast.makeText(this, "askNotificationPermission: enabling notifications is cool bruh!", Toast.LENGTH_SHORT).show();
-            } else {
-                requestPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS);
-            }
-        }
-    }
 
     private void letTheShitBegin() {
         Animation logoAnimation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.logo_animation);

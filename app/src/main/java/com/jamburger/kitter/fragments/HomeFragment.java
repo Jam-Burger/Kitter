@@ -22,11 +22,9 @@ import com.jamburger.kitter.adapters.PostAdapter;
 import com.jamburger.kitter.components.Post;
 
 public class HomeFragment extends Fragment {
-
     RecyclerView recyclerViewPosts;
     PostAdapter postAdapter;
     Toolbar toolbar;
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
@@ -68,13 +66,6 @@ public class HomeFragment extends Fragment {
 
 
     void readPosts() {
-//        DocumentReference userReference = FirebaseFirestore.getInstance().collection("Users").document(FirebaseAuth.getInstance().getUid());
-//        userReference.get().addOnSuccessListener(userSnapshot -> {
-//            User user = userSnapshot.toObject(User.class);
-//
-//        });
-
-
         CollectionReference feedReference = FirebaseFirestore.getInstance().collection("Users").document(FirebaseAuth.getInstance().getUid()).collection("feed");
         feedReference.get().addOnSuccessListener(feedSnapshots -> {
             postAdapter.clearPosts();

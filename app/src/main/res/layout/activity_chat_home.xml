@@ -18,7 +18,7 @@
             android:layout_width="@dimen/icon_size_big"
             android:layout_height="@dimen/icon_size_big"
             android:layout_centerVertical="true"
-            android:src="@drawable/ic_close"
+            android:src="@drawable/ic_back"
             tools:ignore="UseAppTint" />
 
         <TextView
