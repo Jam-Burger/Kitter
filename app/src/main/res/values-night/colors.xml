@@ -9,6 +9,6 @@
     <color name="text_warning">#FF4545</color>
     <color name="button_gray">#2E2E2E</color>
     <color name="background_message">#A96CFF</color>
-    <color name="text_message">#000000</color>
+    <color name="text_message">#E6000000</color>
     <color name="text_light_blue">#3B92FF</color>
 </resources>

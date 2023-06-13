@@ -32,11 +32,10 @@ import com.jamburger.kitter.R;
 import com.jamburger.kitter.components.Post;
 import com.jamburger.kitter.components.User;
 import com.jamburger.kitter.fragments.SelectSourceDialogFragment;
+import com.jamburger.kitter.utilities.DateFormatter;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -109,7 +108,7 @@ public class PostActivity extends AppCompatActivity {
     }
 
     private File createImageFile() throws IOException {
-        String timeStamp = new SimpleDateFormat(getResources().getString(R.string.post_time_format)).format(new Date());
+        String timeStamp = DateFormatter.getCurrentTime();
         String imageFileName = "JPEG_" + timeStamp + "_";
         File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
         File image = File.createTempFile(
@@ -155,8 +154,7 @@ public class PostActivity extends AppCompatActivity {
             progressDialog.setTitle("Uploading...");
             progressDialog.show();
 
-            SimpleDateFormat sdf = new SimpleDateFormat(getResources().getString(R.string.post_time_format));
-            String postId = sdf.format(new Date());
+            String postId = DateFormatter.getCurrentTime();
             StorageReference ref = storageReference.child("Posts/" + postId);
 
             ref.putFile(filePath).addOnSuccessListener(snapshot -> {
@@ -181,8 +179,7 @@ public class PostActivity extends AppCompatActivity {
                 progressDialog.setMessage("Uploaded " + (int) progress + "%");
             });
         } else {
-            SimpleDateFormat sdf = new SimpleDateFormat(getResources().getString(R.string.post_time_format));
-            String postId = sdf.format(new Date());
+            String postId = DateFormatter.getCurrentTime();
             Post post = new Post(user.getUid(), postId, "", "");
             post.setKitt(caption.getText().toString());
             DocumentReference postRef = db.collection("Posts").document(postId);

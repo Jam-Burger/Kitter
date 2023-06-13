@@ -13,8 +13,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.firestore.DocumentReference;
 import com.jamburger.kitter.R;
-import com.jamburger.kitter.activities.MainActivity;
 import com.jamburger.kitter.components.Post;
+import com.jamburger.kitter.utilities.DateFormatter;
 
 import java.util.Comparator;
 import java.util.TreeSet;
@@ -60,7 +60,7 @@ public class MyKittAdapter extends RecyclerView.Adapter<MyKittAdapter.ViewHolder
             Post post = postSnapshot.toObject(Post.class);
             assert post != null;
             holder.kitt.setText(post.getKitt());
-            holder.time.setText(MainActivity.dateIdToString(post.getPostid()));
+            holder.time.setText(DateFormatter.getTimeDifference(post.getPostid()));
             holder.container.setVisibility(View.VISIBLE);
             previewTextView.setText(holder.kitt.getText().toString());
         });

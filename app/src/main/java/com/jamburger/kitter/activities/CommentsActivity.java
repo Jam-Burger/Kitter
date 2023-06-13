@@ -18,11 +18,10 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.jamburger.kitter.R;
 import com.jamburger.kitter.adapters.CommentAdapter;
 import com.jamburger.kitter.components.Comment;
+import com.jamburger.kitter.utilities.DateFormatter;
 import com.jamburger.kitter.utilities.KeyboardManager;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class CommentsActivity extends AppCompatActivity {
@@ -62,8 +61,7 @@ public class CommentsActivity extends AppCompatActivity {
             if (commentString.isEmpty()) return;
             DocumentReference userReference = FirebaseFirestore.getInstance().collection("Users").document(FirebaseAuth.getInstance().getUid());
 
-            SimpleDateFormat sdf = new SimpleDateFormat(getResources().getString(R.string.post_time_format));
-            String commentId = sdf.format(new Date());
+            String commentId = DateFormatter.getCurrentTime();
             Comment comment = new Comment(userReference.getId(), commentString, commentId);
 
             KeyboardManager.closeKeyboard(this);

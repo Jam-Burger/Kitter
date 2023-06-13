@@ -21,6 +21,6 @@
     <color name="button_blue">#237BE8</color>
     <color name="transparent">#00000000</color>
     <color name="background_message">#8E3EFF</color>
-    <color name="text_message">#FFFFFF</color>
+    <color name="text_message">#E6FFFFFF</color>
     <color name="text_light_blue">#1D6FEC</color>
 </resources>

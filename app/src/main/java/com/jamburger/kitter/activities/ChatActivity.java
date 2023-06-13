@@ -22,19 +22,13 @@ import com.jamburger.kitter.R;
 import com.jamburger.kitter.adapters.MessageAdapter;
 import com.jamburger.kitter.components.Message;
 import com.jamburger.kitter.components.User;
-
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
+import com.jamburger.kitter.utilities.DateFormatter;
 
 public class ChatActivity extends AppCompatActivity {
     User fellow;
     String myUID, fellowUID;
     TextView username;
     EditText message;
-    List<Message> messages;
     MessageAdapter messageAdapter;
     RecyclerView recyclerViewMessages;
     DatabaseReference chatReference;
@@ -62,17 +56,17 @@ public class ChatActivity extends AppCompatActivity {
             username.setText(fellow.getUsername());
             Glide.with(this).load(fellow.getProfileImageUrl()).into(profileImage);
 
-            messages = new ArrayList<>();
-            messageAdapter = new MessageAdapter(this, messages, fellow.getProfileImageUrl());
+            messageAdapter = new MessageAdapter(this, fellow.getProfileImageUrl());
             recyclerViewMessages.setHasFixedSize(true);
             recyclerViewMessages.setAdapter(messageAdapter);
+
             getChatData();
+            readMessages();
         });
         sendButton.setOnClickListener(v -> {
             String messageString = message.getText().toString();
             if (!messageString.isEmpty()) {
-                SimpleDateFormat sdf = new SimpleDateFormat(getResources().getString(R.string.post_time_format), Locale.getDefault());
-                String messageId = sdf.format(new Date());
+                String messageId = DateFormatter.getCurrentTime();
                 message.setText("");
                 Message newMessage = new Message(messageId, messageString, myUID);
                 chatReference.child(messageId).setValue(newMessage);
@@ -84,14 +78,32 @@ public class ChatActivity extends AppCompatActivity {
         chatReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot chatSnapshot) {
-                messages.clear();
+                messageAdapter.clearMessages();
+                Message lastMessage = null;
                 for (DataSnapshot messageSnapshot : chatSnapshot.getChildren()) {
-                    Message message = messageSnapshot.getValue(Message.class);
-                    messages.add(message);
+                    Message nextMessage = messageSnapshot.getValue(Message.class);
+                    String nextDateMonth = DateFormatter.getDateMonth(nextMessage.getMessageId());
+
+                    if (lastMessage == null) {
+                        String today = DateFormatter.getDateMonth(DateFormatter.getCurrentTime());
+                        if (nextDateMonth.equals(today)) nextDateMonth = "Today";
+                        Message timestamp = new Message("@", nextDateMonth, "");
+                        messageAdapter.addMessage(timestamp);
+                    } else {
+                        String lastDateMonth = DateFormatter.getDateMonth(lastMessage.getMessageId());
+                        if (!lastDateMonth.equals(nextDateMonth)) {
+                            String today = DateFormatter.getDateMonth(DateFormatter.getCurrentTime());
+                            if (nextDateMonth.equals(today)) nextDateMonth = "Today";
+                            Message timestamp = new Message("@", nextDateMonth, "");
+                            messageAdapter.addMessage(timestamp);
+                        }
+                    }
+
+                    messageAdapter.addMessage(nextMessage);
+                    lastMessage = nextMessage;
                 }
-                if (messages.size() > 0)
-                    recyclerViewMessages.getLayoutManager().smoothScrollToPosition(recyclerViewMessages, new RecyclerView.State(), messages.size() - 1);
-                messageAdapter.notifyDataSetChanged();
+                if (messageAdapter.getItemCount() > 0)
+                    recyclerViewMessages.getLayoutManager().smoothScrollToPosition(recyclerViewMessages, new RecyclerView.State(), messageAdapter.getItemCount() - 1);
             }
 
             @Override
@@ -105,7 +117,6 @@ public class ChatActivity extends AppCompatActivity {
         boolean less = myUID.compareTo(fellowUID) < 0;
         chatId = less ? myUID + '&' + fellowUID : fellowUID + '&' + myUID;
         chatReference = FirebaseDatabase.getInstance().getReference().child("chats").child(chatId);
-        readMessages();
     }
 
     // TODO: finish issue of close keyboard

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_horizontal">
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="2dp"
+        app:cardBackgroundColor="@color/button_gray"
+        app:cardCornerRadius="7dp">
+
+        <TextView
+            android:id="@+id/txt_timestamp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="6dp"
+            android:layout_marginVertical="3dp"
+            android:fontFamily="@font/lato"
+            android:text="Today"
+            android:textColor="@color/text_normal"
+            android:textSize="@dimen/text_normal"
+            android:textStyle="bold" />
+    </androidx.cardview.widget.CardView>
+
+
+</RelativeLayout>

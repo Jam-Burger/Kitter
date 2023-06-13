@@ -32,15 +32,15 @@
         android:src="@mipmap/gavi_hot" />
 
     <androidx.cardview.widget.CardView
+        android:id="@+id/message_card"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:elevation="0dp"
-        android:id="@+id/message_card"
         android:layout_marginStart="4dp"
-        android:orientation="vertical"
         android:layout_toEndOf="@id/img_profile"
-        app:cardBackgroundColor="@color/background_message"
+        android:elevation="0dp"
+        android:orientation="vertical"
         android:outlineProvider="none"
+        app:cardBackgroundColor="@color/background_message"
         app:cardCornerRadius="10dp">
 
         <LinearLayout
@@ -56,8 +56,8 @@
                 android:fontFamily="@font/nunito_sans"
                 android:maxWidth="250dp"
                 android:minWidth="60dp"
-                android:text="ok"
                 android:paddingHorizontal="3dp"
+                android:text="ok"
                 android:textColor="@color/text_message"
                 android:textSize="@dimen/text_big" />
 
@@ -68,10 +68,10 @@
                 android:alpha=".6"
                 android:fontFamily="@font/roboto"
                 android:paddingHorizontal="2dp"
-                android:text="12:30"
+                android:text="12:30 AM"
                 android:textAlignment="viewEnd"
                 android:textColor="@color/text_message"
-                android:textSize="10sp" />
+                android:textSize="@dimen/text_small" />
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 </RelativeLayout>

@@ -27,10 +27,10 @@ import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.jamburger.kitter.R;
 import com.jamburger.kitter.activities.CommentsActivity;
-import com.jamburger.kitter.activities.MainActivity;
 import com.jamburger.kitter.activities.OtherProfileActivity;
 import com.jamburger.kitter.components.Post;
 import com.jamburger.kitter.components.User;
+import com.jamburger.kitter.utilities.DateFormatter;
 
 import java.util.Comparator;
 import java.util.TreeSet;
@@ -83,7 +83,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         });
 
         holder.post = post;
-        holder.time.setText(MainActivity.dateIdToString(post.getPostid()));
+        holder.time.setText(DateFormatter.getTimeDifference(post.getPostid()));
         Glide.with(mContext).load(post.getImageUrl()).into(holder.postImage);
         holder.caption.setText(post.getCaption());
         holder.kitt.setText(post.getKitt());

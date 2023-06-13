@@ -13,48 +13,10 @@ import com.jamburger.kitter.fragments.HomeFragment;
 import com.jamburger.kitter.fragments.ProfileFragment;
 import com.jamburger.kitter.fragments.SearchFragment;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
-
 public class MainActivity extends AppCompatActivity {
     BottomNavigationView bottomNavigationView;
     FirebaseUser user;
     String currentPage;
-
-    public static String dateIdToString(String dateId) {
-        try {
-            DateFormat format = new SimpleDateFormat("yyyy-MM-dd-HH-mm-ss", Locale.ENGLISH);
-            Date date = format.parse(dateId);
-            Date now = new Date();
-            assert date != null;
-            long difference_In_Millis = now.getTime() - date.getTime();
-            long difference_In_Seconds = difference_In_Millis / 1000;
-            long difference_In_Minutes = difference_In_Seconds / 60;
-            long difference_In_Hours = difference_In_Minutes / 60;
-            long difference_In_Days = difference_In_Hours / 24;
-
-            String timeText = "";
-            if (difference_In_Minutes == 0) {
-                timeText = difference_In_Seconds + " second";
-                if (difference_In_Seconds > 1) timeText += "s";
-            } else if (difference_In_Hours == 0) {
-                timeText = difference_In_Minutes + " minute";
-                if (difference_In_Minutes > 1) timeText += "s";
-            } else if (difference_In_Days == 0) {
-                timeText = difference_In_Hours + " hour";
-                if (difference_In_Hours > 1) timeText += "s";
-            } else {
-                timeText = difference_In_Days + " day";
-                if (difference_In_Days > 1) timeText += "s";
-            }
-            timeText += " ago";
-            return timeText;
-        } catch (Exception e) {
-            return null;
-        }
-    }
 
     @Override
     public void onBackPressed() {
@@ -123,11 +85,5 @@ public class MainActivity extends AppCompatActivity {
                 break;
         }
         if (frag != null) startFragment(frag);
-    }
-
-
-    public static String dateIdToTime(String dateId) {
-        String[] strings = dateId.split("-", 6);
-        return strings[3] + ":" + strings[4];
     }
 }
