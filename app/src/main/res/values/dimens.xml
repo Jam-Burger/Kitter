@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="icon_size_normal">30dp</dimen>
     <dimen name="icon_size_small">20dp</dimen>
+    <dimen name="icon_size_medium">26dp</dimen>
+    <dimen name="icon_size_big">30dp</dimen>
     <dimen name="profile_img_icon_size">45dp</dimen>
     <dimen name="text_small">10sp</dimen>
     <dimen name="text_little_small">12sp</dimen>

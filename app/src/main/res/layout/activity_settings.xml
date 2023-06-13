@@ -15,20 +15,16 @@
 
         <ImageView
             android:id="@+id/btn_close"
-            android:layout_width="@dimen/icon_size_normal"
-            android:layout_height="@dimen/icon_size_normal"
+            android:layout_width="@dimen/icon_size_big"
+            android:layout_height="@dimen/icon_size_big"
             android:layout_centerVertical="true"
             android:src="@drawable/ic_close"
             app:tint="@color/inverted" />
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
+            style="@style/Header.Title"
             android:layout_toEndOf="@id/btn_close"
-            android:text="Settings"
-            android:textColor="@color/inverted"
-            android:textSize="25sp" />
+            android:text="Settings" />
     </RelativeLayout>
 
     <com.google.android.material.divider.MaterialDivider
@@ -56,7 +52,7 @@
                 android:id="@+id/setting_edit_info"
                 style="@style/Settings.Option.Iconed"
                 android:text="Edit Info"
-                app:drawableStartCompat="@drawable/ic_edit" />
+                app:drawableStartCompat="@drawable/ic_edit_profile" />
 
             <com.google.android.material.divider.MaterialDivider style="@style/Settings.Divider" />
 
@@ -133,13 +129,13 @@
                 android:id="@+id/setting_add_account"
                 style="@style/Settings.Option.NonIconed"
                 android:text="Add account"
-                android:textColor="@color/light_blue" />
+                android:textColor="@color/text_light_blue" />
 
             <TextView
                 android:id="@+id/setting_logout"
                 style="@style/Settings.Option.NonIconed"
                 android:text="Log out"
-                android:textColor="@color/red" />
+                android:textColor="@color/text_warning" />
 
             <com.google.android.material.divider.MaterialDivider style="@style/Settings.Divider" />
         </LinearLayout>

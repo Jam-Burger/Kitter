@@ -15,25 +15,21 @@
 
         <ImageView
             android:id="@+id/btn_close"
-            android:layout_width="@dimen/icon_size_normal"
-            android:layout_height="@dimen/icon_size_normal"
+            android:layout_width="@dimen/icon_size_big"
+            android:layout_height="@dimen/icon_size_big"
             android:layout_centerVertical="true"
             android:src="@drawable/ic_close"
             app:tint="@color/inverted" />
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
+            style="@style/Header.Title"
             android:layout_toEndOf="@id/btn_close"
-            android:text="Edit info"
-            android:textColor="@color/inverted"
-            android:textSize="25sp" />
+            android:text="Edit info" />
 
         <ImageView
             android:id="@+id/btn_save_info"
-            android:layout_width="@dimen/icon_size_normal"
-            android:layout_height="@dimen/icon_size_normal"
+            android:layout_width="@dimen/icon_size_big"
+            android:layout_height="@dimen/icon_size_big"
             android:layout_alignParentEnd="true"
             android:layout_centerVertical="true"
             android:src="@drawable/ic_check" />
@@ -64,7 +60,7 @@
         android:layout_marginBottom="5dp"
         android:background="@drawable/ic_circle"
         android:padding="8dp"
-        android:src="@drawable/ic_edit"
+        android:src="@drawable/ic_edit_image"
         app:tint="@color/black" />
 
     <LinearLayout

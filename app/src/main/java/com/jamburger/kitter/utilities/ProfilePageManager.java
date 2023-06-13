@@ -28,8 +28,12 @@ public class ProfilePageManager {
     GridLayoutManager layoutManager;
     View picturesIndicator, kittsIndicator;
     Context context;
+    View view;
 
     public ProfilePageManager(View view) {
+        this.view = view;
+        view.setVisibility(View.INVISIBLE);
+
         backgroundImage = view.findViewById(R.id.img_background);
         profileImage = view.findViewById(R.id.img_profile);
         name = view.findViewById(R.id.txt_name);
@@ -109,8 +113,9 @@ public class ProfilePageManager {
         noOfFollowers.setText(String.valueOf(user.getFollowers().size()));
         noOfFollowing.setText(String.valueOf(user.getFollowing().size()));
 
-
         Glide.with(context).load(user.getProfileImageUrl()).into(profileImage);
         Glide.with(context).load(user.getBackgroundImageUrl()).into(backgroundImage);
+
+        view.setVisibility(View.VISIBLE);
     }
 }
