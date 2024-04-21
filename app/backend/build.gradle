@@ -10,6 +10,6 @@ java {
     targetCompatibility = JavaVersion.VERSION_1_9
 }
 dependencies {
-    implementation 'com.google.firebase:firebase-admin:9.1.1'
-    implementation 'com.google.cloud:google-cloud-firestore:3.7.0'
+    implementation 'com.google.firebase:firebase-admin:9.2.0'
+    implementation 'com.google.cloud:google-cloud-firestore:3.20.2'
 }

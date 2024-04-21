@@ -221,7 +221,6 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
             if (isLiked) {
                 likeAnimation.playAnimation();
                 likeAnimation.setVisibility(View.VISIBLE);
-//                NotificationManager.sendNotification(post.getCreator(), "Your post liked by " + FirebaseAuth.getInstance().getCurrentUser().getDisplayName());
             } else {
                 likeAnimation.setVisibility(View.INVISIBLE);
             }

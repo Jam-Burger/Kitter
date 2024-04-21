@@ -2,7 +2,6 @@ package com.jamburger.kitter.activities;
 
 import static com.jamburger.kitter.utilities.Constants.TAG;
 
-import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -34,7 +33,6 @@ public class SettingsActivity extends AppCompatActivity {
     SharedPreferences.Editor editor;
     boolean isDarkModeOn;
 
-    @SuppressLint("NonConstantResourceId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -84,43 +82,39 @@ public class SettingsActivity extends AppCompatActivity {
             if (!option.isClickable()) continue;
 
             option.setOnClickListener(v -> {
-                switch (option.getId()) {
-                    case R.id.setting_edit_info:
-                        startActivity(new Intent(this, EditInfoActivity.class));
-                        break;
-                    case R.id.setting_change_password:
-                        showRecoverPasswordDialog();
-                        break;
-                    case R.id.setting_block_accounts:
-                        break;
-                    case R.id.setting_theme:
-                        Intent intentMine = new Intent(this, SettingsActivity.class);
-                        intentMine.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-                        finish();
-                        startActivity(intentMine);
-                        if (isDarkModeOn) {
-                            editor.putBoolean("isDarkModeOn", false).apply();
-                            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
-                        } else {
-                            editor.putBoolean("isDarkModeOn", true).apply();
-                            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                int optionId = option.getId();
+                if (optionId == R.id.setting_edit_info) {
+                    startActivity(new Intent(this, EditInfoActivity.class));
+                } else if (optionId == R.id.setting_change_password) {
+                    showRecoverPasswordDialog();
+                } else if (optionId == R.id.setting_block_accounts) {
+                    // Do nothing for now
+                } else if (optionId == R.id.setting_theme) {
+                    Intent intentMine = new Intent(this, SettingsActivity.class);
+                    intentMine.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                    finish();
+                    startActivity(intentMine);
+                    if (isDarkModeOn) {
+                        editor.putBoolean("isDarkModeOn", false).apply();
+                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                    } else {
+                        editor.putBoolean("isDarkModeOn", true).apply();
+                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                    }
+                } else if (optionId == R.id.setting_add_account) {
+                    // Do nothing for now
+                } else if (optionId == R.id.setting_logout) {
+                    googleSignInClient.signOut().addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            FirebaseAuth.getInstance().signOut();
+                            Intent intentLogin = new Intent(this, LoginActivity.class);
+                            intentLogin.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                            startActivity(intentLogin);
+                            finish();
                         }
-                        break;
-                    case R.id.setting_add_account:
-                        break;
-                    case R.id.setting_logout:
-                        googleSignInClient.signOut().addOnCompleteListener(task -> {
-                            if (task.isSuccessful()) {
-                                FirebaseAuth.getInstance().signOut();
-                                Intent intentLogin = new Intent(this, LoginActivity.class);
-                                intentLogin.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                startActivity(intentLogin);
-                                finish();
-                            }
-                        });
-                        break;
-                    default:
-                        Log.i(TAG, "nothing selected");
+                    });
+                } else {
+                    Log.i(TAG, "nothing selected");
                 }
             });
         }

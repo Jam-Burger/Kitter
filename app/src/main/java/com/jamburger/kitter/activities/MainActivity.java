@@ -33,16 +33,13 @@ public class MainActivity extends AppCompatActivity {
 
 
         bottomNavigationView.setOnItemSelectedListener(item -> {
-            switch (item.getItemId()) {
-                case R.id.nav_home:
-                    currentPage = homeFragment;
-                    break;
-                case R.id.nav_search:
-                    currentPage = searchFragment;
-                    break;
-                case R.id.nav_profile:
-                    currentPage = profileFragment;
-                    break;
+            int itemId = item.getItemId();
+            if (itemId == R.id.nav_home) {
+                currentPage = homeFragment;
+            } else if (itemId == R.id.nav_search) {
+                currentPage = searchFragment;
+            } else if (itemId == R.id.nav_profile) {
+                currentPage = profileFragment;
             }
             updateFragment();
             return true;

@@ -1,6 +1,5 @@
 package com.jamburger.kitter.fragments;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -58,7 +57,6 @@ public class ProfileFragment extends Fragment {
         userReference = db.collection("Users").document(user.getUid());
     }
 
-    @SuppressLint("NonConstantResourceId")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
@@ -68,13 +66,11 @@ public class ProfileFragment extends Fragment {
         toolbar = view.findViewById(R.id.top_menu);
 
         toolbar.setOnMenuItemClickListener(item -> {
-            switch (item.getItemId()) {
-                case R.id.nav_saved:
-                    startActivity(new Intent(requireActivity(), SavedPostsActivity.class));
-                    break;
-                case R.id.nav_settings:
-                    startActivity(new Intent(requireActivity(), SettingsActivity.class));
-                    break;
+            int itemId = item.getItemId();
+            if (itemId == R.id.nav_saved) {
+                startActivity(new Intent(requireActivity(), SavedPostsActivity.class));
+            } else if (itemId == R.id.nav_settings) {
+                startActivity(new Intent(requireActivity(), SettingsActivity.class));
             }
             return true;
         });

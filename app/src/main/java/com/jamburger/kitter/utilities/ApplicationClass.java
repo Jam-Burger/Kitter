@@ -6,15 +6,11 @@ import android.app.Application;
 import android.util.Log;
 
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
-import com.onesignal.OneSignal;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class ApplicationClass extends Application {
-    // Replace the below with your own ONESIGNAL_APP_ID
-    private static final String ONESIGNAL_APP_ID = "5e126269-04f4-496e-b0aa-70eb66b062e9";
-
     @Override
     public void onCreate() {
         super.onCreate();
@@ -23,7 +19,7 @@ public class ApplicationClass extends Application {
 
         Map<String, Object> remoteConfigDefaults = new HashMap<>();
         remoteConfigDefaults.put(ForceUpdateChecker.KEY_UPDATE_REQUIRED, false);
-        remoteConfigDefaults.put(ForceUpdateChecker.KEY_CURRENT_VERSION, "3.4.0");
+        remoteConfigDefaults.put(ForceUpdateChecker.KEY_CURRENT_VERSION, "4.4.0");
         remoteConfigDefaults.put(ForceUpdateChecker.KEY_PROJECT_URL,
                 "https://github.com/Jam-Burger/Kitter");
 
@@ -35,13 +31,5 @@ public class ApplicationClass extends Application {
                         firebaseRemoteConfig.activate();
                     }
                 });
-
-        // Enable verbose OneSignal logging to debug issues if needed.
-        OneSignal.setLogLevel(OneSignal.LOG_LEVEL.VERBOSE, OneSignal.LOG_LEVEL.NONE);
-
-        // OneSignal Initialization
-        OneSignal.initWithContext(this);
-        OneSignal.setAppId(ONESIGNAL_APP_ID);
-        OneSignal.promptForPushNotifications();
     }
 }

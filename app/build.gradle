@@ -12,7 +12,7 @@ android {
         minSdk 21
         targetSdk 33
         versionCode 5
-        versionName '4.3.0'
+        versionName '4.4.0'
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -24,8 +24,8 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_9
-        targetCompatibility JavaVersion.VERSION_1_9
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
     }
 }
 
@@ -35,12 +35,12 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
 
     implementation 'com.google.android.material:material:1.9.0'
-    implementation 'com.google.android.gms:play-services-auth:20.5.0'
+    implementation 'com.google.android.gms:play-services-auth:21.1.0'
 
     implementation 'de.hdodenhof:circleimageview:3.1.0'
     implementation 'com.github.bumptech.glide:glide:4.15.1'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.15.1'
-    implementation 'com.airbnb.android:lottie:6.0.0'
+    implementation 'com.airbnb.android:lottie:6.4.0'
 
     implementation 'com.google.firebase:firebase-analytics'
     implementation 'com.google.firebase:firebase-auth'
@@ -49,8 +49,8 @@ dependencies {
     implementation 'com.google.firebase:firebase-storage'
     implementation 'com.google.firebase:firebase-functions'
     implementation 'com.google.firebase:firebase-messaging'
-    implementation 'com.google.firebase:firebase-config:21.4.0'
-    implementation platform('com.google.firebase:firebase-bom:32.0.0')
+    implementation 'com.google.firebase:firebase-config:21.6.3'
+    implementation platform('com.google.firebase:firebase-bom:32.8.1')
 
     implementation 'com.onesignal:OneSignal:[4.0.0, 4.99.99]'
 

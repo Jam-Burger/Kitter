@@ -25,6 +25,7 @@ public class HomeFragment extends Fragment {
     RecyclerView recyclerViewPosts;
     PostAdapter postAdapter;
     Toolbar toolbar;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
@@ -32,27 +33,23 @@ public class HomeFragment extends Fragment {
         recyclerViewPosts = view.findViewById(R.id.recyclerview_posts);
 
         toolbar = view.findViewById(R.id.top_menu);
-
         toolbar.setOnMenuItemClickListener(item -> {
             Intent intent;
-            switch (item.getItemId()) {
-                case R.id.nav_post_image:
-                    intent = new Intent(requireActivity(), PostActivity.class);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    intent.putExtra("type", "picture");
-                    startActivity(intent);
-                    break;
-                case R.id.nav_post_text:
-                    intent = new Intent(requireActivity(), PostActivity.class);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    intent.putExtra("type", "text");
-                    startActivity(intent);
-                    break;
-                case R.id.nav_chat:
-                    intent = new Intent(requireActivity(), ChatHomeActivity.class);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    startActivity(intent);
-                    break;
+            int itemId = item.getItemId();
+            if (itemId == R.id.nav_post_image) {
+                intent = new Intent(requireActivity(), PostActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                intent.putExtra("type", "picture");
+                startActivity(intent);
+            } else if (itemId == R.id.nav_post_text) {
+                intent = new Intent(requireActivity(), PostActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                intent.putExtra("type", "text");
+                startActivity(intent);
+            } else if (itemId == R.id.nav_chat) {
+                intent = new Intent(requireActivity(), ChatHomeActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(intent);
             }
             return true;
         });

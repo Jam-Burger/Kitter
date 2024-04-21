@@ -25,7 +25,7 @@
         android:roundIcon="@mipmap/ic_kitter_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Kitter"
-        tools:targetApi="33">
+        tools:targetApi="34">
 
         <activity
             android:name=".activities.SettingsActivity"
