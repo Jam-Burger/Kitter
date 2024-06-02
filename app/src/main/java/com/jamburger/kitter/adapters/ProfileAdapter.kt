@@ -1,81 +1,59 @@
-package com.jamburger.kitter.adapters;
+package com.jamburger.kitter.adapters
 
-import android.content.Context;
-import android.content.Intent;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
+import android.content.Context
+import android.content.Intent
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.jamburger.kitter.R
+import com.jamburger.kitter.activities.ChatActivity
+import com.jamburger.kitter.activities.OtherProfileActivity
+import com.jamburger.kitter.components.User
 
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
-
-import com.bumptech.glide.Glide;
-import com.jamburger.kitter.R;
-import com.jamburger.kitter.activities.ChatActivity;
-import com.jamburger.kitter.activities.OtherProfileActivity;
-import com.jamburger.kitter.components.User;
-
-import java.util.List;
-
-public class ProfileAdapter extends RecyclerView.Adapter<ProfileAdapter.ViewHolder> {
-    Context mContext;
-    List<User> mUsers;
-    String use;
-
-    public ProfileAdapter(Context mContext, List<User> mUsers, String use) {
-        this.mContext = mContext;
-        this.mUsers = mUsers;
-        this.use = use;
+class ProfileAdapter(
+    private var mContext: Context,
+    private var mUsers: List<User>,
+    private var use: String
+) :
+    RecyclerView.Adapter<ProfileAdapter.ViewHolder>() {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        val view = LayoutInflater.from(mContext).inflate(R.layout.adapter_profile, parent, false)
+        return ViewHolder(view)
     }
 
-    @NonNull
-    @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(mContext).inflate(R.layout.adapter_profile, parent, false);
-        return new ProfileAdapter.ViewHolder(view);
-    }
-
-    @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        User user = mUsers.get(position);
-        Glide.with(mContext).load(user.getProfileImageUrl()).into(holder.profileImage);
-        holder.username.setText(user.getUsername());
-        holder.name.setText(user.getName());
-        holder.container.setOnClickListener(view -> {
-            Intent intent;
-            if (use.equals("PROFILE")) {
-                intent = new Intent(mContext, OtherProfileActivity.class);
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        val user = mUsers[position]
+        Glide.with(mContext).load(user.profileImageUrl).into(holder.profileImage)
+        holder.username.text = user.username
+        holder.name.text = user.name
+        holder.container.setOnClickListener {
+            val intent = if (use == "PROFILE") {
+                Intent(mContext, OtherProfileActivity::class.java)
             } else {
-                intent = new Intent(mContext, ChatActivity.class);
+                Intent(mContext, ChatActivity::class.java)
             }
-            intent.putExtra("userid", user.getId());
-            mContext.startActivity(intent);
-        });
-    }
-
-    @Override
-    public int getItemCount() {
-        return mUsers.size();
-    }
-
-    public void filterList(List<User> filteredList) {
-        mUsers = filteredList;
-        notifyDataSetChanged();
-    }
-
-    public static class ViewHolder extends RecyclerView.ViewHolder {
-        ImageView profileImage;
-        TextView username, name;
-        View container;
-
-        public ViewHolder(@NonNull View itemView) {
-            super(itemView);
-            container = itemView.findViewById(R.id.container);
-            profileImage = itemView.findViewById(R.id.img_profile);
-            username = itemView.findViewById(R.id.txt_username);
-            name = itemView.findViewById(R.id.txt_name);
+            intent.putExtra("userid", user.id)
+            mContext.startActivity(intent)
         }
+    }
+
+    override fun getItemCount(): Int {
+        return mUsers.size
+    }
+
+    fun filterList(filteredList: List<User>) {
+        mUsers = filteredList
+        notifyDataSetChanged()
+    }
+
+    class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        var profileImage: ImageView = itemView.findViewById(R.id.img_profile)
+        var username: TextView = itemView.findViewById(R.id.txt_username)
+        var name: TextView = itemView.findViewById(R.id.txt_name)
+        var container: View = itemView.findViewById(R.id.container)
     }
 }

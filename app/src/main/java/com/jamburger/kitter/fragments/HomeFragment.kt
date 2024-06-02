@@ -79,11 +79,13 @@ class HomeFragment : Fragment() {
 //                val isVisited = feedSnapshot.getBoolean("visited")
                 assert(postReference != null)
                 postReference!!.get().addOnSuccessListener { postSnapshot: DocumentSnapshot ->
-                    postAdapter.addPost(
-                        postSnapshot.toObject(
-                            Post::class.java
+                    postSnapshot.toObject(
+                        Post::class.java
+                    )?.let {
+                        postAdapter.addPost(
+                            it
                         )
-                    )
+                    }
                 }
             }
         }

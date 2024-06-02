@@ -1,273 +1,263 @@
-package com.jamburger.kitter.adapters;
+package com.jamburger.kitter.adapters
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.content.Context;
-import android.content.Intent;
-import android.os.Build;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
+import android.content.Context
+import android.content.Intent
+import android.os.Build
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
+import com.airbnb.lottie.LottieAnimationView
+import com.bumptech.glide.Glide
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
+import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.FirebaseFirestore
+import com.jamburger.kitter.R
+import com.jamburger.kitter.activities.CommentsActivity
+import com.jamburger.kitter.activities.OtherProfileActivity
+import com.jamburger.kitter.components.Post
+import com.jamburger.kitter.components.User
+import com.jamburger.kitter.utilities.DateTimeFormatter
+import java.util.TreeSet
 
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
+class PostAdapter(private var mContext: Context) : RecyclerView.Adapter<PostAdapter.ViewHolder>() {
+    private var mPosts: TreeSet<Post>? = null
+    private var db: FirebaseFirestore? = null
+    private var userReference: DocumentReference? = null
+    private var lastClickTime: Long = 0
 
-import com.airbnb.lottie.LottieAnimationView;
-import com.bumptech.glide.Glide;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.FieldValue;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.jamburger.kitter.R;
-import com.jamburger.kitter.activities.CommentsActivity;
-import com.jamburger.kitter.activities.OtherProfileActivity;
-import com.jamburger.kitter.components.Post;
-import com.jamburger.kitter.components.User;
-import com.jamburger.kitter.utilities.DateTimeFormatter;
-
-import java.util.Comparator;
-import java.util.TreeSet;
-
-
-public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
-    Context mContext;
-    TreeSet<Post> mPosts;
-    FirebaseFirestore db;
-    DocumentReference userReference;
-    private static final long DOUBLE_CLICK_TIME_DELTA = 300; //milliseconds
-
-    long lastClickTime = 0;
-
-    public PostAdapter(Context mContext) {
-        this.mContext = mContext;
+    init {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            mPosts = new TreeSet<>(Comparator.comparing(Post::getPostid));
+            mPosts = TreeSet(Comparator.comparing { obj: Post -> obj.postid })
         }
     }
 
-    public void addPost(Post post) {
-        mPosts.add(post);
-        notifyDataSetChanged();
+    fun addPost(post: Post) {
+        mPosts!!.add(post)
+        notifyDataSetChanged()
     }
 
-    public void clearPosts() {
-        mPosts.clear();
-        notifyDataSetChanged();
+    fun clearPosts() {
+        mPosts!!.clear()
+        notifyDataSetChanged()
     }
 
-    @NonNull
-    @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(mContext).inflate(R.layout.adapter_post, parent, false);
-        db = FirebaseFirestore.getInstance();
-        userReference = db.collection("Users").document(FirebaseAuth.getInstance().getUid());
-        ViewHolder.userReference = userReference;
-        return new ViewHolder(view);
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        val view = LayoutInflater.from(mContext).inflate(R.layout.adapter_post, parent, false)
+        db = FirebaseFirestore.getInstance()
+        userReference = db!!.collection("Users").document(FirebaseAuth.getInstance().uid!!)
+        ViewHolder.userReference = userReference
+        return ViewHolder(view)
     }
 
-    @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Post post = mPosts.toArray(new Post[0])[position];
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        val post = mPosts!!.toTypedArray<Post>()[position]
 
-        db.collection("Users").document(post.getCreator()).get().addOnSuccessListener(snapshot -> {
-            User creator = snapshot.toObject(User.class);
-            Glide.with(mContext).load(creator.getProfileImageUrl()).into(holder.profileImage);
-            holder.username.setText(creator.getUsername());
-        });
+        db!!.collection("Users").document(post.creator).get()
+            .addOnSuccessListener { snapshot: DocumentSnapshot ->
+                val creator = snapshot.toObject(
+                    User::class.java
+                )
+                Glide.with(mContext).load(creator!!.profileImageUrl).into(holder.profileImage)
+                holder.username.text = creator.username
+            }
 
-        holder.post = post;
-        holder.time.setText(DateTimeFormatter.getTimeDifference(post.getPostid(), false));
-        Glide.with(mContext).load(post.getImageUrl()).into(holder.postImage);
-        holder.caption.setText(post.getCaption());
-        holder.kitt.setText(post.getKitt());
+        holder.post = post
+        holder.time.text = DateTimeFormatter.getTimeDifference(post.postid, false)
+        Glide.with(mContext).load(post.imageUrl).into(holder.postImage)
+        holder.caption.text = post.caption
+        holder.kitt.text = post.kitt
 
-        if (post.getKitt().isEmpty()) {
-            holder.kitt.setVisibility(View.GONE);
-            holder.caption.setVisibility(View.VISIBLE);
+        if (post.kitt.isEmpty()) {
+            holder.kitt.visibility = View.GONE
+            holder.caption.visibility = View.VISIBLE
         } else {
-            holder.kitt.setVisibility(View.VISIBLE);
-            holder.caption.setVisibility(View.GONE);
+            holder.kitt.visibility = View.VISIBLE
+            holder.caption.visibility = View.GONE
         }
 
-        holder.checkIfLiked();
-        holder.checkIfSaved();
+        holder.checkIfLiked()
+        holder.checkIfSaved()
 
-        DatabaseReference commentsReference = FirebaseDatabase.getInstance().getReference().child("comments").child(post.getPostid());
-        commentsReference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                long commentCount = snapshot.getChildrenCount();
+        val commentsReference =
+            FirebaseDatabase.getInstance().reference.child("comments").child(post.postid)
+        commentsReference.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(snapshot: DataSnapshot) {
+                val commentCount = snapshot.childrenCount
                 if (commentCount >= 2) {
-                    String commentsCountText = "View all " + commentCount + " comments";
-                    holder.commentCount.setText(commentsCountText);
-                    holder.commentCount.setVisibility(View.VISIBLE);
+                    val commentsCountText = "View all $commentCount comments"
+                    holder.commentCount.text = commentsCountText
+                    holder.commentCount.visibility = View.VISIBLE
                 } else {
-                    holder.commentCount.setText("");
-                    holder.commentCount.setVisibility(View.GONE);
+                    holder.commentCount.text = ""
+                    holder.commentCount.visibility = View.GONE
                 }
             }
 
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-
+            override fun onCancelled(error: DatabaseError) {
             }
-        });
+        })
 
 
-        holder.postImage.setOnClickListener(view -> {
-            long clickTime = System.currentTimeMillis();
+        holder.postImage.setOnClickListener {
+            val clickTime = System.currentTimeMillis()
             if (clickTime - lastClickTime < DOUBLE_CLICK_TIME_DELTA) {
-                holder.toggleLike();
+                holder.toggleLike()
             }
-            lastClickTime = clickTime;
-        });
-        holder.like.setOnClickListener(v -> holder.toggleLike());
-        holder.save.setOnClickListener(v -> holder.toggleSave());
+            lastClickTime = clickTime
+        }
+        holder.like.setOnClickListener { holder.toggleLike() }
+        holder.save.setOnClickListener { holder.toggleSave() }
 
-        holder.commentCount.setOnClickListener(view -> {
-            Intent intent = new Intent(mContext, CommentsActivity.class);
-            intent.putExtra("postid", post.getPostid());
-            intent.putExtra("openKeyboard", false);
-            mContext.startActivity(intent);
-        });
-
-        holder.comment.setOnClickListener(view -> {
-            Intent intent = new Intent(mContext, CommentsActivity.class);
-            intent.putExtra("postid", post.getPostid());
-            intent.putExtra("openKeyboard", true);
-            mContext.startActivity(intent);
-        });
-
-        holder.header.setOnClickListener(view -> {
-            Intent intent = new Intent(mContext, OtherProfileActivity.class);
-            intent.putExtra("userid", post.getCreator());
-            mContext.startActivity(intent);
-        });
-    }
-
-
-
-    @Override
-    public int getItemCount() {
-        return mPosts.size();
-    }
-
-    public static class ViewHolder extends RecyclerView.ViewHolder {
-        public ImageView profileImage, like, comment, save, postImage;
-        public View header;
-        LottieAnimationView likeAnimation;
-        public static DocumentReference userReference;
-        public TextView username, noOfLikes, caption, kitt, commentCount, time;
-        protected boolean isLiked, isSaved;
-        public Post post;
-
-        public ViewHolder(@NonNull View itemView) {
-            super(itemView);
-            postImage = itemView.findViewById(R.id.img_post);
-            profileImage = itemView.findViewById(R.id.img_profile);
-            time = itemView.findViewById(R.id.txt_time);
-            header = itemView.findViewById(R.id.header);
-
-            like = itemView.findViewById(R.id.btn_like);
-            likeAnimation = itemView.findViewById(R.id.animation_like);
-            save = itemView.findViewById(R.id.btn_save);
-            comment = itemView.findViewById(R.id.btn_comment);
-
-            noOfLikes = itemView.findViewById(R.id.txt_likes);
-            username = itemView.findViewById(R.id.txt_username);
-            caption = itemView.findViewById(R.id.caption);
-            commentCount = itemView.findViewById(R.id.txt_comment_count);
-            kitt = itemView.findViewById(R.id.txt_kitt);
-
-            likeAnimation.addAnimatorListener(new AnimatorListenerAdapter() {
-                @Override
-                public void onAnimationStart(@NonNull Animator animation, boolean isReverse) {
-
-                }
-
-                @Override
-                public void onAnimationEnd(@NonNull Animator animation, boolean isReverse) {
-                    likeAnimation.setVisibility(View.INVISIBLE);
-                }
-            });
+        holder.commentCount.setOnClickListener {
+            val intent = Intent(mContext, CommentsActivity::class.java)
+            intent.putExtra("postid", post.postid)
+            intent.putExtra("openKeyboard", false)
+            mContext.startActivity(intent)
         }
 
-        void update() {
-            int n = post.getLikes().size();
+        holder.comment.setOnClickListener {
+            val intent = Intent(mContext, CommentsActivity::class.java)
+            intent.putExtra("postid", post.postid)
+            intent.putExtra("openKeyboard", true)
+            mContext.startActivity(intent)
+        }
+
+        holder.header.setOnClickListener {
+            val intent = Intent(mContext, OtherProfileActivity::class.java)
+            intent.putExtra("userid", post.creator)
+            mContext.startActivity(intent)
+        }
+    }
+
+
+    override fun getItemCount(): Int {
+        return mPosts!!.size
+    }
+
+    open class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        var profileImage: ImageView = itemView.findViewById(R.id.img_profile)
+        var like: ImageView = itemView.findViewById(R.id.btn_like)
+        var comment: ImageView = itemView.findViewById(R.id.btn_comment)
+        var save: ImageView = itemView.findViewById(R.id.btn_save)
+        var postImage: ImageView = itemView.findViewById(R.id.img_post)
+        var header: View = itemView.findViewById(R.id.header)
+        var likeAnimation: LottieAnimationView = itemView.findViewById(R.id.animation_like)
+        var username: TextView = itemView.findViewById(R.id.txt_username)
+        private var noOfLikes: TextView = itemView.findViewById(R.id.txt_likes)
+        var caption: TextView = itemView.findViewById(R.id.caption)
+        var kitt: TextView = itemView.findViewById(R.id.txt_kitt)
+        var commentCount: TextView = itemView.findViewById(R.id.txt_comment_count)
+        var time: TextView = itemView.findViewById(R.id.txt_time)
+        private var isLiked: Boolean = false
+        private var isSaved: Boolean = false
+        var post: Post? = null
+
+        init {
+            likeAnimation.addAnimatorListener(object : AnimatorListenerAdapter() {
+                override fun onAnimationStart(animation: Animator, isReverse: Boolean) {
+                }
+
+                override fun onAnimationEnd(animation: Animator, isReverse: Boolean) {
+                    likeAnimation.visibility = View.INVISIBLE
+                }
+            })
+        }
+
+        private fun update() {
+            val n = post!!.likes.size
             if (n > 0) {
-                noOfLikes.setVisibility(View.VISIBLE);
-                String str = n + (n > 1 ? " likes" : " like");
-                noOfLikes.setText(str);
+                noOfLikes.visibility = View.VISIBLE
+                val str = n.toString() + (if (n > 1) " likes" else " like")
+                noOfLikes.text = str
             } else {
-                noOfLikes.setVisibility(View.GONE);
+                noOfLikes.visibility = View.GONE
             }
 
-            if (isLiked) like.setImageResource(R.drawable.ic_heart);
-            else like.setImageResource(R.drawable.ic_heart_outlined);
+            if (isLiked) like.setImageResource(R.drawable.ic_heart)
+            else like.setImageResource(R.drawable.ic_heart_outlined)
 
-            if (isSaved) save.setImageResource(R.drawable.ic_save);
-            else save.setImageResource(R.drawable.ic_save_outlined);
+            if (isSaved) save.setImageResource(R.drawable.ic_save)
+            else save.setImageResource(R.drawable.ic_save_outlined)
         }
 
-        public void toggleLike() {
-            isLiked = !isLiked;
+        fun toggleLike() {
+            isLiked = !isLiked
             if (isLiked) {
-                likeAnimation.playAnimation();
-                likeAnimation.setVisibility(View.VISIBLE);
+                likeAnimation.playAnimation()
+                likeAnimation.visibility = View.VISIBLE
             } else {
-                likeAnimation.setVisibility(View.INVISIBLE);
+                likeAnimation.visibility = View.INVISIBLE
             }
-            updateLikesData();
+            updateLikesData()
         }
 
-        public void toggleSave() {
-            isSaved = !isSaved;
-            updateSavedData();
+        fun toggleSave() {
+            isSaved = !isSaved
+            updateSavedData()
         }
 
 
-        private void checkIfLiked() {
-            isLiked = post.getLikes().contains(userReference);
-            update();
+        fun checkIfLiked() {
+            isLiked = post!!.likes.contains(userReference)
+            update()
         }
 
-        void updateLikesData() {
-            DocumentReference postReference = FirebaseFirestore.getInstance().collection("Posts").document(post.getPostid());
+        private fun updateLikesData() {
+            val postReference = FirebaseFirestore.getInstance().collection("Posts").document(
+                post!!.postid
+            )
             if (isLiked) {
-                postReference.update("likes", FieldValue.arrayUnion(userReference));
-                post.getLikes().add(userReference);
+                postReference.update("likes", FieldValue.arrayUnion(userReference))
+                post!!.likes.add(userReference)
             } else {
-                postReference.update("likes", FieldValue.arrayRemove(userReference));
-                post.getLikes().remove(userReference);
+                postReference.update("likes", FieldValue.arrayRemove(userReference))
+                post!!.likes.remove(userReference)
             }
-            update();
+            update()
         }
 
-        public void checkIfSaved() {
-            DocumentReference postReference = FirebaseFirestore.getInstance().collection("Posts").document(post.getPostid());
-            userReference.get().addOnSuccessListener(documentSnapshot -> {
-                User user = documentSnapshot.toObject(User.class);
-                assert user != null;
-                isSaved = user.getSaved().contains(postReference);
-                update();
-            });
+        fun checkIfSaved() {
+            val postReference = FirebaseFirestore.getInstance().collection("Posts").document(
+                post!!.postid
+            )
+            userReference!!.get().addOnSuccessListener { documentSnapshot: DocumentSnapshot ->
+                val user = documentSnapshot.toObject(
+                    User::class.java
+                )!!
+                isSaved = user.saved.contains(postReference)
+                update()
+            }
         }
 
-        private void updateSavedData() {
-            DocumentReference postReference = FirebaseFirestore.getInstance().collection("Posts").document(post.getPostid());
+        private fun updateSavedData() {
+            val postReference = FirebaseFirestore.getInstance().collection("Posts").document(
+                post!!.postid
+            )
             if (isSaved) {
-                userReference.update("saved", FieldValue.arrayUnion(postReference));
+                userReference!!.update("saved", FieldValue.arrayUnion(postReference))
             } else {
-                userReference.update("saved", FieldValue.arrayRemove(postReference));
+                userReference!!.update("saved", FieldValue.arrayRemove(postReference))
             }
-            update();
+            update()
         }
+
+        companion object {
+            var userReference: DocumentReference? = null
+        }
+    }
+
+    companion object {
+        private const val DOUBLE_CLICK_TIME_DELTA: Long = 300 //milliseconds
     }
 }

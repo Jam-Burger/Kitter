@@ -44,11 +44,13 @@ class SavedPostsActivity : AppCompatActivity() {
             for (savedPostReference in user.saved) {
                 savedPostReference.get()
                     .addOnSuccessListener { savedPostSnapshot: DocumentSnapshot ->
-                        postAdapter.addPost(
-                            savedPostSnapshot.toObject(
-                                Post::class.java
+                        savedPostSnapshot.toObject(
+                            Post::class.java
+                        )?.let {
+                            postAdapter.addPost(
+                                it
                             )
-                        )
+                        }
                     }
             }
         }

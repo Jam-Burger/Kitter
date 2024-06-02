@@ -24,7 +24,7 @@ class CommentsActivity : AppCompatActivity() {
     private lateinit var sendButton: ImageView
     private lateinit var closeButton: ImageView
     private lateinit var commentAdapter: CommentAdapter
-    private lateinit var comments: MutableList<Comment?>
+    private lateinit var comments: MutableList<Comment>
     private lateinit var commentsReference: DatabaseReference
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -87,7 +87,7 @@ class CommentsActivity : AppCompatActivity() {
             if (task.isSuccessful) {
                 comments.clear()
                 for (commentSnapshot in task.result.children) {
-                    comments.add(commentSnapshot.getValue(Comment::class.java))
+                    commentSnapshot.getValue(Comment::class.java)?.let { comments.add(it) }
                 }
                 commentAdapter.notifyDataSetChanged()
             }

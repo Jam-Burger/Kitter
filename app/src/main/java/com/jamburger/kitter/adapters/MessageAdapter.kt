@@ -1,116 +1,89 @@
-package com.jamburger.kitter.adapters;
+package com.jamburger.kitter.adapters
 
-import android.content.Context;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
+import android.content.Context
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.google.firebase.auth.FirebaseAuth
+import com.jamburger.kitter.R
+import com.jamburger.kitter.components.Message
+import com.jamburger.kitter.utilities.DateTimeFormatter
 
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
+class MessageAdapter(private var mContext: Context, private var fellowProfileImageUrl: String) :
+    RecyclerView.Adapter<MessageAdapter.ViewHolder>() {
+    private var myUID: String? = FirebaseAuth.getInstance().uid
+    private var messages: MutableList<Message> = ArrayList()
 
-import com.bumptech.glide.Glide;
-import com.google.firebase.auth.FirebaseAuth;
-import com.jamburger.kitter.R;
-import com.jamburger.kitter.components.Message;
-import com.jamburger.kitter.utilities.DateTimeFormatter;
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        val view = if (viewType == MESSAGE_LAYOUT) LayoutInflater.from(mContext)
+            .inflate(R.layout.adapter_message, parent, false)
+        else LayoutInflater.from(mContext).inflate(R.layout.adapter_timestamp, parent, false)
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHolder> {
-    private static final int MESSAGE_LAYOUT = 0;
-    private static final int TIMESTAMP_LAYOUT = 1;
-    String fellowProfileImageUrl;
-    String myUID;
-    Context mContext;
-    List<Message> messages;
-
-
-    public MessageAdapter(Context mContext, String fellowProfileImageUrl) {
-        this.mContext = mContext;
-        this.messages = new ArrayList<>();
-        myUID = FirebaseAuth.getInstance().getUid();
-        this.fellowProfileImageUrl = fellowProfileImageUrl;
+        return ViewHolder(view)
     }
 
-    @NonNull
-    @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view;
-        if (viewType == MESSAGE_LAYOUT)
-            view = LayoutInflater.from(mContext).inflate(R.layout.adapter_message, parent, false);
-        else
-            view = LayoutInflater.from(mContext).inflate(R.layout.adapter_timestamp, parent, false);
-
-        return new ViewHolder(view);
+    override fun getItemViewType(position: Int): Int {
+        return if (messages[position].messageId == "@") TIMESTAMP_LAYOUT else MESSAGE_LAYOUT
     }
 
-    @Override
-    public int getItemViewType(int position) {
-        return messages.get(position).getMessageId().equals("@") ? TIMESTAMP_LAYOUT : MESSAGE_LAYOUT;
-    }
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        val message = messages[position]
+        val nextMessage = if (position + 1 < messages.size) messages[position + 1] else null
 
-    @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Message message = messages.get(position);
-        Message nextMessage = position + 1 < messages.size() ? messages.get(position + 1) : null;
+        if (holder.itemViewType == MESSAGE_LAYOUT) {
+            holder.message.text = message.text
+            holder.time.text =
+                DateTimeFormatter.getHoursMinutes(message.messageId)
 
-        if (holder.getItemViewType() == MESSAGE_LAYOUT) {
-            holder.message.setText(message.getText());
-            holder.time.setText(DateTimeFormatter.getHoursMinutes(message.getMessageId()));
-
-            if (myUID.equals(message.getSenderId())) {
-                holder.container.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
-                holder.profileImage.setVisibility(View.GONE);
+            if (myUID == message.senderId) {
+                holder.container.layoutDirection = View.LAYOUT_DIRECTION_RTL
+                holder.profileImage.visibility = View.GONE
             } else {
-                holder.container.setLayoutDirection(View.LAYOUT_DIRECTION_LTR);
-                if (nextMessage == null || nextMessage.getSenderId().equals(myUID)) {
-                    holder.profileImage.setVisibility(View.VISIBLE);
-                    Glide.with(mContext).load(fellowProfileImageUrl).into(holder.profileImage);
+                holder.container.layoutDirection = View.LAYOUT_DIRECTION_LTR
+                if (nextMessage == null || nextMessage.senderId == myUID) {
+                    holder.profileImage.visibility = View.VISIBLE
+                    Glide.with(mContext).load(fellowProfileImageUrl).into(holder.profileImage)
                 } else {
-                    holder.profileImage.setVisibility(View.INVISIBLE);
+                    holder.profileImage.visibility = View.INVISIBLE
                 }
             }
         } else {
-            holder.timestamp.setText(message.getText());
+            holder.timestamp.text = message.text
         }
     }
 
-    @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position, @NonNull List<Object> payloads) {
-        super.onBindViewHolder(holder, position, payloads);
+    override fun onBindViewHolder(holder: ViewHolder, position: Int, payloads: List<Any>) {
+        super.onBindViewHolder(holder, position, payloads)
     }
 
-    @Override
-    public int getItemCount() {
-        return messages.size();
+    override fun getItemCount(): Int {
+        return messages.size
     }
 
-    public void addMessage(Message message) {
-        messages.add(message);
-        notifyItemInserted(messages.size() - 1);
+    fun addMessage(message: Message) {
+        messages.add(message)
+        notifyItemInserted(messages.size - 1)
     }
 
-    public void clearMessages() {
-        messages.clear();
-        notifyDataSetChanged();
+    fun clearMessages() {
+        messages.clear()
+        notifyDataSetChanged()
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView message, time;
-        ImageView profileImage;
-        TextView timestamp;
-        View container;
+    class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        var message: TextView = itemView.findViewById(R.id.txt_message)
+        var time: TextView = itemView.findViewById(R.id.txt_time)
+        var profileImage: ImageView = itemView.findViewById(R.id.img_profile)
+        var timestamp: TextView = itemView.findViewById(R.id.txt_timestamp)
+        var container: View = itemView.findViewById(R.id.container)
+    }
 
-        public ViewHolder(@NonNull View itemView) {
-            super(itemView);
-            message = itemView.findViewById(R.id.txt_message);
-            time = itemView.findViewById(R.id.txt_time);
-            profileImage = itemView.findViewById(R.id.img_profile);
-            container = itemView.findViewById(R.id.container);
-            timestamp = itemView.findViewById(R.id.txt_timestamp);
-        }
+    companion object {
+        private const val MESSAGE_LAYOUT = 0
+        private const val TIMESTAMP_LAYOUT = 1
     }
 }

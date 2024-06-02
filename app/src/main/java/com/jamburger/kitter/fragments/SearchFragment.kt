@@ -20,8 +20,8 @@ class SearchFragment : Fragment() {
     private lateinit var recyclerViewProfiles: RecyclerView
     private lateinit var messageText: TextView
     private lateinit var profileAdapter: ProfileAdapter
-    private lateinit var profiles: MutableList<User?>
-    private lateinit var allProfiles: MutableList<User?>
+    private lateinit var profiles: MutableList<User>
+    private lateinit var allProfiles: MutableList<User>
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -58,7 +58,7 @@ class SearchFragment : Fragment() {
         messageText.visibility = View.GONE
         if (text.isEmpty()) return
         for (user in allProfiles) {
-            if (user!!.name.lowercase(Locale.getDefault())
+            if (user.name.lowercase(Locale.getDefault())
                     .contains(text.lowercase(Locale.getDefault())) || user.username.lowercase(
                     Locale.getDefault()
                 ).contains(text.lowercase(Locale.getDefault()))

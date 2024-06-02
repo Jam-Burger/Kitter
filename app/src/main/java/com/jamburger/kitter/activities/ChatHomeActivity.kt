@@ -13,7 +13,7 @@ import com.jamburger.kitter.components.User
 
 class ChatHomeActivity : AppCompatActivity() {
     private lateinit var recyclerViewProfiles: RecyclerView
-    private var profiles: MutableList<User?>? = null
+    private lateinit var profiles: MutableList<User>
     private var allProfiles: List<User>? = null
     private var profileAdapter: ProfileAdapter? = null
     private lateinit var closeButton: ImageView
@@ -39,13 +39,13 @@ class ChatHomeActivity : AppCompatActivity() {
     private fun readProfiles() {
         val userReference = FirebaseFirestore.getInstance().collection("Users")
         userReference.get().addOnSuccessListener { usersSnapshots: QuerySnapshot ->
-            profiles!!.clear()
+            profiles.clear()
             for (userSnapshot in usersSnapshots) {
                 val user = userSnapshot.toObject(
                     User::class.java
                 )
                 if (user.id == FirebaseAuth.getInstance().uid) continue
-                profiles!!.add(user)
+                profiles.add(user)
             }
             profileAdapter!!.filterList(profiles)
         }

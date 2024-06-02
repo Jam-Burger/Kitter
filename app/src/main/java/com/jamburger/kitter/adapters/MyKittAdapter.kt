@@ -1,90 +1,75 @@
-package com.jamburger.kitter.adapters;
+package com.jamburger.kitter.adapters
 
-import android.app.Dialog;
-import android.content.Context;
-import android.os.Build;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
+import android.app.Dialog
+import android.content.Context
+import android.os.Build
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.DocumentSnapshot
+import com.jamburger.kitter.R
+import com.jamburger.kitter.components.Post
+import com.jamburger.kitter.utilities.DateTimeFormatter
+import java.util.TreeSet
 
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
+class MyKittAdapter(private var mContext: Context) :
+    RecyclerView.Adapter<MyKittAdapter.ViewHolder>() {
+    private var mPosts: TreeSet<DocumentReference>? = null
 
-import com.google.firebase.firestore.DocumentReference;
-import com.jamburger.kitter.R;
-import com.jamburger.kitter.components.Post;
-import com.jamburger.kitter.utilities.DateTimeFormatter;
-
-import java.util.Comparator;
-import java.util.TreeSet;
-
-public class MyKittAdapter extends RecyclerView.Adapter<MyKittAdapter.ViewHolder> {
-    Context mContext;
-    TreeSet<DocumentReference> mPosts;
-
-    public MyKittAdapter(Context mContext) {
-        this.mContext = mContext;
+    init {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            mPosts = new TreeSet<>(Comparator.comparing(DocumentReference::getId).reversed());
+            mPosts = TreeSet(Comparator.comparing { obj: DocumentReference -> obj.id }
+                .reversed())
         }
     }
 
-    public void addPost(DocumentReference post) {
-        mPosts.add(post);
-        notifyDataSetChanged();
+    fun addPost(post: DocumentReference) {
+        mPosts!!.add(post)
+        notifyDataSetChanged()
     }
 
-    public void clearPosts() {
-        mPosts.clear();
-        notifyDataSetChanged();
+    fun clearPosts() {
+        mPosts!!.clear()
+        notifyDataSetChanged()
     }
 
-    @NonNull
-    @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(mContext).inflate(R.layout.adapter_my_kitt, parent, false);
-        return new MyKittAdapter.ViewHolder(view);
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        val view = LayoutInflater.from(mContext).inflate(R.layout.adapter_my_kitt, parent, false)
+        return ViewHolder(view)
     }
 
-    @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        DocumentReference postReference = mPosts.toArray(new DocumentReference[0])[position];
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        val postReference = mPosts!!.toTypedArray<DocumentReference>()[position]
 
-        Dialog dialog = new Dialog(mContext);
-        dialog.getWindow().setBackgroundDrawableResource(R.color.transparent);
-        dialog.setContentView(R.layout.dialog_my_kitt_preview);
-        TextView previewTextView = dialog.findViewById(R.id.kitt_mypost);
+        val dialog = Dialog(mContext)
+        dialog.window!!.setBackgroundDrawableResource(R.color.transparent)
+        dialog.setContentView(R.layout.dialog_my_kitt_preview)
+        val previewTextView = dialog.findViewById<TextView>(R.id.kitt_mypost)
 
-        postReference.get().addOnSuccessListener(postSnapshot -> {
-            Post post = postSnapshot.toObject(Post.class);
-            assert post != null;
-            holder.kitt.setText(post.getKitt());
-            holder.time.setText(DateTimeFormatter.getTimeDifference(post.getPostid(), false));
-            holder.container.setVisibility(View.VISIBLE);
-            previewTextView.setText(holder.kitt.getText().toString());
-        });
-
-        holder.container.setOnLongClickListener(v -> {
-            dialog.show();
-            return true;
-        });
-    }
-
-    @Override
-    public int getItemCount() {
-        return mPosts.size();
-    }
-
-    public static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView kitt, time;
-        View container;
-
-        public ViewHolder(@NonNull View itemView) {
-            super(itemView);
-            kitt = itemView.findViewById(R.id.txt_kitt);
-            time = itemView.findViewById(R.id.txt_time);
-            container = itemView.findViewById(R.id.container);
+        postReference.get().addOnSuccessListener { postSnapshot: DocumentSnapshot ->
+            val post = postSnapshot.toObject(Post::class.java)!!
+            holder.kitt.text = post.kitt
+            holder.time.text = DateTimeFormatter.getTimeDifference(post.postid, false)
+            holder.container.visibility = View.VISIBLE
+            previewTextView.text = holder.kitt.text.toString()
         }
+
+        holder.container.setOnLongClickListener {
+            dialog.show()
+            true
+        }
+    }
+
+    override fun getItemCount(): Int {
+        return mPosts!!.size
+    }
+
+    class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        var kitt: TextView = itemView.findViewById(R.id.txt_kitt)
+        var time: TextView = itemView.findViewById(R.id.txt_time)
+        var container: View = itemView.findViewById(R.id.container)
     }
 }
