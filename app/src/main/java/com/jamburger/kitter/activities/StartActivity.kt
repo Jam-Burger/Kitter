@@ -1,145 +1,156 @@
-package com.jamburger.kitter.activities;
+package com.jamburger.kitter.activities
 
-import static com.jamburger.kitter.utilities.Constants.TAG;
+import android.content.DialogInterface
+import android.content.Intent
+import android.net.Uri
+import android.os.Bundle
+import android.util.Log
+import android.view.View
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
+import android.widget.ImageView
+import android.widget.TextView
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.tasks.Task
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.FirebaseFirestore
+import com.jamburger.kitter.R
+import com.jamburger.kitter.components.User
+import com.jamburger.kitter.utilities.Constants
+import com.jamburger.kitter.utilities.ForceUpdateChecker
+import com.jamburger.kitter.utilities.ForceUpdateChecker.OnUpdateNeededListener
+import com.jamburger.kitter.utilities.PermissionManager
 
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.net.Uri;
-import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
-import android.widget.ImageView;
-import android.widget.TextView;
-import android.widget.Toast;
+class StartActivity : AppCompatActivity(), OnUpdateNeededListener {
+    private var gsc: GoogleSignInClient? = null
+    private var logo: ImageView? = null
+    private var appName: TextView? = null
 
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.app.AppCompatDelegate;
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_start)
 
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.google.android.gms.auth.api.signin.GoogleSignInClient;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.jamburger.kitter.R;
-import com.jamburger.kitter.components.User;
-import com.jamburger.kitter.utilities.ForceUpdateChecker;
-import com.jamburger.kitter.utilities.PermissionManager;
+        PermissionManager.askPermissions(this)
 
-public class StartActivity extends AppCompatActivity implements ForceUpdateChecker.OnUpdateNeededListener {
-    GoogleSignInClient gsc;
-    ImageView logo;
-    TextView appName;
+        logo = findViewById(R.id.img_logo)
+        appName = findViewById(R.id.txt_appname)
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_start);
+        val decorView = window.decorView
+        val uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN
+        decorView.systemUiVisibility = uiOptions
 
-        PermissionManager.askPermissions(this);
-
-        logo = findViewById(R.id.img_logo);
-        appName = findViewById(R.id.txt_appname);
-
-        View decorView = getWindow().getDecorView();
-        int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
-        decorView.setSystemUiVisibility(uiOptions);
-
-        SharedPreferences sharedPreferences = getSharedPreferences("sharedPrefs", MODE_PRIVATE);
-        final boolean isDarkModeOn = sharedPreferences.getBoolean("isDarkModeOn", true);
+        val sharedPreferences = getSharedPreferences("sharedPrefs", MODE_PRIVATE)
+        val isDarkModeOn = sharedPreferences.getBoolean("isDarkModeOn", true)
         if (isDarkModeOn) {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
         } else {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
         }
 
-        letTheShitBegin();
+        letTheShitBegin()
     }
 
 
-    private void letTheShitBegin() {
-        Animation logoAnimation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.logo_animation);
-        Animation appNameAnimation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.app_name_animation);
-        logo.startAnimation(logoAnimation);
-        appName.startAnimation(appNameAnimation);
-        appNameAnimation.setAnimationListener(new Animation.AnimationListener() {
-            @Override
-            public void onAnimationStart(Animation animation) {
-
+    private fun letTheShitBegin() {
+        val logoAnimation = AnimationUtils.loadAnimation(applicationContext, R.anim.logo_animation)
+        val appNameAnimation = AnimationUtils.loadAnimation(
+            applicationContext, R.anim.app_name_animation
+        )
+        logo!!.startAnimation(logoAnimation)
+        appName!!.startAnimation(appNameAnimation)
+        appNameAnimation.setAnimationListener(object : Animation.AnimationListener {
+            override fun onAnimationStart(animation: Animation) {
             }
 
-            @Override
-            public void onAnimationEnd(Animation animation) {
-                boolean required = ForceUpdateChecker.with(StartActivity.this).onUpdateNeeded(StartActivity.this).check();
-                if (required) return;
-                gsc = GoogleSignIn.getClient(StartActivity.this, GoogleSignInOptions.DEFAULT_SIGN_IN);
-                FirebaseAuth auth = FirebaseAuth.getInstance();
-                if (auth.getCurrentUser() == null || !auth.getCurrentUser().isEmailVerified()) {
-                    Intent intent = new Intent(StartActivity.this, LoginActivity.class);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                    startActivity(intent);
-                    finish();
+            override fun onAnimationEnd(animation: Animation) {
+                val required =
+                    ForceUpdateChecker.with(this@StartActivity).onUpdateNeeded(this@StartActivity)
+                        .check()
+                if (required) return
+                gsc =
+                    GoogleSignIn.getClient(this@StartActivity, GoogleSignInOptions.DEFAULT_SIGN_IN)
+                val auth = FirebaseAuth.getInstance()
+                if (auth.currentUser == null || !auth.currentUser!!.isEmailVerified) {
+                    val intent = Intent(this@StartActivity, LoginActivity::class.java)
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                    startActivity(intent)
+                    finish()
                 } else {
-                    DocumentReference userReference = FirebaseFirestore.getInstance().document("Users/" + auth.getUid());
+                    val userReference =
+                        FirebaseFirestore.getInstance().document("Users/" + auth.uid)
                     try {
-                        userReference.get().addOnCompleteListener(task -> {
-                            if (task.isSuccessful()) {
-                                User user = task.getResult().toObject(User.class);
-                                Intent intent;
+                        userReference.get().addOnCompleteListener { task: Task<DocumentSnapshot> ->
+                            if (task.isSuccessful) {
+                                val user = task.result.toObject(
+                                    User::class.java
+                                )
+                                val intent: Intent
                                 if (user != null) {
-                                    if (user.getUsername().isEmpty()) {
-                                        intent = new Intent(StartActivity.this, AddInfoActivity.class);
+                                    intent = if (user.username.isEmpty()) {
+                                        Intent(this@StartActivity, AddInfoActivity::class.java)
                                     } else {
-                                        intent = new Intent(StartActivity.this, MainActivity.class);
+                                        Intent(this@StartActivity, MainActivity::class.java)
                                     }
                                 } else {
-                                    Toast.makeText(StartActivity.this, "user is deleted on firestore", Toast.LENGTH_SHORT).show();
-                                    intent = new Intent(StartActivity.this, LoginActivity.class);
+                                    Toast.makeText(
+                                        this@StartActivity,
+                                        "user is deleted on firestore",
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                    intent = Intent(this@StartActivity, LoginActivity::class.java)
                                 }
-                                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                                startActivity(intent);
-                                finish();
+                                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                                startActivity(intent)
+                                finish()
                             } else {
-                                Log.e("signin", task.getException().getMessage());
-                                FirebaseAuth.getInstance().signOut();
-                                gsc.signOut();
+                                Log.e("signin", task.exception!!.message!!)
+                                FirebaseAuth.getInstance().signOut()
+                                gsc!!.signOut()
                             }
-                        });
-                    } catch (Exception e) {
-                        Log.d(TAG, "onAnimationEnd: " + e);
-                        Toast.makeText(StartActivity.this, "something's wrong again", Toast.LENGTH_SHORT).show();
-                        FirebaseAuth.getInstance().signOut();
-                        gsc.signOut();
+                        }
+                    } catch (e: Exception) {
+                        Log.d(Constants.TAG, "onAnimationEnd: $e")
+                        Toast.makeText(
+                            this@StartActivity,
+                            "something's wrong again",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        FirebaseAuth.getInstance().signOut()
+                        gsc!!.signOut()
                     }
                 }
             }
 
-            @Override
-            public void onAnimationRepeat(Animation animation) {
-
+            override fun onAnimationRepeat(animation: Animation) {
             }
-        });
+        })
     }
 
-    @Override
-    public void onUpdateNeeded(String updateUrl) {
-        AlertDialog dialog = new AlertDialog.Builder(this)
-                .setTitle("New version available")
-                .setMessage("Please, update app to new version to continue reposting.")
-                .setCancelable(false)
-                .setPositiveButton("Update",
-                        (dialog1, which) -> redirectStore(updateUrl)).setNegativeButton("No, thanks",
-                        (dialog12, which) -> finish()).create();
-        dialog.show();
+    override fun onUpdateNeeded(updateUrl: String) {
+        val dialog = AlertDialog.Builder(this)
+            .setTitle("New version available")
+            .setMessage("Please, update app to new version to continue reposting.")
+            .setCancelable(false)
+            .setPositiveButton(
+                "Update"
+            ) { _: DialogInterface?, _: Int -> redirectStore(updateUrl) }
+            .setNegativeButton(
+                "No, thanks"
+            ) { _: DialogInterface?, _: Int -> finish() }.create()
+        dialog.show()
     }
 
-    private void redirectStore(String updateUrl) {
-        final Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(updateUrl));
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(intent);
-        finish();
+    private fun redirectStore(updateUrl: String) {
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(updateUrl))
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        startActivity(intent)
+        finish()
     }
 }

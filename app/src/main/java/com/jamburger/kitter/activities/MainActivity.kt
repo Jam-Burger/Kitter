@@ -1,79 +1,85 @@
-package com.jamburger.kitter.activities;
+package com.jamburger.kitter.activities
 
-import android.os.Bundle;
+import android.os.Bundle
+import android.view.MenuItem
+import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
+import com.jamburger.kitter.R
+import com.jamburger.kitter.fragments.HomeFragment
+import com.jamburger.kitter.fragments.ProfileFragment
+import com.jamburger.kitter.fragments.SearchFragment
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
+class MainActivity : AppCompatActivity() {
+    private lateinit var bottomNavigationView: BottomNavigationView
+    var user: FirebaseUser? = null
+    private lateinit var currentPage: Fragment
+    private lateinit var homeFragment: Fragment
+    private lateinit var searchFragment: Fragment
+    private lateinit var profileFragment: Fragment
 
-import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.jamburger.kitter.R;
-import com.jamburger.kitter.fragments.HomeFragment;
-import com.jamburger.kitter.fragments.ProfileFragment;
-import com.jamburger.kitter.fragments.SearchFragment;
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+        bottomNavigationView = findViewById(R.id.bottom_navigation)
 
-public class MainActivity extends AppCompatActivity {
-    BottomNavigationView bottomNavigationView;
-    FirebaseUser user;
-    Fragment currentPage;
-    private Fragment homeFragment, searchFragment, profileFragment;
+        user = FirebaseAuth.getInstance().currentUser
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-        bottomNavigationView = findViewById(R.id.bottom_navigation);
-
-        user = FirebaseAuth.getInstance().getCurrentUser();
-
-        homeFragment = new HomeFragment();
-        searchFragment = new SearchFragment();
-        profileFragment = new ProfileFragment();
+        homeFragment = HomeFragment()
+        searchFragment = SearchFragment()
+        profileFragment = ProfileFragment()
 
 
-        bottomNavigationView.setOnItemSelectedListener(item -> {
-            int itemId = item.getItemId();
-            if (itemId == R.id.nav_home) {
-                currentPage = homeFragment;
-            } else if (itemId == R.id.nav_search) {
-                currentPage = searchFragment;
-            } else if (itemId == R.id.nav_profile) {
-                currentPage = profileFragment;
+        bottomNavigationView.setOnItemSelectedListener { item: MenuItem ->
+            val itemId = item.itemId
+            when (itemId) {
+                R.id.nav_home -> {
+                    currentPage = homeFragment
+                }
+
+                R.id.nav_search -> {
+                    currentPage = searchFragment
+                }
+
+                R.id.nav_profile -> {
+                    currentPage = profileFragment
+                }
             }
-            updateFragment();
-            return true;
-        });
+            updateFragment()
+            true
+        }
 
-        String page = getIntent().getStringExtra("page");
+        val page = intent.getStringExtra("page")
         if (page != null) {
-            if (page.equals("PROFILE")) {
-                currentPage = profileFragment;
-                bottomNavigationView.setSelectedItemId(R.id.nav_profile);
-                updateFragment();
+            if (page == "PROFILE") {
+                currentPage = profileFragment
+                bottomNavigationView.setSelectedItemId(R.id.nav_profile)
+                updateFragment()
             }
         } else {
-            currentPage = homeFragment;
-            updateFragment();
+            currentPage = homeFragment
+            updateFragment()
         }
     }
 
-    @Override
-    public void onBackPressed() {
-        if (currentPage.equals(homeFragment)) {
-            super.onBackPressed();
+    @Deprecated("Deprecated in Java")
+    override fun onBackPressed() {
+        if (currentPage == homeFragment) {
+            super.onBackPressed()
         } else {
-            currentPage = homeFragment;
-            bottomNavigationView.setSelectedItemId(R.id.nav_home);
+            currentPage = homeFragment
+            bottomNavigationView.selectedItemId = R.id.nav_home
         }
     }
 
-    void updateFragment() {
-        getSupportFragmentManager()
-                .beginTransaction()
-                .setCustomAnimations(R.anim.slide_in, R.anim.slide_out, R.anim.fade_in, R.anim.fade_out)
-                .replace(R.id.frame_container, currentPage)
-                .setReorderingAllowed(true)
-                .commit();
+    private fun updateFragment() {
+        supportFragmentManager
+            .beginTransaction()
+            .setCustomAnimations(R.anim.slide_in, R.anim.slide_out, R.anim.fade_in, R.anim.fade_out)
+            .replace(R.id.frame_container, currentPage)
+            .setReorderingAllowed(true)
+            .commit()
     }
 }

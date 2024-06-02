@@ -1,99 +1,96 @@
-package com.jamburger.kitter.activities;
+package com.jamburger.kitter.activities
 
-import android.os.Bundle;
-import android.view.MotionEvent;
-import android.view.View;
-import android.widget.EditText;
-import android.widget.ImageView;
+import android.os.Bundle
+import android.view.MotionEvent
+import android.widget.EditText
+import android.widget.ImageView
+import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.RecyclerView
+import com.google.android.gms.tasks.Task
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.firestore.FirebaseFirestore
+import com.jamburger.kitter.R
+import com.jamburger.kitter.adapters.CommentAdapter
+import com.jamburger.kitter.components.Comment
+import com.jamburger.kitter.utilities.DateTimeFormatter
+import com.jamburger.kitter.utilities.KeyboardManager
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.RecyclerView;
+class CommentsActivity : AppCompatActivity() {
+    private lateinit var recyclerViewComments: RecyclerView
+    private lateinit var commentText: EditText
+    private lateinit var sendButton: ImageView
+    private lateinit var closeButton: ImageView
+    private lateinit var commentAdapter: CommentAdapter
+    private lateinit var comments: MutableList<Comment?>
+    private lateinit var commentsReference: DatabaseReference
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.jamburger.kitter.R;
-import com.jamburger.kitter.adapters.CommentAdapter;
-import com.jamburger.kitter.components.Comment;
-import com.jamburger.kitter.utilities.DateTimeFormatter;
-import com.jamburger.kitter.utilities.KeyboardManager;
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_comments)
 
-import java.util.ArrayList;
-import java.util.List;
+        recyclerViewComments = findViewById(R.id.recyclerview_comments)
+        commentText = findViewById(R.id.et_comment)
+        sendButton = findViewById(R.id.btn_send_message)
+        closeButton = findViewById(R.id.btn_close)
 
-public class CommentsActivity extends AppCompatActivity {
-    RecyclerView recyclerViewComments;
-    EditText commentText;
-    ImageView sendButton, closeButton;
-    CommentAdapter commentAdapter;
-    List<Comment> comments;
-    DatabaseReference commentsReference;
+        comments = ArrayList()
+        commentAdapter = CommentAdapter(this, comments)
+        recyclerViewComments.setHasFixedSize(true)
+        recyclerViewComments.setAdapter(commentAdapter)
+        val postId = intent.extras!!.getString("postid")
+        commentsReference =
+            FirebaseDatabase.getInstance().reference.child("comments").child(postId!!)
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_comments);
-
-        recyclerViewComments = findViewById(R.id.recyclerview_comments);
-        commentText = findViewById(R.id.et_comment);
-        sendButton = findViewById(R.id.btn_send_message);
-        closeButton = findViewById(R.id.btn_close);
-
-        comments = new ArrayList<>();
-        commentAdapter = new CommentAdapter(this, comments);
-        recyclerViewComments.setHasFixedSize(true);
-        recyclerViewComments.setAdapter(commentAdapter);
-        String postId = getIntent().getExtras().getString("postid");
-        commentsReference = FirebaseDatabase.getInstance().getReference().child("comments").child(postId);
-
-        readComments();
-        boolean openKeyboard = getIntent().getExtras().getBoolean("openKeyboard");
+        readComments()
+        val openKeyboard = intent.extras!!.getBoolean("openKeyboard")
         if (openKeyboard) {
-            commentText.requestFocus();
-            KeyboardManager.openKeyboard(this);
+            commentText.requestFocus()
+            KeyboardManager.openKeyboard(this)
         }
 
-        sendButton.setOnClickListener(v -> {
-            String commentString = commentText.getText().toString();
-            if (commentString.isEmpty()) return;
-            DocumentReference userReference = FirebaseFirestore.getInstance().collection("Users").document(FirebaseAuth.getInstance().getUid());
+        sendButton.setOnClickListener {
+            val commentString = commentText.getText().toString()
+            if (commentString.isEmpty()) return@setOnClickListener
+            val userReference = FirebaseFirestore.getInstance().collection("Users").document(
+                FirebaseAuth.getInstance().uid!!
+            )
 
-            String commentId = DateTimeFormatter.getCurrentTime();
-            Comment comment = new Comment(userReference.getId(), commentString, commentId);
+            val commentId = DateTimeFormatter.getCurrentTime()
+            val comment = Comment(userReference.id, commentString, commentId)
 
-            KeyboardManager.closeKeyboard(this);
-            commentText.clearFocus();
-            commentText.setText("");
-            commentsReference.child(commentId).setValue(comment).addOnSuccessListener(unused -> {
-                comments.add(comment);
-                commentAdapter.notifyDataSetChanged();
-            });
-        });
-        closeButton.setOnClickListener(view -> finish());
-    }
-
-
-    @Override
-    public boolean dispatchTouchEvent(MotionEvent event) {
-        View focused = getCurrentFocus();
-        if (focused != null) {
-            KeyboardManager.closeKeyboard(this);
-        }
-        return super.dispatchTouchEvent(event);
-    }
-
-    private void readComments() {
-        commentsReference.get().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                comments.clear();
-                for (DataSnapshot commentSnapshot : task.getResult().getChildren()) {
-                    comments.add(commentSnapshot.getValue(Comment.class));
+            KeyboardManager.closeKeyboard(this)
+            commentText.clearFocus()
+            commentText.setText("")
+            commentsReference.child(commentId).setValue(comment)
+                .addOnSuccessListener {
+                    comments.add(comment)
+                    commentAdapter.notifyDataSetChanged()
                 }
-                commentAdapter.notifyDataSetChanged();
+        }
+        closeButton.setOnClickListener { finish() }
+    }
+
+
+    override fun dispatchTouchEvent(event: MotionEvent): Boolean {
+        val focused = currentFocus
+        if (focused != null) {
+            KeyboardManager.closeKeyboard(this)
+        }
+        return super.dispatchTouchEvent(event)
+    }
+
+    private fun readComments() {
+        commentsReference.get().addOnCompleteListener { task: Task<DataSnapshot> ->
+            if (task.isSuccessful) {
+                comments.clear()
+                for (commentSnapshot in task.result.children) {
+                    comments.add(commentSnapshot.getValue(Comment::class.java))
+                }
+                commentAdapter.notifyDataSetChanged()
             }
-        });
+        }
     }
 }

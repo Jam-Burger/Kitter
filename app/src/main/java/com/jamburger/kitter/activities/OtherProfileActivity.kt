@@ -1,119 +1,122 @@
-package com.jamburger.kitter.activities;
+package com.jamburger.kitter.activities
 
-import android.content.Intent;
-import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
+import android.content.Intent
+import android.os.Bundle
+import android.view.View
+import android.widget.Button
+import androidx.appcompat.app.AppCompatActivity
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.FirebaseFirestore
+import com.jamburger.kitter.R
+import com.jamburger.kitter.components.User
+import com.jamburger.kitter.utilities.ProfilePageManager
 
-import androidx.appcompat.app.AppCompatActivity;
+class OtherProfileActivity : AppCompatActivity() {
+    private lateinit var profilePageManager: ProfilePageManager
+    var userReference: DocumentReference? = null
+    private var myReference: DocumentReference? = null
+    private lateinit var followButton: Button
+    private lateinit var messageButton: Button
+    private var amFollowing: Boolean = false
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.FieldValue;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.jamburger.kitter.R;
-import com.jamburger.kitter.components.User;
-import com.jamburger.kitter.utilities.ProfilePageManager;
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_other_profile)
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+        val userid = intent.getStringExtra("userid")
+        userReference = FirebaseFirestore.getInstance().collection("Users").document(userid!!)
+        myReference = FirebaseFirestore.getInstance().collection("Users")
+            .document(FirebaseAuth.getInstance().uid!!)
 
-public class OtherProfileActivity extends AppCompatActivity {
-    ProfilePageManager profilePageManager;
-    DocumentReference userReference, myReference;
-    Button followButton, messageButton;
-    boolean amFollowing;
+        profilePageManager = ProfilePageManager(this.window.decorView)
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_other_profile);
+        followButton = findViewById(R.id.btn_follow)
+        messageButton = findViewById(R.id.btn_message)
 
-        String userid = getIntent().getStringExtra("userid");
-        userReference = FirebaseFirestore.getInstance().collection("Users").document(userid);
-        myReference = FirebaseFirestore.getInstance().collection("Users").document(FirebaseAuth.getInstance().getUid());
-
-        profilePageManager = new ProfilePageManager(this.getWindow().getDecorView());
-
-        followButton = findViewById(R.id.btn_follow);
-        messageButton = findViewById(R.id.btn_message);
-
-        if (myReference.equals(userReference)) {
-            followButton.setVisibility(View.GONE);
-            messageButton.setVisibility(View.GONE);
+        if (myReference == userReference) {
+            followButton.visibility = View.GONE
+            messageButton.visibility = View.GONE
         }
 
-        fillUserData();
-        readPosts();
+        fillUserData()
+        readPosts()
 
-        followButton.setOnClickListener(v -> toggleFollow());
-        messageButton.setOnClickListener(v -> {
-            Intent intent = new Intent(this, OtherProfileActivity.class);
-            intent.putExtra("userid", userid);
-            startActivity(intent);
-        });
+        followButton.setOnClickListener { toggleFollow() }
+        messageButton.setOnClickListener {
+            val intent = Intent(this, OtherProfileActivity::class.java)
+            intent.putExtra("userid", userid)
+            startActivity(intent)
+        }
     }
 
 
-    private void toggleFollow() {
-        amFollowing = !amFollowing;
+    private fun toggleFollow() {
+        amFollowing = !amFollowing
         if (amFollowing) {
-            profilePageManager.noOfFollowers.setText(String.valueOf(Integer.parseInt(profilePageManager.noOfFollowers.getText().toString()) + 1));
+            profilePageManager.noOfFollowers.text =
+                (Integer.parseInt(profilePageManager.noOfFollowers.text.toString()) + 1).toString()
 
-            myReference.update("following", FieldValue.arrayUnion(userReference));
-            userReference.update("followers", FieldValue.arrayUnion(myReference)).addOnSuccessListener(unused -> readPosts());
-            userReference.get().addOnSuccessListener(userSnapshot -> {
-                User user = userSnapshot.toObject(User.class);
-                assert user != null;
-                List<DocumentReference> posts = user.getPosts();
-                for (DocumentReference postReference : posts) {
-                    Map<String, Object> map = new HashMap<>();
-                    map.put("postReference", postReference);
-                    map.put("visited", false);
-                    myReference.collection("feed").document(postReference.getId()).set(map);
+            myReference!!.update("following", FieldValue.arrayUnion(userReference))
+            userReference!!.update("followers", FieldValue.arrayUnion(myReference))
+                .addOnSuccessListener { readPosts() }
+            userReference!!.get().addOnSuccessListener { userSnapshot: DocumentSnapshot ->
+                val user = userSnapshot.toObject(
+                    User::class.java
+                )!!
+                val posts = user.posts
+                for (postReference in posts) {
+                    val map: MutableMap<String, Any> = HashMap()
+                    map["postReference"] = postReference
+                    map["visited"] = false
+                    myReference!!.collection("feed").document(postReference.id).set(map)
                 }
-            });
+            }
         } else {
-            profilePageManager.noOfFollowers.setText(String.valueOf(Integer.parseInt(profilePageManager.noOfFollowers.getText().toString()) - 1));
+            profilePageManager.noOfFollowers.text =
+                (profilePageManager.noOfFollowers.text.toString().toInt() - 1).toString()
 
-            myReference.update("following", FieldValue.arrayRemove(userReference));
-            userReference.update("followers", FieldValue.arrayRemove(myReference)).addOnSuccessListener(unused -> readPosts());
-            userReference.get().addOnSuccessListener(userSnapshot -> {
-                User user = userSnapshot.toObject(User.class);
-                assert user != null;
-                List<DocumentReference> posts = user.getPosts();
-                for (DocumentReference postReference : posts) {
-                    myReference.collection("feed").document(postReference.getId()).delete();
+            myReference!!.update("following", FieldValue.arrayRemove(userReference))
+            userReference!!.update("followers", FieldValue.arrayRemove(myReference))
+                .addOnSuccessListener { readPosts() }
+            userReference!!.get().addOnSuccessListener { userSnapshot: DocumentSnapshot ->
+                val user = userSnapshot.toObject(
+                    User::class.java
+                )!!
+                val posts = user.posts
+                for (postReference in posts) {
+                    myReference!!.collection("feed").document(postReference.id).delete()
                 }
-            });
+            }
         }
-        updateFollowButton();
+        updateFollowButton()
     }
 
 
-    void updateFollowButton() {
+    private fun updateFollowButton() {
         if (amFollowing) {
-            followButton.setText("Following");
-            followButton.setBackgroundColor(getResources().getColor(R.color.button_gray));
+            followButton.text = "Following"
+            followButton.setBackgroundColor(resources.getColor(R.color.button_gray, theme))
         } else {
-            followButton.setText("Follow");
-            followButton.setBackgroundColor(getResources().getColor(R.color.button_blue));
+            followButton.text = "Follow"
+            followButton.setBackgroundColor(resources.getColor(R.color.button_blue, theme))
         }
     }
 
-    void fillUserData() {
-        userReference.get().addOnSuccessListener(documentSnapshot -> {
-            User user = documentSnapshot.toObject(User.class);
-            assert user != null;
-
-            profilePageManager.fillUserData(user);
-            amFollowing = user.getFollowers().contains(myReference);
-            updateFollowButton();
-        });
+    private fun fillUserData() {
+        userReference!!.get().addOnSuccessListener { documentSnapshot: DocumentSnapshot ->
+            val user = documentSnapshot.toObject(
+                User::class.java
+            )!!
+            profilePageManager.fillUserData(user)
+            amFollowing = user.followers.contains(myReference)
+            updateFollowButton()
+        }
     }
 
-    private void readPosts() {
-        profilePageManager.readPosts(userReference);
+    private fun readPosts() {
+        profilePageManager.readPosts(userReference)
     }
 }

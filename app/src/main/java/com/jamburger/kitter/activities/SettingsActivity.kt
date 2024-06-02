@@ -1,160 +1,174 @@
-package com.jamburger.kitter.activities;
+package com.jamburger.kitter.activities
 
-import static com.jamburger.kitter.utilities.Constants.TAG;
+import android.app.AlertDialog
+import android.app.ProgressDialog
+import android.content.DialogInterface
+import android.content.Intent
+import android.content.SharedPreferences
+import android.os.Bundle
+import android.util.Log
+import android.view.View
+import android.view.ViewGroup
+import android.widget.LinearLayout
+import android.widget.TextView
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.tasks.Task
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.FirebaseFirestore
+import com.jamburger.kitter.R
+import com.jamburger.kitter.components.User
+import com.jamburger.kitter.utilities.Constants
 
-import android.app.AlertDialog;
-import android.app.ProgressDialog;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.LinearLayout;
-import android.widget.TextView;
-import android.widget.Toast;
+class SettingsActivity : AppCompatActivity() {
+    private lateinit var settingsList: ViewGroup
+    private lateinit var googleSignInClient: GoogleSignInClient
+    private var userReference: DocumentReference? = null
+    private lateinit var editor: SharedPreferences.Editor
+    private var isDarkModeOn: Boolean = false
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.app.AppCompatDelegate;
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_settings)
 
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.google.android.gms.auth.api.signin.GoogleSignInClient;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.jamburger.kitter.R;
-import com.jamburger.kitter.components.User;
+        googleSignInClient = GoogleSignIn.getClient(this, GoogleSignInOptions.DEFAULT_SIGN_IN)
+        userReference = FirebaseFirestore.getInstance().collection("Users")
+            .document(FirebaseAuth.getInstance().uid!!)
 
-public class SettingsActivity extends AppCompatActivity {
-    ViewGroup settingsList;
-    GoogleSignInClient googleSignInClient;
-    DocumentReference userReference;
-    SharedPreferences.Editor editor;
-    boolean isDarkModeOn;
+        settingsList = findViewById(R.id.settings_list)
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_settings);
-
-        googleSignInClient = GoogleSignIn.getClient(this, GoogleSignInOptions.DEFAULT_SIGN_IN);
-        userReference = FirebaseFirestore.getInstance().collection("Users").document(FirebaseAuth.getInstance().getUid());
-
-        settingsList = findViewById(R.id.settings_list);
-
-        updateUserData();
-        updateThemeOption();
-        setOptionCLickListener();
-        findViewById(R.id.btn_close).setOnClickListener(v -> finish());
+        updateUserData()
+        updateThemeOption()
+        setOptionCLickListener()
+        findViewById<View>(R.id.btn_close).setOnClickListener { finish() }
     }
 
-    private void updateUserData() {
-        userReference.get().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                User user = task.getResult().toObject(User.class);
-                assert user != null;
-                ((TextView) findViewById(R.id.txt_account_privacy)).setText(user.isPrivate() ? "Private" : "Public");
-                ((TextView) findViewById(R.id.txt_blocked_count)).setText(String.valueOf(user.getBlockedAccounts().size()));
+    private fun updateUserData() {
+        userReference!!.get().addOnCompleteListener { task: Task<DocumentSnapshot> ->
+            if (task.isSuccessful) {
+                val user = task.result.toObject(
+                    User::class.java
+                )!!
+                (findViewById<View>(R.id.txt_account_privacy) as TextView).text =
+                    if (user.isPrivate) "Private" else "Public"
+                (findViewById<View>(R.id.txt_blocked_count) as TextView).text =
+                    user.blockedAccounts.size.toString()
             }
-        });
+        }
     }
 
-    private void updateThemeOption() {
-        SharedPreferences sharedPreferences = getSharedPreferences("sharedPrefs", MODE_PRIVATE);
-        isDarkModeOn = sharedPreferences.getBoolean("isDarkModeOn", true);
-        editor = sharedPreferences.edit();
+    private fun updateThemeOption() {
+        val sharedPreferences = getSharedPreferences("sharedPrefs", MODE_PRIVATE)
+        isDarkModeOn = sharedPreferences.getBoolean("isDarkModeOn", true)
+        editor = sharedPreferences.edit()
 
-        TextView themeOption = findViewById(R.id.setting_theme);
+        val themeOption = findViewById<TextView>(R.id.setting_theme)
         if (isDarkModeOn) {
-            themeOption.setText("Dark mode");
-            themeOption.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_dark, 0, R.drawable.ic_next, 0);
+            themeOption.text = "Dark mode"
+            themeOption.setCompoundDrawablesWithIntrinsicBounds(
+                R.drawable.ic_dark,
+                0,
+                R.drawable.ic_next,
+                0
+            )
         } else {
-            themeOption.setText("Light mode");
-            themeOption.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_light, 0, R.drawable.ic_next, 0);
+            themeOption.text = "Light mode"
+            themeOption.setCompoundDrawablesWithIntrinsicBounds(
+                R.drawable.ic_light,
+                0,
+                R.drawable.ic_next,
+                0
+            )
         }
     }
 
 
-    void setOptionCLickListener() {
-        for (int i = 0; i < settingsList.getChildCount(); i++) {
-            View option = settingsList.getChildAt(i);
-            if (!option.isClickable()) continue;
+    private fun setOptionCLickListener() {
+        for (i in 0 until settingsList.childCount) {
+            val option = settingsList.getChildAt(i)
+            if (!option.isClickable) continue
 
-            option.setOnClickListener(v -> {
-                int optionId = option.getId();
+            option.setOnClickListener {
+                val optionId = option.id
                 if (optionId == R.id.setting_edit_info) {
-                    startActivity(new Intent(this, EditInfoActivity.class));
+                    startActivity(Intent(this, EditInfoActivity::class.java))
                 } else if (optionId == R.id.setting_change_password) {
-                    showRecoverPasswordDialog();
+                    showRecoverPasswordDialog()
                 } else if (optionId == R.id.setting_block_accounts) {
                     // Do nothing for now
                 } else if (optionId == R.id.setting_theme) {
-                    Intent intentMine = new Intent(this, SettingsActivity.class);
-                    intentMine.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
-                    finish();
-                    startActivity(intentMine);
+                    val intentMine = Intent(this, SettingsActivity::class.java)
+                    intentMine.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION)
+                    finish()
+                    startActivity(intentMine)
                     if (isDarkModeOn) {
-                        editor.putBoolean("isDarkModeOn", false).apply();
-                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
+                        editor.putBoolean("isDarkModeOn", false).apply()
+                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
                     } else {
-                        editor.putBoolean("isDarkModeOn", true).apply();
-                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES);
+                        editor.putBoolean("isDarkModeOn", true).apply()
+                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
                     }
                 } else if (optionId == R.id.setting_add_account) {
                     // Do nothing for now
                 } else if (optionId == R.id.setting_logout) {
-                    googleSignInClient.signOut().addOnCompleteListener(task -> {
-                        if (task.isSuccessful()) {
-                            FirebaseAuth.getInstance().signOut();
-                            Intent intentLogin = new Intent(this, LoginActivity.class);
-                            intentLogin.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                            startActivity(intentLogin);
-                            finish();
+                    googleSignInClient.signOut().addOnCompleteListener { task: Task<Void?> ->
+                        if (task.isSuccessful) {
+                            FirebaseAuth.getInstance().signOut()
+                            val intentLogin = Intent(this, LoginActivity::class.java)
+                            intentLogin.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                            startActivity(intentLogin)
+                            finish()
                         }
-                    });
+                    }
                 } else {
-                    Log.i(TAG, "nothing selected");
+                    Log.i(Constants.TAG, "nothing selected")
                 }
-            });
+            }
         }
     }
 
-    void showRecoverPasswordDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Change Password");
-        String email = FirebaseAuth.getInstance().getCurrentUser().getEmail();
+    private fun showRecoverPasswordDialog() {
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("Change Password")
+        val email = FirebaseAuth.getInstance().currentUser!!.email
 
-        final LinearLayout linearLayout = new LinearLayout(this);
-        final TextView emailEt = new TextView(this);
-        final String txt = "We will send change password link to :\n" + email;
-        emailEt.setText(txt);
-        emailEt.setMinEms(16);
-        linearLayout.setPadding(50, 20, 50, 0);
-        linearLayout.addView(emailEt);
-        builder.setView(linearLayout);
+        val linearLayout = LinearLayout(this)
+        val emailEt = TextView(this)
+        val txt = "We will send change password link to :\n$email"
+        emailEt.text = txt
+        emailEt.minEms = 16
+        linearLayout.setPadding(50, 20, 50, 0)
+        linearLayout.addView(emailEt)
+        builder.setView(linearLayout)
 
-        builder.setPositiveButton("Confirm", (dialog, which) -> {
-            beginRecovery(email);
-        });
+        builder.setPositiveButton("Confirm") { _: DialogInterface?, _: Int ->
+            beginRecovery(email)
+        }
 
-        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss());
-        builder.create().show();
+        builder.setNegativeButton("Cancel") { dialog: DialogInterface, _: Int -> dialog.dismiss() }
+        builder.create().show()
     }
 
-    private void beginRecovery(String email) {
-        ProgressDialog loadingBar = new ProgressDialog(this);
-        loadingBar.setMessage("Sending Email....");
-        loadingBar.setCanceledOnTouchOutside(false);
-        loadingBar.show();
+    private fun beginRecovery(email: String?) {
+        val loadingBar = ProgressDialog(this)
+        loadingBar.setMessage("Sending Email....")
+        loadingBar.setCanceledOnTouchOutside(false)
+        loadingBar.show()
 
-        FirebaseAuth.getInstance().sendPasswordResetEmail(email).addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                Toast.makeText(this, "Link sent on " + email, Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+        FirebaseAuth.getInstance().sendPasswordResetEmail(email!!)
+            .addOnCompleteListener { task: Task<Void?> ->
+                if (task.isSuccessful) {
+                    Toast.makeText(this, "Link sent on $email", Toast.LENGTH_SHORT).show()
+                } else {
+                    Toast.makeText(this, task.exception!!.message, Toast.LENGTH_SHORT).show()
+                }
+                loadingBar.dismiss()
             }
-            loadingBar.dismiss();
-        });
     }
 }
