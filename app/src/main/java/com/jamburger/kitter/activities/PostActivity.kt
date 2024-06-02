@@ -106,7 +106,7 @@ class PostActivity : AppCompatActivity() {
 
     @Throws(IOException::class)
     private fun createImageFile(): File {
-        val timeStamp = DateTimeFormatter.getCurrentTime()
+        val timeStamp = DateTimeFormatter.currentTime
         val imageFileName = "JPEG_" + timeStamp + "_"
         val storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES)
         val image = File.createTempFile(
@@ -159,7 +159,7 @@ class PostActivity : AppCompatActivity() {
             progressDialog.setTitle("Uploading...")
             progressDialog.show()
 
-            val postId = DateTimeFormatter.getCurrentTime()
+            val postId = DateTimeFormatter.currentTime
             val ref = storageReference!!.child("Posts/$postId")
 
             ref.putFile(filePath!!).addOnSuccessListener {
@@ -185,7 +185,7 @@ class PostActivity : AppCompatActivity() {
                 progressDialog.setMessage("Uploaded " + progress.toInt() + "%")
             }
         } else {
-            val postId = DateTimeFormatter.getCurrentTime()
+            val postId = DateTimeFormatter.currentTime
             val post = Post(user!!.uid, postId, "", "")
             post.kitt = caption!!.text.toString()
             val postRef = db!!.collection("Posts").document(postId)

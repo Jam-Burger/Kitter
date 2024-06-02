@@ -135,6 +135,6 @@ class ProfileFragment : Fragment() {
     }
 
     private fun readPosts() {
-        profilePageManager.readPosts(userReference)
+        userReference?.let { profilePageManager.readPosts(it) }
     }
 }

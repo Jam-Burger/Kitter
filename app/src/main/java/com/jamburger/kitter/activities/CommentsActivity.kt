@@ -58,7 +58,7 @@ class CommentsActivity : AppCompatActivity() {
                 FirebaseAuth.getInstance().uid!!
             )
 
-            val commentId = DateTimeFormatter.getCurrentTime()
+            val commentId = DateTimeFormatter.currentTime
             val comment = Comment(userReference.id, commentString, commentId)
 
             KeyboardManager.closeKeyboard(this)

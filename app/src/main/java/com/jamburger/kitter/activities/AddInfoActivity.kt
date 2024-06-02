@@ -64,8 +64,7 @@ class AddInfoActivity : AppCompatActivity() {
             ).commit()
             current = Fragments.DETAILS
         } else if (current == Fragments.DETAILS) {
-            if (profileImageUri != null) updateDataWithImage()
-            else updateData()
+            updateDataWithImage()
         }
     }
 

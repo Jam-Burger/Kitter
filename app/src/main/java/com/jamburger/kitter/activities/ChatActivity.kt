@@ -66,7 +66,7 @@ class ChatActivity : AppCompatActivity() {
         sendButton.setOnClickListener {
             val messageString = message.getText().toString()
             if (messageString.isNotEmpty()) {
-                val messageId = DateTimeFormatter.getCurrentTime()
+                val messageId = DateTimeFormatter.currentTime
                 message.setText("")
                 val newMessage = Message(messageId, messageString, myUID)
                 chatReference.child(messageId).setValue(newMessage)
@@ -89,7 +89,7 @@ class ChatActivity : AppCompatActivity() {
 
                     if (lastMessage == null) {
                         val today =
-                            DateTimeFormatter.getDateMonth(DateTimeFormatter.getCurrentTime())
+                            DateTimeFormatter.getDateMonth(DateTimeFormatter.currentTime)
                         if (nextDateMonth == today) nextDateMonth = "Today"
                         val timestamp = Message("@", nextDateMonth, "")
                         messageAdapter.addMessage(timestamp)
@@ -97,7 +97,7 @@ class ChatActivity : AppCompatActivity() {
                         val lastDateMonth = DateTimeFormatter.getDateMonth(lastMessage.messageId)
                         if (lastDateMonth != nextDateMonth) {
                             val today =
-                                DateTimeFormatter.getDateMonth(DateTimeFormatter.getCurrentTime())
+                                DateTimeFormatter.getDateMonth(DateTimeFormatter.currentTime)
                             if (nextDateMonth == today) nextDateMonth = "Today"
                             val timestamp = Message("@", nextDateMonth, "")
                             messageAdapter.addMessage(timestamp)

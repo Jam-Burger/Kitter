@@ -1,35 +1,29 @@
-package com.jamburger.kitter.utilities;
+package com.jamburger.kitter.utilities
 
-import static com.jamburger.kitter.utilities.Constants.TAG;
+import android.app.Application
+import android.util.Log
+import com.google.android.gms.tasks.Task
+import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 
-import android.app.Application;
-import android.util.Log;
+class ApplicationClass : Application() {
+    override fun onCreate() {
+        super.onCreate()
 
-import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
+        val firebaseRemoteConfig = FirebaseRemoteConfig.getInstance()
 
-import java.util.HashMap;
-import java.util.Map;
+        val remoteConfigDefaults: MutableMap<String, Any> = HashMap()
+        remoteConfigDefaults[ForceUpdateChecker.KEY_UPDATE_REQUIRED] = false
+        remoteConfigDefaults[ForceUpdateChecker.KEY_CURRENT_VERSION] = "4.4.0"
+        remoteConfigDefaults[ForceUpdateChecker.KEY_PROJECT_URL] =
+            "https://github.com/Jam-Burger/Kitter"
 
-public class ApplicationClass extends Application {
-    @Override
-    public void onCreate() {
-        super.onCreate();
-
-        final FirebaseRemoteConfig firebaseRemoteConfig = FirebaseRemoteConfig.getInstance();
-
-        Map<String, Object> remoteConfigDefaults = new HashMap<>();
-        remoteConfigDefaults.put(ForceUpdateChecker.KEY_UPDATE_REQUIRED, false);
-        remoteConfigDefaults.put(ForceUpdateChecker.KEY_CURRENT_VERSION, "4.4.0");
-        remoteConfigDefaults.put(ForceUpdateChecker.KEY_PROJECT_URL,
-                "https://github.com/Jam-Burger/Kitter");
-
-        firebaseRemoteConfig.setDefaultsAsync(remoteConfigDefaults);
+        firebaseRemoteConfig.setDefaultsAsync(remoteConfigDefaults)
         firebaseRemoteConfig.fetch(60) // fetch every minutes
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        Log.d(TAG, "remote config is fetched.");
-                        firebaseRemoteConfig.activate();
-                    }
-                });
+            .addOnCompleteListener { task: Task<Void?> ->
+                if (task.isSuccessful) {
+                    Log.d(Constants.TAG, "remote config is fetched.")
+                    firebaseRemoteConfig.activate()
+                }
+            }
     }
 }
