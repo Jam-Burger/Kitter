@@ -14,4 +14,3 @@ dependencyResolutionManagement {
 }
 rootProject.name = "Kitter"
 include ':app'
-include ':app:backend'

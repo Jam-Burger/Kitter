@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="CompilerConfiguration">
-    <bytecodeTargetLevel target="18" />
+    <bytecodeTargetLevel target="18">
+      <module name="Kitter.app.backend" target="9" />
+      <module name="Kitter.app.backend.main" target="9" />
+      <module name="Kitter.app.backend.test" target="9" />
+    </bytecodeTargetLevel>
   </component>
 </project>
