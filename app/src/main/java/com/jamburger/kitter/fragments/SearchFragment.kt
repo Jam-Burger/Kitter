@@ -1,91 +1,87 @@
-package com.jamburger.kitter.fragments;
+package com.jamburger.kitter.fragments
 
-import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.TextView
+import androidx.appcompat.widget.SearchView
+import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.QuerySnapshot
+import com.jamburger.kitter.R
+import com.jamburger.kitter.adapters.ProfileAdapter
+import com.jamburger.kitter.components.User
+import java.util.Locale
 
-import androidx.appcompat.widget.SearchView;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.RecyclerView;
+class SearchFragment : Fragment() {
+    private lateinit var searchbar: SearchView
+    private lateinit var recyclerViewProfiles: RecyclerView
+    private lateinit var messageText: TextView
+    private lateinit var profileAdapter: ProfileAdapter
+    private lateinit var profiles: MutableList<User?>
+    private lateinit var allProfiles: MutableList<User?>
 
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.jamburger.kitter.R;
-import com.jamburger.kitter.adapters.ProfileAdapter;
-import com.jamburger.kitter.components.User;
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        val view = inflater.inflate(R.layout.fragment_search, container, false)
+        recyclerViewProfiles = view.findViewById(R.id.recyclerview_profiles)
+        searchbar = view.findViewById(R.id.et_search)
+        messageText = view.findViewById(R.id.txt_message)
 
-import java.util.ArrayList;
-import java.util.List;
+        profiles = ArrayList()
+        allProfiles = ArrayList()
+        profileAdapter = ProfileAdapter(requireContext(), profiles, "PROFILE")
+        recyclerViewProfiles.setHasFixedSize(true)
+        recyclerViewProfiles.setAdapter(profileAdapter)
 
-public class SearchFragment extends Fragment {
-    SearchView searchbar;
-    RecyclerView recyclerViewProfiles;
-    TextView messageText;
-    ProfileAdapter profileAdapter;
-    List<User> profiles, allProfiles;
+        readProfiles()
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_search, container, false);
-        recyclerViewProfiles = view.findViewById(R.id.recyclerview_profiles);
-        searchbar = view.findViewById(R.id.et_search);
-        messageText = view.findViewById(R.id.txt_message);
-
-        profiles = new ArrayList<>();
-        allProfiles = new ArrayList<>();
-        profileAdapter = new ProfileAdapter(requireContext(), profiles, "PROFILE");
-        recyclerViewProfiles.setHasFixedSize(true);
-        recyclerViewProfiles.setAdapter(profileAdapter);
-
-        readProfiles();
-
-        searchbar.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                return false;
+        searchbar.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String): Boolean {
+                return false
             }
 
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                filter(newText);
-                return false;
+            override fun onQueryTextChange(newText: String): Boolean {
+                filter(newText)
+                return false
             }
-        });
-        return view;
+        })
+        return view
     }
 
-    private void filter(String text) {
-        profiles.clear();
-        messageText.setVisibility(View.GONE);
-        if (text.length() == 0) return;
-        for (User user : allProfiles) {
-            if (user.getName().toLowerCase().contains(text.toLowerCase()) || user.getUsername().toLowerCase().contains(text.toLowerCase())) {
-                profiles.add(user);
+    private fun filter(text: String) {
+        profiles.clear()
+        messageText.visibility = View.GONE
+        if (text.isEmpty()) return
+        for (user in allProfiles) {
+            if (user!!.name.lowercase(Locale.getDefault())
+                    .contains(text.lowercase(Locale.getDefault())) || user.username.lowercase(
+                    Locale.getDefault()
+                ).contains(text.lowercase(Locale.getDefault()))
+            ) {
+                profiles.add(user)
             }
         }
         if (profiles.isEmpty()) {
-            messageText.setVisibility(View.VISIBLE);
+            messageText.visibility = View.VISIBLE
         }
-        profileAdapter.filterList(profiles);
+        profileAdapter.filterList(profiles)
     }
 
-    private void readProfiles() {
-        CollectionReference userReference = FirebaseFirestore.getInstance().collection("Users");
-        userReference.get().addOnSuccessListener(usersSnapshots -> {
-            allProfiles.clear();
-            for (DocumentSnapshot userSnapshot : usersSnapshots) {
-                User user = userSnapshot.toObject(User.class);
-                allProfiles.add(user);
+    private fun readProfiles() {
+        val userReference = FirebaseFirestore.getInstance().collection("Users")
+        userReference.get().addOnSuccessListener { usersSnapshots: QuerySnapshot ->
+            allProfiles.clear()
+            for (userSnapshot in usersSnapshots) {
+                val user = userSnapshot.toObject(
+                    User::class.java
+                )
+                allProfiles.add(user)
             }
-        });
+        }
     }
 }

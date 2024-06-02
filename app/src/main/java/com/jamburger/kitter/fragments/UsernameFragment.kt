@@ -1,81 +1,70 @@
-package com.jamburger.kitter.fragments;
+package com.jamburger.kitter.fragments
 
-import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.EditText;
+import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.EditText
+import androidx.fragment.app.Fragment
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.QuerySnapshot
+import com.jamburger.kitter.R
+import com.jamburger.kitter.activities.AddInfoActivity
+import com.jamburger.kitter.components.User
 
-import androidx.fragment.app.Fragment;
+class UsernameFragment(var parent: AddInfoActivity) : Fragment() {
+    private lateinit var username: EditText
+    private lateinit var userNames: MutableList<String>
+    var valid: Boolean = false
 
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.jamburger.kitter.R;
-import com.jamburger.kitter.activities.AddInfoActivity;
-import com.jamburger.kitter.components.User;
-
-import java.util.ArrayList;
-import java.util.List;
-
-public class UsernameFragment extends Fragment {
-
-    EditText username;
-    AddInfoActivity parent;
-    List<String> userNames;
-    boolean valid;
-
-    public UsernameFragment(AddInfoActivity parent) {
-        this.parent = parent;
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_username, container, false);
-        username = view.findViewById(R.id.et_username);
-        parent.headerText.setText("Choose a username");
-        userNames = new ArrayList<>();
-        FirebaseFirestore.getInstance().collection("Users").get().addOnSuccessListener(userSnapshots -> {
-            for (DocumentSnapshot userSnapshot : userSnapshots) {
-                User user = userSnapshot.toObject(User.class);
-                userNames.add(user.getUsername());
-            }
-        });
-        parent.nextButton.setClickable(false);
-        username.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                valid = true;
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                parent.data.put("username", s.toString());
-                if (!s.toString().matches("^\\w+$") || s.length() < 3 || s.length() > 15) {
-                    valid = false;
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        val view = inflater.inflate(R.layout.fragment_username, container, false)
+        username = view.findViewById(R.id.et_username)
+        parent.headerText.text = "Choose a username"
+        userNames = ArrayList()
+        FirebaseFirestore.getInstance().collection("Users").get()
+            .addOnSuccessListener { userSnapshots: QuerySnapshot ->
+                for (userSnapshot in userSnapshots) {
+                    val user = userSnapshot.toObject(
+                        User::class.java
+                    )
+                    userNames.add(user.username)
                 }
-                for (String name : userNames) {
-                    if (name.equals(s.toString())) {
-                        valid = false;
-                        break;
+            }
+        parent.nextButton.isClickable = false
+        username.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
+                valid = true
+            }
+
+            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
+            }
+
+            override fun afterTextChanged(s: Editable) {
+                parent.data["username"] = s.toString()
+                if (!s.toString().matches("^\\w+$".toRegex()) || s.length < 3 || s.length > 15) {
+                    valid = false
+                }
+                for (name in userNames) {
+                    if (name == s.toString()) {
+                        valid = false
+                        break
                     }
                 }
                 if (!valid) {
-                    username.setTextColor(getResources().getColor(R.color.like));
-                    parent.nextButton.setClickable(false);
+                    username.setTextColor(resources.getColor(R.color.like))
+                    parent.nextButton.isClickable = false
                 } else {
-                    username.setTextColor(getResources().getColor(R.color.inverted));
-                    parent.nextButton.setClickable(true);
+                    username.setTextColor(resources.getColor(R.color.inverted))
+                    parent.nextButton.isClickable = true
                 }
             }
-        });
-        return view;
+        })
+        return view
     }
 }

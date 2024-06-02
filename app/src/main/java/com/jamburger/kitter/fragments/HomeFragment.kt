@@ -1,77 +1,91 @@
-package com.jamburger.kitter.fragments;
+package com.jamburger.kitter.fragments
 
-import android.content.Intent;
-import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
+import android.content.Intent
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
+import androidx.appcompat.widget.Toolbar
+import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.QuerySnapshot
+import com.jamburger.kitter.R
+import com.jamburger.kitter.activities.ChatHomeActivity
+import com.jamburger.kitter.activities.PostActivity
+import com.jamburger.kitter.adapters.PostAdapter
+import com.jamburger.kitter.components.Post
 
-import androidx.appcompat.widget.Toolbar;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.RecyclerView;
+class HomeFragment : Fragment() {
+    private lateinit var recyclerViewPosts: RecyclerView
+    private lateinit var postAdapter: PostAdapter
+    private lateinit var toolbar: Toolbar
 
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.firestore.CollectionReference;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.jamburger.kitter.R;
-import com.jamburger.kitter.activities.ChatHomeActivity;
-import com.jamburger.kitter.activities.PostActivity;
-import com.jamburger.kitter.adapters.PostAdapter;
-import com.jamburger.kitter.components.Post;
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        val view = inflater.inflate(R.layout.fragment_home, container, false)
+        recyclerViewPosts = view.findViewById(R.id.recyclerview_posts)
 
-public class HomeFragment extends Fragment {
-    RecyclerView recyclerViewPosts;
-    PostAdapter postAdapter;
-    Toolbar toolbar;
+        toolbar = view.findViewById(R.id.top_menu)
+        toolbar.setOnMenuItemClickListener { item: MenuItem ->
+            val intent: Intent
+            val itemId = item.itemId
+            when (itemId) {
+                R.id.nav_post_image -> {
+                    intent = Intent(requireActivity(), PostActivity::class.java)
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                    intent.putExtra("type", "picture")
+                    startActivity(intent)
+                }
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+                R.id.nav_post_text -> {
+                    intent = Intent(requireActivity(), PostActivity::class.java)
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                    intent.putExtra("type", "text")
+                    startActivity(intent)
+                }
 
-        View view = inflater.inflate(R.layout.fragment_home, container, false);
-        recyclerViewPosts = view.findViewById(R.id.recyclerview_posts);
-
-        toolbar = view.findViewById(R.id.top_menu);
-        toolbar.setOnMenuItemClickListener(item -> {
-            Intent intent;
-            int itemId = item.getItemId();
-            if (itemId == R.id.nav_post_image) {
-                intent = new Intent(requireActivity(), PostActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                intent.putExtra("type", "picture");
-                startActivity(intent);
-            } else if (itemId == R.id.nav_post_text) {
-                intent = new Intent(requireActivity(), PostActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                intent.putExtra("type", "text");
-                startActivity(intent);
-            } else if (itemId == R.id.nav_chat) {
-                intent = new Intent(requireActivity(), ChatHomeActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(intent);
+                R.id.nav_chat -> {
+                    intent = Intent(requireActivity(), ChatHomeActivity::class.java)
+                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                    startActivity(intent)
+                }
             }
-            return true;
-        });
+            true
+        }
 
-        postAdapter = new PostAdapter(requireContext());
-        recyclerViewPosts.setHasFixedSize(true);
-        recyclerViewPosts.setAdapter(postAdapter);
-        readPosts();
-        return view;
+        postAdapter = PostAdapter(requireContext())
+        recyclerViewPosts.setHasFixedSize(true)
+        recyclerViewPosts.setAdapter(postAdapter)
+        readPosts()
+        return view
     }
 
 
-    void readPosts() {
-        CollectionReference feedReference = FirebaseFirestore.getInstance().collection("Users").document(FirebaseAuth.getInstance().getUid()).collection("feed");
-        feedReference.get().addOnSuccessListener(feedSnapshots -> {
-            postAdapter.clearPosts();
-            for (DocumentSnapshot feedSnapshot : feedSnapshots) {
-                DocumentReference postReference = feedSnapshot.getDocumentReference("postReference");
-                boolean isVisited = Boolean.TRUE.equals(feedSnapshot.getBoolean("visited"));
-                assert postReference != null;
-                postReference.get().addOnSuccessListener(postSnapshot -> postAdapter.addPost(postSnapshot.toObject(Post.class)));
+    private fun readPosts() {
+        val feedReference = FirebaseFirestore.getInstance().collection("Users").document(
+            FirebaseAuth.getInstance().uid!!
+        ).collection("feed")
+        feedReference.get().addOnSuccessListener { feedSnapshots: QuerySnapshot ->
+            postAdapter.clearPosts()
+            for (feedSnapshot in feedSnapshots) {
+                val postReference = feedSnapshot.getDocumentReference("postReference")
+//                val isVisited = feedSnapshot.getBoolean("visited")
+                assert(postReference != null)
+                postReference!!.get().addOnSuccessListener { postSnapshot: DocumentSnapshot ->
+                    postAdapter.addPost(
+                        postSnapshot.toObject(
+                            Post::class.java
+                        )
+                    )
+                }
             }
-        });
+        }
     }
 }

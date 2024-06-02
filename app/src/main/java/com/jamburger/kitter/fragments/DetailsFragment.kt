@@ -1,66 +1,51 @@
-package com.jamburger.kitter.fragments;
+package com.jamburger.kitter.fragments
 
-import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.EditText;
+import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.EditText
+import androidx.fragment.app.Fragment
+import com.jamburger.kitter.R
+import com.jamburger.kitter.activities.AddInfoActivity
 
-import androidx.fragment.app.Fragment;
+class DetailsFragment(var parent: AddInfoActivity) : Fragment() {
+    private lateinit var name: EditText
+    private lateinit var bio: EditText
 
-import com.jamburger.kitter.R;
-import com.jamburger.kitter.activities.AddInfoActivity;
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        val view = inflater.inflate(R.layout.fragment_details, container, false)
+        name = view.findViewById(R.id.et_name)
+        bio = view.findViewById(R.id.et_bio)
+        parent.headerText.text = "Add details"
 
-public class DetailsFragment extends Fragment {
-    EditText name, bio;
-    AddInfoActivity parent;
-
-    public DetailsFragment(AddInfoActivity parent) {
-        this.parent = parent;
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_details, container, false);
-        name = view.findViewById(R.id.et_name);
-        bio = view.findViewById(R.id.et_bio);
-        parent.headerText.setText("Add details");
-
-        name.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
+        name.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
             }
 
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
+            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
             }
 
-            @Override
-            public void afterTextChanged(Editable s) {
-                parent.data.put("name", s.toString());
+            override fun afterTextChanged(s: Editable) {
+                parent.data["name"] = s.toString()
             }
-        });
-        bio.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
+        })
+        bio.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {
             }
 
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-
+            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
             }
 
-            @Override
-            public void afterTextChanged(Editable s) {
-                parent.data.put("bio", s.toString());
+            override fun afterTextChanged(s: Editable) {
+                parent.data["bio"] = s.toString()
             }
-        });
-        return view;
+        })
+        return view
     }
 }
