@@ -16,6 +16,8 @@ import com.jamburger.kitter.adapters.MyPictureAdapter;
 import com.jamburger.kitter.components.Post;
 import com.jamburger.kitter.components.User;
 
+import java.util.Objects;
+
 public class ProfilePageManager {
     public TextView noOfFollowers;
     public ImageView backgroundImage;
@@ -87,14 +89,14 @@ public class ProfilePageManager {
             assert user != null;
             myPictureAdapter.clearPosts();
             myKittAdapter.clearPosts();
-            for (DocumentReference postReference : user.getPosts()) {
+            for (DocumentReference postReference : Objects.requireNonNull(user.getPosts())) {
                 postReference.get().addOnSuccessListener(postSnapshot -> {
                     Post post = postSnapshot.toObject(Post.class);
                     assert post != null;
-                    if (!post.getImageUrl().isEmpty()) {
+                    if (!Objects.requireNonNull(post.getImageUrl()).isEmpty()) {
                         myPictureAdapter.addPost(postReference);
                     }
-                    if (!post.getKitt().isEmpty()) {
+                    if (!Objects.requireNonNull(post.getKitt()).isEmpty()) {
                         myKittAdapter.addPost(postReference);
                     }
                 });
@@ -103,18 +105,18 @@ public class ProfilePageManager {
     }
 
     public void fillUserData(User user) {
-        String txt_username = "@" + user.getUsername();
+        String txt_username = "@" + user.username;
 
         username.setText(txt_username);
-        name.setText(user.getName());
-        bio.setText(user.getBio());
+        name.setText(user.name);
+        bio.setText(user.bio);
 
-        noOfPosts.setText(String.valueOf(user.getPosts().size()));
-        noOfFollowers.setText(String.valueOf(user.getFollowers().size()));
-        noOfFollowing.setText(String.valueOf(user.getFollowing().size()));
+        noOfPosts.setText(String.valueOf(user.posts.size()));
+        noOfFollowers.setText(String.valueOf(user.followers.size()));
+        noOfFollowing.setText(String.valueOf(user.following.size()));
 
-        Glide.with(context).load(user.getProfileImageUrl()).into(profileImage);
-        Glide.with(context).load(user.getBackgroundImageUrl()).into(backgroundImage);
+        Glide.with(context).load(user.profileImageUrl).into(profileImage);
+        Glide.with(context).load(user.backgroundImageUrl).into(backgroundImage);
 
         view.setVisibility(View.VISIBLE);
     }

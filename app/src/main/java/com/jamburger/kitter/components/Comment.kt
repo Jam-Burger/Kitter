@@ -1,39 +1,14 @@
-package com.jamburger.kitter.components;
+package com.jamburger.kitter.components
 
-public class Comment {
-    String publisherId;
-    String text;
+class Comment {
+    lateinit var publisherId: String
+    lateinit var text: String
+    lateinit var commentId: String
 
-    String commentId;
-
-
-    public Comment() {
-
-    }
-
-    public Comment(String publisherId, String text, String commentId) {
-        this.publisherId = publisherId;
-        this.text = text;
-        this.commentId = commentId;
-    }
-
-    public String getText() {
-        return text;
-    }
-
-    public void setText(String text) {
-        this.text = text;
-    }
-
-    public String getPublisherId() {
-        return publisherId;
-    }
-
-    public void setPublisherId(String publisherId) {
-        this.publisherId = publisherId;
-    }
-
-    public String getCommentId() {
-        return commentId;
+    constructor()
+    constructor(publisherId: String, text: String, commentId: String) {
+        this.publisherId = publisherId
+        this.text = text
+        this.commentId = commentId
     }
 }

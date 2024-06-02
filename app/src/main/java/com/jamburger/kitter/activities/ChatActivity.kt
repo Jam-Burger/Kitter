@@ -22,24 +22,24 @@ import com.jamburger.kitter.components.User
 import com.jamburger.kitter.utilities.DateTimeFormatter
 
 class ChatActivity : AppCompatActivity() {
-    private var fellow: User? = null
-    private var myUID: String? = null
-    private var fellowUID: String? = null
+    private lateinit var fellow: User
+    private lateinit var myUID: String
+    private lateinit var fellowUID: String
     private lateinit var username: TextView
     private lateinit var message: EditText
     private lateinit var messageAdapter: MessageAdapter
     private lateinit var recyclerViewMessages: RecyclerView
-    private var chatReference: DatabaseReference? = null
+    private lateinit var chatReference: DatabaseReference
     private lateinit var profileImage: ImageView
     private lateinit var sendButton: ImageView
-    private var chatId: String? = null
+    private lateinit var chatId: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_chat)
 
-        myUID = FirebaseAuth.getInstance().uid
-        fellowUID = intent.getStringExtra("userid")
+        myUID = FirebaseAuth.getInstance().uid!!
+        fellowUID = intent.getStringExtra("userid")!!
 
         username = findViewById(R.id.txt_username)
         profileImage = findViewById(R.id.img_profile)
@@ -48,16 +48,15 @@ class ChatActivity : AppCompatActivity() {
         recyclerViewMessages = findViewById(R.id.recyclerview_messages)
 
         val users = FirebaseFirestore.getInstance().collection("Users")
-        users.document(fellowUID!!).get()
+        users.document(fellowUID).get()
             .addOnSuccessListener { documentSnapshot: DocumentSnapshot ->
                 fellow = documentSnapshot.toObject(
                     User::class.java
-                )
-                assert(fellow != null)
-                username.text = fellow!!.username
-                Glide.with(this).load(fellow!!.profileImageUrl).into(profileImage)
+                )!!
+                username.text = fellow.username
+                Glide.with(this).load(fellow.profileImageUrl).into(profileImage)
 
-                messageAdapter = MessageAdapter(this, fellow!!.profileImageUrl)
+                messageAdapter = MessageAdapter(this, fellow.profileImageUrl)
                 recyclerViewMessages.setHasFixedSize(true)
                 recyclerViewMessages.setAdapter(messageAdapter)
 
@@ -70,13 +69,13 @@ class ChatActivity : AppCompatActivity() {
                 val messageId = DateTimeFormatter.getCurrentTime()
                 message.setText("")
                 val newMessage = Message(messageId, messageString, myUID)
-                chatReference!!.child(messageId).setValue(newMessage)
+                chatReference.child(messageId).setValue(newMessage)
             }
         }
     }
 
     private fun readMessages() {
-        chatReference!!.addValueEventListener(object : ValueEventListener {
+        chatReference.addValueEventListener(object : ValueEventListener {
             override fun onDataChange(chatSnapshot: DataSnapshot) {
                 messageAdapter.clearMessages()
                 var lastMessage: Message? = null
@@ -123,8 +122,8 @@ class ChatActivity : AppCompatActivity() {
 
     private val chatData: Unit
         get() {
-            val less = myUID!! < fellowUID!!
+            val less = myUID < fellowUID
             chatId = if (less) "$myUID&$fellowUID" else "$fellowUID&$myUID"
-            chatReference = FirebaseDatabase.getInstance().reference.child("chats").child(chatId!!)
+            chatReference = FirebaseDatabase.getInstance().reference.child("chats").child(chatId)
         } // TODO: finish issue of close keyboard
 }

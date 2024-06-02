@@ -31,9 +31,9 @@ import com.jamburger.kitter.utilities.DateTimeFormatter
 import java.util.TreeSet
 
 class PostAdapter(private var mContext: Context) : RecyclerView.Adapter<PostAdapter.ViewHolder>() {
-    private var mPosts: TreeSet<Post>? = null
-    private var db: FirebaseFirestore? = null
-    private var userReference: DocumentReference? = null
+    private lateinit var mPosts: TreeSet<Post>
+    private lateinit var db: FirebaseFirestore
+    private lateinit var userReference: DocumentReference
     private var lastClickTime: Long = 0
 
     init {
@@ -43,27 +43,27 @@ class PostAdapter(private var mContext: Context) : RecyclerView.Adapter<PostAdap
     }
 
     fun addPost(post: Post) {
-        mPosts!!.add(post)
+        mPosts.add(post)
         notifyDataSetChanged()
     }
 
     fun clearPosts() {
-        mPosts!!.clear()
+        mPosts.clear()
         notifyDataSetChanged()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(mContext).inflate(R.layout.adapter_post, parent, false)
         db = FirebaseFirestore.getInstance()
-        userReference = db!!.collection("Users").document(FirebaseAuth.getInstance().uid!!)
+        userReference = db.collection("Users").document(FirebaseAuth.getInstance().uid!!)
         ViewHolder.userReference = userReference
         return ViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val post = mPosts!!.toTypedArray<Post>()[position]
+        val post = mPosts.toTypedArray<Post>()[position]
 
-        db!!.collection("Users").document(post.creator).get()
+        db.collection("Users").document(post.creator).get()
             .addOnSuccessListener { snapshot: DocumentSnapshot ->
                 val creator = snapshot.toObject(
                     User::class.java
@@ -142,7 +142,7 @@ class PostAdapter(private var mContext: Context) : RecyclerView.Adapter<PostAdap
 
 
     override fun getItemCount(): Int {
-        return mPosts!!.size
+        return mPosts.size
     }
 
     open class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -231,7 +231,7 @@ class PostAdapter(private var mContext: Context) : RecyclerView.Adapter<PostAdap
             val postReference = FirebaseFirestore.getInstance().collection("Posts").document(
                 post!!.postid
             )
-            userReference!!.get().addOnSuccessListener { documentSnapshot: DocumentSnapshot ->
+            userReference.get().addOnSuccessListener { documentSnapshot: DocumentSnapshot ->
                 val user = documentSnapshot.toObject(
                     User::class.java
                 )!!
@@ -245,15 +245,15 @@ class PostAdapter(private var mContext: Context) : RecyclerView.Adapter<PostAdap
                 post!!.postid
             )
             if (isSaved) {
-                userReference!!.update("saved", FieldValue.arrayUnion(postReference))
+                userReference.update("saved", FieldValue.arrayUnion(postReference))
             } else {
-                userReference!!.update("saved", FieldValue.arrayRemove(postReference))
+                userReference.update("saved", FieldValue.arrayRemove(postReference))
             }
             update()
         }
 
         companion object {
-            var userReference: DocumentReference? = null
+            lateinit var userReference: DocumentReference
         }
     }
 

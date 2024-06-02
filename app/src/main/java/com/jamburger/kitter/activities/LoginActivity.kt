@@ -7,7 +7,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.text.InputType
 import android.util.Log
-import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.LinearLayout
@@ -63,29 +62,29 @@ class LoginActivity : AppCompatActivity() {
             googleSignInOptions
         )
 
-        loginButton.setOnClickListener(View.OnClickListener { view: View? ->
+        loginButton.setOnClickListener {
             val strEmail = email.getText().toString()
             val strPassword = password.getText().toString()
             login(strEmail, strPassword)
-        })
+        }
 
-        signupText.setOnClickListener(View.OnClickListener { view: View? ->
+        signupText.setOnClickListener {
             startActivity(
                 Intent(
                     this@LoginActivity, SignupEmailActivity::class.java
                 )
             )
-        })
-        googleButton.setOnClickListener(View.OnClickListener { view: View? ->
+        }
+        googleButton.setOnClickListener {
             val intent = googleSignInClient.signInIntent
             startActivityForResult(intent, 100)
-        })
-        forgetPasswordButton.setOnClickListener(View.OnClickListener { view: View? ->
+        }
+        forgetPasswordButton.setOnClickListener {
             showRecoverPasswordDialog()
-        })
+        }
     }
 
-    fun login(strEmail: String, strPassword: String) {
+    private fun login(strEmail: String, strPassword: String) {
         if (strEmail.isEmpty() || strPassword.isEmpty()) {
             Toast.makeText(this, "Enter all fields", Toast.LENGTH_SHORT).show()
             return
@@ -118,11 +117,11 @@ class LoginActivity : AppCompatActivity() {
                 )
                 if (user == null) {
                     user = User(
-                        auth!!.uid,
+                        auth!!.uid!!,
                         "",
                         "",
                         auth!!.currentUser!!
-                            .email,
+                            .email!!,
                         resources.getString(R.string.default_profile_img_url),
                         resources.getString(R.string.default_background_img_url)
                     )
@@ -152,7 +151,7 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-    fun showRecoverPasswordDialog() {
+    private fun showRecoverPasswordDialog() {
         val builder = AlertDialog.Builder(this)
         builder.setTitle("Recover Password")
         val linearLayout = LinearLayout(this)
@@ -166,12 +165,12 @@ class LoginActivity : AppCompatActivity() {
         linearLayout.setPadding(30, 20, 30, 10)
         builder.setView(linearLayout)
 
-        builder.setPositiveButton("Recover") { dialog: DialogInterface?, which: Int ->
+        builder.setPositiveButton("Recover") { _: DialogInterface?, _: Int ->
             val email = emailEt.text.toString().trim { it <= ' ' }
-            if (!email.isEmpty()) beginRecovery(email)
+            if (email.isNotEmpty()) beginRecovery(email)
         }
 
-        builder.setNegativeButton("Cancel") { dialog: DialogInterface, which: Int -> dialog.dismiss() }
+        builder.setNegativeButton("Cancel") { dialog: DialogInterface, _: Int -> dialog.dismiss() }
         builder.create().show()
     }
 
@@ -192,6 +191,7 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
+    @Deprecated("Deprecated in Java")
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == 100) {
