@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FieldValue
@@ -13,6 +12,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.toObject
 import com.jamburger.kitter.R
 import com.jamburger.kitter.components.User
+import com.jamburger.kitter.services.AuthService
 import com.jamburger.kitter.utilities.ProfilePageManager
 
 class OtherProfileActivity : AppCompatActivity() {
@@ -30,7 +30,7 @@ class OtherProfileActivity : AppCompatActivity() {
         val userid = intent.getStringExtra("userid")
         userReference = FirebaseFirestore.getInstance().collection("Users").document(userid!!)
         myReference = FirebaseFirestore.getInstance().collection("Users")
-            .document(FirebaseAuth.getInstance().uid!!)
+            .document(AuthService.auth.uid!!)
 
         profilePageManager = ProfilePageManager(this.window.decorView)
 

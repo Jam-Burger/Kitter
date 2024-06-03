@@ -58,7 +58,7 @@
             android:name=".activities.MainActivity"
             android:exported="false" />
         <activity
-            android:name=".activities.SignupEmailActivity"
+            android:name=".activities.SignupActivity"
             android:exported="false" />
         <activity
             android:name=".activities.LoginActivity"

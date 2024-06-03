@@ -6,26 +6,23 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.text.InputType
-import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInClient
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.android.gms.common.api.ApiException
+import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.tasks.Task
-import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.GoogleAuthProvider
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.toObject
 import com.jamburger.kitter.R
 import com.jamburger.kitter.components.User
+import com.jamburger.kitter.services.AuthService
+import kotlinx.coroutines.launch
 
 class LoginActivity : AppCompatActivity() {
     private lateinit var email: EditText
@@ -34,8 +31,7 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var googleButton: Button
     private lateinit var forgetPasswordButton: Button
     private lateinit var signupText: TextView
-    private var auth: FirebaseAuth? = null
-    private lateinit var googleSignInClient: GoogleSignInClient
+    private lateinit var auth: FirebaseAuth
     private lateinit var usersReference: CollectionReference
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,85 +45,87 @@ class LoginActivity : AppCompatActivity() {
         forgetPasswordButton = findViewById(R.id.btn_forget_password)
         signupText = findViewById(R.id.txt_signup)
 
-        auth = FirebaseAuth.getInstance()
-        usersReference = FirebaseFirestore.getInstance().collection("Users")
-        val googleSignInOptions = GoogleSignInOptions.Builder(
-            GoogleSignInOptions.DEFAULT_SIGN_IN
-        ).requestIdToken(getString(R.string.default_web_client_id))
-            .requestEmail()
-            .build()
+        auth = AuthService.auth
 
-        googleSignInClient = GoogleSignIn.getClient(
-            this@LoginActivity,
-            googleSignInOptions
-        )
+        usersReference = FirebaseFirestore.getInstance().collection("Users")
 
         loginButton.setOnClickListener {
             val strEmail = email.getText().toString()
             val strPassword = password.getText().toString()
-            login(strEmail, strPassword)
+
+            lifecycleScope.launch {
+                loginWithEmailAndPassword(strEmail, strPassword)
+            }
         }
 
         signupText.setOnClickListener {
             startActivity(
                 Intent(
-                    this@LoginActivity, SignupEmailActivity::class.java
+                    this@LoginActivity, SignupActivity::class.java
                 )
             )
         }
         googleButton.setOnClickListener {
-            val intent = googleSignInClient.signInIntent
-            startActivityForResult(intent, 100)
+            lifecycleScope.launch {
+                try {
+                    AuthService.signInWithGoogle(this@LoginActivity)
+                    doValidUserShit()
+                } catch (e: Exception) {
+                    Toast.makeText(
+                        this@LoginActivity, e.message, Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
         }
+
         forgetPasswordButton.setOnClickListener {
-            showRecoverPasswordDialog()
+            showForgotPasswordDialog()
         }
     }
 
-    private fun login(strEmail: String, strPassword: String) {
+    private suspend fun loginWithEmailAndPassword(strEmail: String, strPassword: String) {
         if (strEmail.isEmpty() || strPassword.isEmpty()) {
             Toast.makeText(this, "Enter all fields", Toast.LENGTH_SHORT).show()
             return
         }
-        auth!!.signInWithEmailAndPassword(strEmail, strPassword)
-            .addOnCompleteListener { task: Task<AuthResult?> ->
-                if (task.isSuccessful) {
-                    if (auth!!.currentUser!!.isEmailVerified) {
-                        doValidUserShit()
-                    } else {
-                        Toast.makeText(
-                            this, "Verify your email first\nLink sent to " + auth!!.currentUser!!
-                                .email, Toast.LENGTH_SHORT
-                        ).show()
-                        auth!!.currentUser!!.sendEmailVerification()
-                    }
-                } else {
-                    Toast.makeText(this, task.exception!!.message, Toast.LENGTH_SHORT).show()
-                }
+        try {
+            AuthService.signInWithEmailAndPassword(strEmail, strPassword)
+            if (auth.currentUser?.isEmailVerified == true) {
+                doValidUserShit()
+            } else {
+                AuthService.sendEmailVerification()
+                Toast.makeText(
+                    this,
+                    "Verify your email first\nLink sent to $strEmail",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
+        } catch (e: Exception) {
+            Toast.makeText(
+                this, e.message, Toast.LENGTH_SHORT
+            ).show()
+        }
     }
 
     private fun doValidUserShit() {
-        val userReference = FirebaseFirestore.getInstance().document("Users/" + auth!!.uid)
+        val userReference = FirebaseFirestore.getInstance().document("Users/" + auth.uid)
 
-        userReference.get().addOnCompleteListener { task0: Task<DocumentSnapshot> ->
-            if (task0.isSuccessful) {
-                var user = task0.result.toObject(
-                    User::class.java
-                )
+        userReference.get().addOnCompleteListener { documentTask: Task<DocumentSnapshot> ->
+            if (documentTask.isSuccessful) {
+                var user = documentTask.result.toObject<User>()
                 if (user == null) {
+                    // first time on app
                     user = User(
-                        auth!!.uid!!,
+                        auth.uid!!,
                         "",
                         "",
-                        auth!!.currentUser!!
-                            .email!!,
+                        auth.currentUser?.email!!,
                         resources.getString(R.string.default_profile_img_url),
                         resources.getString(R.string.default_background_img_url)
                     )
                     userReference.set(user).addOnCompleteListener { task1: Task<Void?> ->
                         if (task1.isSuccessful) {
-                            Toast.makeText(this@LoginActivity, auth!!.uid, Toast.LENGTH_SHORT)
+                            Toast.makeText(this@LoginActivity, auth.uid, Toast.LENGTH_SHORT)
                                 .show()
                         } else {
                             Toast.makeText(
@@ -140,18 +138,20 @@ class LoginActivity : AppCompatActivity() {
                     startAddInfoActivity()
                 } else {
                     if (user.username.isEmpty()) {
+                        // not first time but use is not initialized
                         startAddInfoActivity()
                     } else {
+                        // regular scenario
                         startMainActivity()
                     }
                 }
             } else {
-                Toast.makeText(this, task0.exception!!.message, Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, documentTask.exception?.message, Toast.LENGTH_SHORT).show()
             }
         }
     }
 
-    private fun showRecoverPasswordDialog() {
+    private fun showForgotPasswordDialog() {
         val builder = AlertDialog.Builder(this)
         builder.setTitle("Recover Password")
         val linearLayout = LinearLayout(this)
@@ -167,69 +167,23 @@ class LoginActivity : AppCompatActivity() {
 
         builder.setPositiveButton("Recover") { _: DialogInterface?, _: Int ->
             val email = emailEt.text.toString().trim { it <= ' ' }
-            if (email.isNotEmpty()) beginRecovery(email)
+
+            lifecycleScope.launch {
+                if (email.isNotEmpty()) beginRecovery(email)
+            }
         }
 
         builder.setNegativeButton("Cancel") { dialog: DialogInterface, _: Int -> dialog.dismiss() }
         builder.create().show()
     }
 
-    private fun beginRecovery(email: String) {
+    private suspend fun beginRecovery(email: String) {
         val loadingBar = ProgressDialog(this)
         loadingBar.setMessage("Sending Email....")
         loadingBar.setCanceledOnTouchOutside(false)
         loadingBar.show()
 
-        auth!!.sendPasswordResetEmail(email).addOnCompleteListener { task: Task<Void?> ->
-            loadingBar.dismiss()
-            if (task.isSuccessful) {
-                Toast.makeText(this@LoginActivity, "Recovery email sent", Toast.LENGTH_SHORT).show()
-            } else {
-                Toast.makeText(this@LoginActivity, task.exception!!.message, Toast.LENGTH_SHORT)
-                    .show()
-            }
-        }
-    }
-
-    @Deprecated("Deprecated in Java")
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == 100) {
-            val signInAccountTask = GoogleSignIn
-                .getSignedInAccountFromIntent(data)
-
-            if (signInAccountTask.isSuccessful) {
-                Toast.makeText(this, "Google sign in successful", Toast.LENGTH_SHORT).show()
-                try {
-                    val googleSignInAccount = signInAccountTask
-                        .getResult(ApiException::class.java)
-                    if (googleSignInAccount != null) {
-                        val authCredential = GoogleAuthProvider
-                            .getCredential(
-                                googleSignInAccount.idToken,
-                                null
-                            )
-                        auth!!.signInWithCredential(authCredential)
-                            .addOnCompleteListener(this) { task: Task<AuthResult?> ->
-                                if (task.isSuccessful) {
-                                    doValidUserShit()
-                                } else {
-                                    Toast.makeText(
-                                        this, "Authentication Failed :" +
-                                                task.exception!!.message, Toast.LENGTH_SHORT
-                                    ).show()
-                                }
-                            }
-                    }
-                } catch (e: ApiException) {
-                    Log.e("ApiException", e.message!!)
-                    e.printStackTrace()
-                }
-            } else {
-                Log.e("signInAccountTask", signInAccountTask.exception!!.message!!)
-                signInAccountTask.exception!!.printStackTrace()
-            }
-        }
+        AuthService.sendPasswordResetEmail(email)
     }
 
     private fun startAddInfoActivity() {

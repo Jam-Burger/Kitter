@@ -9,7 +9,6 @@ import android.view.ViewGroup
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
@@ -19,6 +18,7 @@ import com.jamburger.kitter.activities.ChatHomeActivity
 import com.jamburger.kitter.activities.PostActivity
 import com.jamburger.kitter.adapters.PostAdapter
 import com.jamburger.kitter.components.Post
+import com.jamburger.kitter.services.AuthService
 
 class HomeFragment : Fragment() {
     private lateinit var recyclerViewPosts: RecyclerView
@@ -71,7 +71,7 @@ class HomeFragment : Fragment() {
 
     private fun readPosts() {
         val feedReference = FirebaseFirestore.getInstance().collection("Users").document(
-            FirebaseAuth.getInstance().uid!!
+            AuthService.auth.uid!!
         ).collection("feed")
         feedReference.get().addOnSuccessListener { feedSnapshots: QuerySnapshot ->
             postAdapter.clearPosts()

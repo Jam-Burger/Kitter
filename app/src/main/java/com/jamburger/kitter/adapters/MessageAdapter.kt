@@ -8,14 +8,14 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.google.firebase.auth.FirebaseAuth
 import com.jamburger.kitter.R
 import com.jamburger.kitter.components.Message
+import com.jamburger.kitter.services.AuthService
 import com.jamburger.kitter.utilities.DateTimeFormatter
 
 class MessageAdapter(private var mContext: Context, private var fellowProfileImageUrl: String) :
     RecyclerView.Adapter<MessageAdapter.ViewHolder>() {
-    private var myUID: String? = FirebaseAuth.getInstance().uid
+    private var myUID: String? = AuthService.auth.uid
     private var messages: MutableList<Message> = ArrayList()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {

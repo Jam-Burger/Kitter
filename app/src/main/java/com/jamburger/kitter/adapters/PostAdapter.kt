@@ -13,7 +13,6 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.airbnb.lottie.LottieAnimationView
 import com.bumptech.glide.Glide
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
@@ -28,6 +27,7 @@ import com.jamburger.kitter.activities.CommentsActivity
 import com.jamburger.kitter.activities.OtherProfileActivity
 import com.jamburger.kitter.components.Post
 import com.jamburger.kitter.components.User
+import com.jamburger.kitter.services.AuthService
 import com.jamburger.kitter.utilities.DateTimeFormatter
 import java.util.TreeSet
 
@@ -56,7 +56,7 @@ class PostAdapter(private var mContext: Context) : RecyclerView.Adapter<PostAdap
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(mContext).inflate(R.layout.adapter_post, parent, false)
         db = FirebaseFirestore.getInstance()
-        userReference = db.collection("Users").document(FirebaseAuth.getInstance().uid!!)
+        userReference = db.collection("Users").document(AuthService.auth.uid!!)
         ViewHolder.userReference = userReference
         return ViewHolder(view)
     }

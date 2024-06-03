@@ -18,7 +18,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import com.bumptech.glide.Glide
 import com.google.android.material.textfield.TextInputLayout
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
@@ -32,6 +31,7 @@ import com.jamburger.kitter.R
 import com.jamburger.kitter.components.Post
 import com.jamburger.kitter.components.User
 import com.jamburger.kitter.fragments.SelectSourceDialogFragment
+import com.jamburger.kitter.services.AuthService
 import com.jamburger.kitter.utilities.DateTimeFormatter
 import java.io.File
 import java.io.IOException
@@ -77,7 +77,7 @@ class PostActivity : AppCompatActivity() {
         val closeButton = findViewById<ImageView>(R.id.btn_close)
         val postButton = findViewById<ImageView>(R.id.btn_post)
 
-        user = FirebaseAuth.getInstance().currentUser
+        user = AuthService.auth.currentUser
         storageReference = FirebaseStorage.getInstance().reference
         db = FirebaseFirestore.getInstance()
 

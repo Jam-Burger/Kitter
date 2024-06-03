@@ -5,12 +5,12 @@ import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.jamburger.kitter.R
 import com.jamburger.kitter.fragments.HomeFragment
 import com.jamburger.kitter.fragments.ProfileFragment
 import com.jamburger.kitter.fragments.SearchFragment
+import com.jamburger.kitter.services.AuthService
 
 class MainActivity : AppCompatActivity() {
     private lateinit var bottomNavigationView: BottomNavigationView
@@ -25,7 +25,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         bottomNavigationView = findViewById(R.id.bottom_navigation)
 
-        user = FirebaseAuth.getInstance().currentUser
+        user = AuthService.auth.currentUser
 
         homeFragment = HomeFragment()
         searchFragment = SearchFragment()

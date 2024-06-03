@@ -7,7 +7,6 @@ import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.tasks.Task
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
@@ -16,6 +15,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.jamburger.kitter.R
 import com.jamburger.kitter.adapters.CommentAdapter
 import com.jamburger.kitter.components.Comment
+import com.jamburger.kitter.services.AuthService
 import com.jamburger.kitter.utilities.DateTimeFormatter
 import com.jamburger.kitter.utilities.KeyboardManager
 
@@ -56,7 +56,7 @@ class CommentsActivity : AppCompatActivity() {
             val commentString = commentText.getText().toString()
             if (commentString.isEmpty()) return@setOnClickListener
             val userReference = FirebaseFirestore.getInstance().collection("Users").document(
-                FirebaseAuth.getInstance().uid!!
+                AuthService.auth.uid!!
             )
 
             val commentId = DateTimeFormatter.currentTime

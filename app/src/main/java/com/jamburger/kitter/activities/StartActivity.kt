@@ -5,7 +5,6 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
-import android.view.View
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.widget.ImageView
@@ -14,23 +13,20 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
-import com.google.android.gms.auth.api.signin.GoogleSignIn
-import com.google.android.gms.auth.api.signin.GoogleSignInClient
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.tasks.Task
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.toObject
 import com.jamburger.kitter.R
 import com.jamburger.kitter.components.User
-import com.jamburger.kitter.utilities.Constants
+import com.jamburger.kitter.services.AuthService
 import com.jamburger.kitter.utilities.ForceUpdateChecker
 import com.jamburger.kitter.utilities.ForceUpdateChecker.OnUpdateNeededListener
 import com.jamburger.kitter.utilities.PermissionManager
+import kotlinx.coroutines.launch
 
 class StartActivity : AppCompatActivity(), OnUpdateNeededListener {
-    private var gsc: GoogleSignInClient? = null
     private var logo: ImageView? = null
     private var appName: TextView? = null
 
@@ -42,10 +38,6 @@ class StartActivity : AppCompatActivity(), OnUpdateNeededListener {
 
         logo = findViewById(R.id.img_logo)
         appName = findViewById(R.id.txt_appname)
-
-        val decorView = window.decorView
-        val uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN
-        decorView.systemUiVisibility = uiOptions
 
         val sharedPreferences = getSharedPreferences("sharedPrefs", MODE_PRIVATE)
         val isDarkModeOn = sharedPreferences.getBoolean("isDarkModeOn", true)
@@ -75,9 +67,7 @@ class StartActivity : AppCompatActivity(), OnUpdateNeededListener {
                     ForceUpdateChecker.with(this@StartActivity).onUpdateNeeded(this@StartActivity)
                         .check()
                 if (required) return
-                gsc =
-                    GoogleSignIn.getClient(this@StartActivity, GoogleSignInOptions.DEFAULT_SIGN_IN)
-                val auth = FirebaseAuth.getInstance()
+                val auth = AuthService.auth
                 if (auth.currentUser == null || !auth.currentUser!!.isEmailVerified) {
                     val intent = Intent(this@StartActivity, LoginActivity::class.java)
                     intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
@@ -110,19 +100,20 @@ class StartActivity : AppCompatActivity(), OnUpdateNeededListener {
                                 finish()
                             } else {
                                 Log.e("signin", task.exception!!.message!!)
-                                FirebaseAuth.getInstance().signOut()
-                                gsc!!.signOut()
+                                lifecycleScope.launch {
+                                    AuthService.signOut(this@StartActivity)
+                                }
                             }
                         }
                     } catch (e: Exception) {
-                        Log.d(Constants.TAG, "onAnimationEnd: $e")
-                        Toast.makeText(
-                            this@StartActivity,
-                            "something's wrong again",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                        FirebaseAuth.getInstance().signOut()
-                        gsc!!.signOut()
+                        lifecycleScope.launch {
+                            Toast.makeText(
+                                this@StartActivity,
+                                "something's wrong again",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            AuthService.signOut(this@StartActivity)
+                        }
                     }
                 }
             }

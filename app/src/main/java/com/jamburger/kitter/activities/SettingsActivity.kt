@@ -14,18 +14,20 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
+import androidx.lifecycle.lifecycleScope
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.tasks.Task
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.toObject
 import com.jamburger.kitter.R
 import com.jamburger.kitter.components.User
+import com.jamburger.kitter.services.AuthService
 import com.jamburger.kitter.utilities.Constants
+import kotlinx.coroutines.launch
 
 class SettingsActivity : AppCompatActivity() {
     private lateinit var settingsList: ViewGroup
@@ -40,7 +42,7 @@ class SettingsActivity : AppCompatActivity() {
 
         googleSignInClient = GoogleSignIn.getClient(this, GoogleSignInOptions.DEFAULT_SIGN_IN)
         userReference = FirebaseFirestore.getInstance().collection("Users")
-            .document(FirebaseAuth.getInstance().uid!!)
+            .document(AuthService.auth.uid!!)
 
         settingsList = findViewById(R.id.settings_list)
 
@@ -95,38 +97,55 @@ class SettingsActivity : AppCompatActivity() {
 
             option.setOnClickListener {
                 val optionId = option.id
-                if (optionId == R.id.setting_edit_info) {
-                    startActivity(Intent(this, EditInfoActivity::class.java))
-                } else if (optionId == R.id.setting_change_password) {
-                    showRecoverPasswordDialog()
-                } else if (optionId == R.id.setting_block_accounts) {
-                    // Do nothing for now
-                } else if (optionId == R.id.setting_theme) {
-                    val intentMine = Intent(this, SettingsActivity::class.java)
-                    intentMine.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION)
-                    finish()
-                    startActivity(intentMine)
-                    if (isDarkModeOn) {
-                        editor.putBoolean("isDarkModeOn", false).apply()
-                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-                    } else {
-                        editor.putBoolean("isDarkModeOn", true).apply()
-                        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+                when (optionId) {
+                    R.id.setting_edit_info -> {
+                        startActivity(Intent(this, EditInfoActivity::class.java))
                     }
-                } else if (optionId == R.id.setting_add_account) {
-                    // Do nothing for now
-                } else if (optionId == R.id.setting_logout) {
-                    googleSignInClient.signOut().addOnCompleteListener { task: Task<Void?> ->
-                        if (task.isSuccessful) {
-                            FirebaseAuth.getInstance().signOut()
-                            val intentLogin = Intent(this, LoginActivity::class.java)
-                            intentLogin.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                            startActivity(intentLogin)
-                            finish()
+
+                    R.id.setting_change_password -> {
+                        showRecoverPasswordDialog()
+                    }
+
+                    R.id.setting_block_accounts -> {
+                        // Do nothing for now
+                    }
+
+                    R.id.setting_theme -> {
+                        val intentMine = Intent(this, SettingsActivity::class.java)
+                        intentMine.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION)
+                        finish()
+                        startActivity(intentMine)
+                        if (isDarkModeOn) {
+                            editor.putBoolean("isDarkModeOn", false).apply()
+                            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+                        } else {
+                            editor.putBoolean("isDarkModeOn", true).apply()
+                            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
                         }
                     }
-                } else {
-                    Log.i(Constants.TAG, "nothing selected")
+
+                    R.id.setting_add_account -> {
+                        // Do nothing for now
+                    }
+
+                    R.id.setting_logout -> {
+                        lifecycleScope.launch {
+                            try {
+                                AuthService.signOut(this@SettingsActivity)
+                                val intentLogin =
+                                    Intent(this@SettingsActivity, LoginActivity::class.java)
+                                intentLogin.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                                finish()
+                                startActivity(intentLogin)
+                            } catch (e: Exception) {
+                                Log.e(Constants.TAG, e.message.toString())
+                            }
+                        }
+                    }
+
+                    else -> {
+                        Log.i(Constants.TAG, "nothing selected")
+                    }
                 }
             }
         }
@@ -135,7 +154,7 @@ class SettingsActivity : AppCompatActivity() {
     private fun showRecoverPasswordDialog() {
         val builder = AlertDialog.Builder(this)
         builder.setTitle("Change Password")
-        val email = FirebaseAuth.getInstance().currentUser!!.email
+        val email = AuthService.auth.currentUser!!.email
 
         val linearLayout = LinearLayout(this)
         val emailEt = TextView(this)
@@ -160,7 +179,7 @@ class SettingsActivity : AppCompatActivity() {
         loadingBar.setCanceledOnTouchOutside(false)
         loadingBar.show()
 
-        FirebaseAuth.getInstance().sendPasswordResetEmail(email!!)
+        AuthService.auth.sendPasswordResetEmail(email!!)
             .addOnCompleteListener { task: Task<Void?> ->
                 if (task.isSuccessful) {
                     Toast.makeText(this, "Link sent on $email", Toast.LENGTH_SHORT).show()

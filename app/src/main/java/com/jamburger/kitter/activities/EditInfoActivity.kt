@@ -15,7 +15,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import com.bumptech.glide.Glide
 import com.google.android.gms.tasks.Task
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
@@ -26,6 +25,7 @@ import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.UploadTask
 import com.jamburger.kitter.R
 import com.jamburger.kitter.components.User
+import com.jamburger.kitter.services.AuthService
 
 class EditInfoActivity : AppCompatActivity() {
     private var user: User? = null
@@ -118,7 +118,7 @@ class EditInfoActivity : AppCompatActivity() {
     private fun updateData() {
         val request = UserProfileChangeRequest.Builder().setDisplayName(data["name"].toString())
             .setPhotoUri(profileImageUri).build()
-        FirebaseAuth.getInstance().currentUser!!.updateProfile(request)
+        AuthService.auth.currentUser!!.updateProfile(request)
         userReference.update(data).addOnCompleteListener { task: Task<Void?> ->
             if (task.isSuccessful) {
                 val intentMain = Intent(this, MainActivity::class.java)
@@ -132,7 +132,7 @@ class EditInfoActivity : AppCompatActivity() {
 
     private fun fillUserData() {
         userReference = FirebaseFirestore.getInstance().collection("Users")
-            .document(FirebaseAuth.getInstance().uid!!)
+            .document(AuthService.auth.uid!!)
         userReference.get().addOnSuccessListener { snapshot: DocumentSnapshot ->
             user = snapshot.toObject<User>()
             username.setText(user!!.username)

@@ -6,18 +6,20 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.google.firebase.auth.AuthResult
+import androidx.lifecycle.lifecycleScope
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.jamburger.kitter.R
+import com.jamburger.kitter.services.AuthService
+import kotlinx.coroutines.launch
 
-class SignupEmailActivity : AppCompatActivity() {
+class SignupActivity : AppCompatActivity() {
     private lateinit var email: EditText
     private lateinit var password: EditText
     private lateinit var confirmPassword: EditText
     private lateinit var signupButton: Button
     private var db: FirebaseFirestore? = null
-    private var auth: FirebaseAuth? = null
+    private lateinit var auth: FirebaseAuth
     private var pd: ProgressDialog? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -31,14 +33,17 @@ class SignupEmailActivity : AppCompatActivity() {
 
         db = FirebaseFirestore.getInstance()
 
-        auth = FirebaseAuth.getInstance()
+        auth = AuthService.auth
+
         pd = ProgressDialog(this)
         signupButton.setOnClickListener {
             val strEmail = email.getText().toString()
             val strPassword = password.getText().toString()
             val strConfirmPassword = confirmPassword.getText().toString()
             if (validate(strEmail, strPassword, strConfirmPassword)) {
-                signupWithEmail(strEmail, strPassword)
+                lifecycleScope.launch {
+                    signupWithEmail(strEmail, strPassword)
+                }
             } else {
                 Toast.makeText(this, "Enter all details properly", Toast.LENGTH_SHORT).show()
             }
@@ -53,18 +58,20 @@ class SignupEmailActivity : AppCompatActivity() {
         return strEmail.isNotEmpty() && strPassword.isNotEmpty() && strPassword.length >= 6 && strPassword == strConfirmPassword
     }
 
-    private fun signupWithEmail(strEmail: String, strPassword: String) {
+    private suspend fun signupWithEmail(strEmail: String, strPassword: String) {
         pd!!.setMessage("Please Wait")
         pd!!.show()
-        auth!!.createUserWithEmailAndPassword(strEmail, strPassword)
-            .addOnSuccessListener { authResult: AuthResult ->
-                authResult.user!!.sendEmailVerification().addOnSuccessListener {
-                    Toast.makeText(
-                        this@SignupEmailActivity, "Verification mail sent to " + authResult.user!!
-                            .email, Toast.LENGTH_LONG
-                    ).show()
-                    finish()
-                }
-            }
+
+        try {
+            AuthService.signUpWithEmailAndPassword(strEmail, strPassword)
+            Toast.makeText(
+                this@SignupActivity,
+                "Verification mail sent to " + auth.currentUser?.email,
+                Toast.LENGTH_LONG
+            ).show()
+            finish()
+        } catch (e: Exception) {
+            Toast.makeText(this, e.message, Toast.LENGTH_SHORT).show()
+        }
     }
 }

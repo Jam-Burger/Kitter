@@ -7,7 +7,6 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
@@ -21,6 +20,7 @@ import com.jamburger.kitter.R
 import com.jamburger.kitter.adapters.MessageAdapter
 import com.jamburger.kitter.components.Message
 import com.jamburger.kitter.components.User
+import com.jamburger.kitter.services.AuthService
 import com.jamburger.kitter.utilities.DateTimeFormatter
 
 class ChatActivity : AppCompatActivity() {
@@ -40,7 +40,7 @@ class ChatActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_chat)
 
-        myUID = FirebaseAuth.getInstance().uid!!
+        myUID = AuthService.auth.uid!!
         fellowUID = intent.getStringExtra("userid")!!
 
         username = findViewById(R.id.txt_username)

@@ -9,7 +9,6 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.gms.tasks.Task
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
@@ -19,6 +18,7 @@ import com.jamburger.kitter.R
 import com.jamburger.kitter.fragments.DetailsFragment
 import com.jamburger.kitter.fragments.ProfileImageFragment
 import com.jamburger.kitter.fragments.UsernameFragment
+import com.jamburger.kitter.services.AuthService
 
 class AddInfoActivity : AppCompatActivity() {
     lateinit var nextButton: ImageView
@@ -32,7 +32,7 @@ class AddInfoActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_info)
         userReference = FirebaseFirestore.getInstance().collection("Users")
-            .document(FirebaseAuth.getInstance().uid!!)
+            .document(AuthService.auth.uid!!)
         nextButton = findViewById(R.id.btn_next)
         headerText = findViewById(R.id.txt_header)
 
@@ -79,7 +79,7 @@ class AddInfoActivity : AppCompatActivity() {
             .setDisplayName(data["name"].toString())
             .setPhotoUri(profileImageUri)
             .build()
-        FirebaseAuth.getInstance().currentUser!!.updateProfile(request)
+        AuthService.auth.currentUser!!.updateProfile(request)
 
         userReference!!.update(data).addOnCompleteListener { task: Task<Void?> ->
             if (task.isSuccessful) {

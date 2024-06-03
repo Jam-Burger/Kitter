@@ -17,7 +17,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.Glide
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
@@ -29,6 +28,7 @@ import com.jamburger.kitter.R
 import com.jamburger.kitter.activities.SavedPostsActivity
 import com.jamburger.kitter.activities.SettingsActivity
 import com.jamburger.kitter.components.User
+import com.jamburger.kitter.services.AuthService
 import com.jamburger.kitter.utilities.ProfilePageManager
 
 class ProfileFragment : Fragment() {
@@ -53,7 +53,7 @@ class ProfileFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        user = FirebaseAuth.getInstance().currentUser
+        user = AuthService.auth.currentUser
         db = FirebaseFirestore.getInstance()
         userReference = db!!.collection("Users").document(user!!.uid)
     }

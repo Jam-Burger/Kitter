@@ -4,13 +4,13 @@ import android.os.Bundle
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.toObject
 import com.jamburger.kitter.R
 import com.jamburger.kitter.adapters.ProfileAdapter
 import com.jamburger.kitter.components.User
+import com.jamburger.kitter.services.AuthService
 
 class ChatHomeActivity : AppCompatActivity() {
     private lateinit var recyclerViewProfiles: RecyclerView
@@ -43,7 +43,7 @@ class ChatHomeActivity : AppCompatActivity() {
             profiles.clear()
             for (userSnapshot in usersSnapshots) {
                 val user = userSnapshot.toObject<User>()
-                if (user.id == FirebaseAuth.getInstance().uid) continue
+                if (user.id == AuthService.auth.uid) continue
                 profiles.add(user)
             }
             profileAdapter!!.filterList(profiles)
