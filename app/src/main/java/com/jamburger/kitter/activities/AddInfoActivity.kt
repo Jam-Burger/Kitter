@@ -49,22 +49,28 @@ class AddInfoActivity : AppCompatActivity() {
     }
 
     private fun nextFragment() {
-        if (current == Fragments.USERNAME) {
-            supportFragmentManager.beginTransaction().replace(
-                R.id.frame_container, ProfileImageFragment(
-                    this
-                )
-            ).commit()
-            current = Fragments.PROFILE_IMAGE
-        } else if (current == Fragments.PROFILE_IMAGE) {
-            supportFragmentManager.beginTransaction().replace(
-                R.id.frame_container, DetailsFragment(
-                    this
-                )
-            ).commit()
-            current = Fragments.DETAILS
-        } else if (current == Fragments.DETAILS) {
-            updateDataWithImage()
+        when (current) {
+            Fragments.USERNAME -> {
+                supportFragmentManager.beginTransaction().replace(
+                    R.id.frame_container, ProfileImageFragment(
+                        this
+                    )
+                ).commit()
+                current = Fragments.PROFILE_IMAGE
+            }
+
+            Fragments.PROFILE_IMAGE -> {
+                supportFragmentManager.beginTransaction().replace(
+                    R.id.frame_container, DetailsFragment(
+                        this
+                    )
+                ).commit()
+                current = Fragments.DETAILS
+            }
+
+            Fragments.DETAILS -> {
+                updateDataWithImage()
+            }
         }
     }
 

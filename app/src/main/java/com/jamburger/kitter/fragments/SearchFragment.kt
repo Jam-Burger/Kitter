@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
+import com.google.firebase.firestore.toObject
 import com.jamburger.kitter.R
 import com.jamburger.kitter.adapters.ProfileAdapter
 import com.jamburger.kitter.components.User
@@ -77,9 +78,7 @@ class SearchFragment : Fragment() {
         userReference.get().addOnSuccessListener { usersSnapshots: QuerySnapshot ->
             allProfiles.clear()
             for (userSnapshot in usersSnapshots) {
-                val user = userSnapshot.toObject(
-                    User::class.java
-                )
+                val user = userSnapshot.toObject<User>()
                 allProfiles.add(user)
             }
         }

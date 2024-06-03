@@ -22,6 +22,7 @@ import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.toObject
 import com.jamburger.kitter.R
 import com.jamburger.kitter.activities.CommentsActivity
 import com.jamburger.kitter.activities.OtherProfileActivity
@@ -65,9 +66,7 @@ class PostAdapter(private var mContext: Context) : RecyclerView.Adapter<PostAdap
 
         db.collection("Users").document(post.creator).get()
             .addOnSuccessListener { snapshot: DocumentSnapshot ->
-                val creator = snapshot.toObject(
-                    User::class.java
-                )
+                val creator = snapshot.toObject<User>()
                 Glide.with(mContext).load(creator!!.profileImageUrl).into(holder.profileImage)
                 holder.username.text = creator.username
             }
@@ -232,10 +231,8 @@ class PostAdapter(private var mContext: Context) : RecyclerView.Adapter<PostAdap
                 post!!.postid
             )
             userReference.get().addOnSuccessListener { documentSnapshot: DocumentSnapshot ->
-                val user = documentSnapshot.toObject(
-                    User::class.java
-                )!!
-                isSaved = user.saved.contains(postReference)
+                val user = documentSnapshot.toObject<User>()
+                isSaved = user?.saved?.contains(postReference) == true
                 update()
             }
         }

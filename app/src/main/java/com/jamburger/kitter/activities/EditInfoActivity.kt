@@ -21,6 +21,7 @@ import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
+import com.google.firebase.firestore.toObject
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.UploadTask
 import com.jamburger.kitter.R
@@ -73,9 +74,7 @@ class EditInfoActivity : AppCompatActivity() {
         FirebaseFirestore.getInstance().collection("Users").get()
             .addOnSuccessListener { userSnapshots: QuerySnapshot ->
                 for (userSnapshot in userSnapshots) {
-                    val user = userSnapshot.toObject(
-                        User::class.java
-                    )
+                    val user = userSnapshot.toObject<User>()
                     userNames.add(user.username)
                 }
             }
@@ -135,9 +134,7 @@ class EditInfoActivity : AppCompatActivity() {
         userReference = FirebaseFirestore.getInstance().collection("Users")
             .document(FirebaseAuth.getInstance().uid!!)
         userReference.get().addOnSuccessListener { snapshot: DocumentSnapshot ->
-            user = snapshot.toObject(
-                User::class.java
-            )
+            user = snapshot.toObject<User>()
             username.setText(user!!.username)
             name.setText(user!!.name)
             bio.setText(user!!.bio)

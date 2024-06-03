@@ -13,6 +13,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
+import com.google.firebase.firestore.toObject
 import com.jamburger.kitter.R
 import com.jamburger.kitter.activities.ChatHomeActivity
 import com.jamburger.kitter.activities.PostActivity
@@ -79,12 +80,8 @@ class HomeFragment : Fragment() {
 //                val isVisited = feedSnapshot.getBoolean("visited")
                 assert(postReference != null)
                 postReference!!.get().addOnSuccessListener { postSnapshot: DocumentSnapshot ->
-                    postSnapshot.toObject(
-                        Post::class.java
-                    )?.let {
-                        postAdapter.addPost(
-                            it
-                        )
+                    postSnapshot.toObject<Post>()?.let {
+                        postAdapter.addPost(it)
                     }
                 }
             }

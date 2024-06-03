@@ -11,6 +11,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.getValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.jamburger.kitter.R
 import com.jamburger.kitter.adapters.CommentAdapter
@@ -87,7 +88,7 @@ class CommentsActivity : AppCompatActivity() {
             if (task.isSuccessful) {
                 comments.clear()
                 for (commentSnapshot in task.result.children) {
-                    commentSnapshot.getValue(Comment::class.java)?.let { comments.add(it) }
+                    commentSnapshot.getValue<Comment>()?.let { comments.add(it) }
                 }
                 commentAdapter.notifyDataSetChanged()
             }

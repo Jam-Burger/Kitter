@@ -24,6 +24,7 @@ import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.toObject
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.UploadTask
@@ -207,9 +208,7 @@ class PostActivity : AppCompatActivity() {
         map["visited"] = false
         userReference.collection("feed").document(postReference.id).set(map)
         userReference.get().addOnSuccessListener { userSnapshot: DocumentSnapshot ->
-            val me = userSnapshot.toObject(
-                User::class.java
-            )!!
+            val me = userSnapshot.toObject<User>()!!
             for (follower in me.followers) {
                 follower.collection("feed").document(postReference.id).set(map)
             }

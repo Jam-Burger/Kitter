@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.toObject
 import com.jamburger.kitter.R
 import com.jamburger.kitter.activities.OtherProfileActivity
 import com.jamburger.kitter.components.Comment
@@ -29,9 +30,7 @@ class CommentAdapter(private var mContext: Context, private var mComments: List<
         val publisherReference =
             FirebaseFirestore.getInstance().collection("Users").document(comment.publisherId)
         publisherReference.get().addOnSuccessListener { snapshot: DocumentSnapshot ->
-            val user = snapshot.toObject(
-                User::class.java
-            )
+            val user = snapshot.toObject<User>()
             Glide.with(mContext).load(user!!.profileImageUrl).into(holder.profileImage)
             holder.username.text = user.username
             holder.time.text = DateTimeFormatter.getTimeDifference(comment.commentId, true)

@@ -21,6 +21,7 @@ import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.toObject
 import com.jamburger.kitter.R
 import com.jamburger.kitter.components.User
 import com.jamburger.kitter.utilities.Constants
@@ -88,9 +89,7 @@ class StartActivity : AppCompatActivity(), OnUpdateNeededListener {
                     try {
                         userReference.get().addOnCompleteListener { task: Task<DocumentSnapshot> ->
                             if (task.isSuccessful) {
-                                val user = task.result.toObject(
-                                    User::class.java
-                                )
+                                val user = task.result.toObject<User>()
                                 val intent: Intent
                                 if (user != null) {
                                     intent = if (user.username.isEmpty()) {

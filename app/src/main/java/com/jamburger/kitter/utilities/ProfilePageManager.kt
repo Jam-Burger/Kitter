@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.toObject
 import com.jamburger.kitter.R
 import com.jamburger.kitter.adapters.MyKittAdapter
 import com.jamburger.kitter.adapters.MyPictureAdapter
@@ -85,14 +86,12 @@ class ProfilePageManager(var view: View) {
 
     fun readPosts(userReference: DocumentReference) {
         userReference.get().addOnSuccessListener { userSnapshot: DocumentSnapshot ->
-            val user = userSnapshot.toObject(
-                User::class.java
-            )!!
+            val user = userSnapshot.toObject<User>()!!
             myPictureAdapter!!.clearPosts()
             myKittAdapter!!.clearPosts()
             for (postReference in user.posts) {
                 postReference.get().addOnSuccessListener { postSnapshot: DocumentSnapshot ->
-                    val post = postSnapshot.toObject(Post::class.java)!!
+                    val post = postSnapshot.toObject<Post>()!!
                     if (post.imageUrl.isNotEmpty()) {
                         myPictureAdapter!!.addPost(postReference)
                     }

@@ -13,8 +13,10 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.getValue
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.toObject
 import com.jamburger.kitter.R
 import com.jamburger.kitter.adapters.MessageAdapter
 import com.jamburger.kitter.components.Message
@@ -50,9 +52,7 @@ class ChatActivity : AppCompatActivity() {
         val users = FirebaseFirestore.getInstance().collection("Users")
         users.document(fellowUID).get()
             .addOnSuccessListener { documentSnapshot: DocumentSnapshot ->
-                fellow = documentSnapshot.toObject(
-                    User::class.java
-                )!!
+                fellow = documentSnapshot.toObject<User>()!!
                 username.text = fellow.username
                 Glide.with(this).load(fellow.profileImageUrl).into(profileImage)
 
@@ -60,7 +60,7 @@ class ChatActivity : AppCompatActivity() {
                 recyclerViewMessages.setHasFixedSize(true)
                 recyclerViewMessages.setAdapter(messageAdapter)
 
-                chatData
+                getChatData()
                 readMessages()
             }
         sendButton.setOnClickListener {
@@ -80,9 +80,7 @@ class ChatActivity : AppCompatActivity() {
                 messageAdapter.clearMessages()
                 var lastMessage: Message? = null
                 for (messageSnapshot in chatSnapshot.children) {
-                    val nextMessage = messageSnapshot.getValue(
-                        Message::class.java
-                    )
+                    val nextMessage = messageSnapshot.getValue<Message>()
                     var nextDateMonth = DateTimeFormatter.getDateMonth(
                         nextMessage!!.messageId
                     )
@@ -120,10 +118,9 @@ class ChatActivity : AppCompatActivity() {
         })
     }
 
-    private val chatData: Unit
-        get() {
-            val less = myUID < fellowUID
-            chatId = if (less) "$myUID&$fellowUID" else "$fellowUID&$myUID"
-            chatReference = FirebaseDatabase.getInstance().reference.child("chats").child(chatId)
-        } // TODO: finish issue of close keyboard
+    private fun getChatData() {
+        val less = myUID < fellowUID
+        chatId = if (less) "$myUID&$fellowUID" else "$fellowUID&$myUID"
+        chatReference = FirebaseDatabase.getInstance().reference.child("chats").child(chatId)
+    } // TODO: finish issue of close keyboard
 }

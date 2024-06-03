@@ -10,6 +10,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.toObject
 import com.jamburger.kitter.R
 import com.jamburger.kitter.components.Post
 import com.jamburger.kitter.utilities.DateTimeFormatter
@@ -50,7 +51,7 @@ class MyKittAdapter(private var mContext: Context) :
         val previewTextView = dialog.findViewById<TextView>(R.id.kitt_mypost)
 
         postReference.get().addOnSuccessListener { postSnapshot: DocumentSnapshot ->
-            val post = postSnapshot.toObject(Post::class.java)!!
+            val post = postSnapshot.toObject<Post>()!!
             holder.kitt.text = post.kitt
             holder.time.text = DateTimeFormatter.getTimeDifference(post.postid, false)
             holder.container.visibility = View.VISIBLE

@@ -22,6 +22,7 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.toObject
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.UploadTask
 import com.jamburger.kitter.R
@@ -127,9 +128,7 @@ class ProfileFragment : Fragment() {
 
     private fun fillUserData() {
         userReference!!.get().addOnSuccessListener { documentSnapshot: DocumentSnapshot ->
-            val user = documentSnapshot.toObject(
-                User::class.java
-            )!!
+            val user = documentSnapshot.toObject<User>()!!
             profilePageManager.fillUserData(user)
         }
     }

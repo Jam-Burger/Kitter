@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
+import com.google.firebase.firestore.toObject
 import com.jamburger.kitter.R
 import com.jamburger.kitter.adapters.ProfileAdapter
 import com.jamburger.kitter.components.User
@@ -41,9 +42,7 @@ class ChatHomeActivity : AppCompatActivity() {
         userReference.get().addOnSuccessListener { usersSnapshots: QuerySnapshot ->
             profiles.clear()
             for (userSnapshot in usersSnapshots) {
-                val user = userSnapshot.toObject(
-                    User::class.java
-                )
+                val user = userSnapshot.toObject<User>()
                 if (user.id == FirebaseAuth.getInstance().uid) continue
                 profiles.add(user)
             }

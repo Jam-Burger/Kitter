@@ -10,6 +10,7 @@ import android.widget.EditText
 import androidx.fragment.app.Fragment
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
+import com.google.firebase.firestore.toObject
 import com.jamburger.kitter.R
 import com.jamburger.kitter.activities.AddInfoActivity
 import com.jamburger.kitter.components.User
@@ -30,9 +31,7 @@ class UsernameFragment(var parent: AddInfoActivity) : Fragment() {
         FirebaseFirestore.getInstance().collection("Users").get()
             .addOnSuccessListener { userSnapshots: QuerySnapshot ->
                 for (userSnapshot in userSnapshots) {
-                    val user = userSnapshot.toObject(
-                        User::class.java
-                    )
+                    val user = userSnapshot.toObject<User>()
                     userNames.add(user.username)
                 }
             }

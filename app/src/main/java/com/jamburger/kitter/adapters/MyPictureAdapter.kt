@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.toObject
 import com.jamburger.kitter.R
 import com.jamburger.kitter.components.Post
 import java.util.TreeSet
@@ -49,7 +50,7 @@ class MyPictureAdapter(private var mContext: Context) :
         val previewImageView = dialog.findViewById<ImageView>(R.id.img_mypost)
 
         postReference.get().addOnSuccessListener { postSnapshot: DocumentSnapshot ->
-            val post = postSnapshot.toObject(Post::class.java)!!
+            val post = postSnapshot.toObject<Post>()!!
             Glide.with(mContext).load(post.imageUrl).into(holder.myPostImage)
             Glide.with(dialog.context).load(post.imageUrl).into(previewImageView)
         }

@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.toObject
 import com.jamburger.kitter.R
 import com.jamburger.kitter.adapters.PostAdapter
 import com.jamburger.kitter.components.Post
@@ -38,18 +39,12 @@ class SavedPostsActivity : AppCompatActivity() {
         val userReference =
             FirebaseFirestore.getInstance().document("Users/" + FirebaseAuth.getInstance().uid)
         userReference.get().addOnSuccessListener { userSnapshot: DocumentSnapshot ->
-            val user = userSnapshot.toObject(
-                User::class.java
-            )!!
+            val user = userSnapshot.toObject<User>()!!
             for (savedPostReference in user.saved) {
                 savedPostReference.get()
                     .addOnSuccessListener { savedPostSnapshot: DocumentSnapshot ->
-                        savedPostSnapshot.toObject(
-                            Post::class.java
-                        )?.let {
-                            postAdapter.addPost(
-                                it
-                            )
+                        savedPostSnapshot.toObject<Post>()?.let {
+                            postAdapter.addPost(it)
                         }
                     }
             }

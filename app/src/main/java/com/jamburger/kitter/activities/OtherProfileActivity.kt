@@ -10,6 +10,7 @@ import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.toObject
 import com.jamburger.kitter.R
 import com.jamburger.kitter.components.User
 import com.jamburger.kitter.utilities.ProfilePageManager
@@ -63,9 +64,7 @@ class OtherProfileActivity : AppCompatActivity() {
             userReference!!.update("followers", FieldValue.arrayUnion(myReference))
                 .addOnSuccessListener { readPosts() }
             userReference!!.get().addOnSuccessListener { userSnapshot: DocumentSnapshot ->
-                val user = userSnapshot.toObject(
-                    User::class.java
-                )!!
+                val user = userSnapshot.toObject<User>()!!
                 val posts = user.posts
                 for (postReference in posts) {
                     val map: MutableMap<String, Any> = HashMap()
@@ -82,9 +81,7 @@ class OtherProfileActivity : AppCompatActivity() {
             userReference!!.update("followers", FieldValue.arrayRemove(myReference))
                 .addOnSuccessListener { readPosts() }
             userReference!!.get().addOnSuccessListener { userSnapshot: DocumentSnapshot ->
-                val user = userSnapshot.toObject(
-                    User::class.java
-                )!!
+                val user = userSnapshot.toObject<User>()!!
                 val posts = user.posts
                 for (postReference in posts) {
                     myReference!!.collection("feed").document(postReference.id).delete()
@@ -107,9 +104,7 @@ class OtherProfileActivity : AppCompatActivity() {
 
     private fun fillUserData() {
         userReference!!.get().addOnSuccessListener { documentSnapshot: DocumentSnapshot ->
-            val user = documentSnapshot.toObject(
-                User::class.java
-            )!!
+            val user = documentSnapshot.toObject<User>()!!
             profilePageManager.fillUserData(user)
             amFollowing = user.followers.contains(myReference)
             updateFollowButton()

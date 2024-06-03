@@ -22,6 +22,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.toObject
 import com.jamburger.kitter.R
 import com.jamburger.kitter.components.User
 import com.jamburger.kitter.utilities.Constants
@@ -52,9 +53,7 @@ class SettingsActivity : AppCompatActivity() {
     private fun updateUserData() {
         userReference!!.get().addOnCompleteListener { task: Task<DocumentSnapshot> ->
             if (task.isSuccessful) {
-                val user = task.result.toObject(
-                    User::class.java
-                )!!
+                val user = task.result.toObject<User>()!!
                 (findViewById<View>(R.id.txt_account_privacy) as TextView).text =
                     if (user.isPrivate) "Private" else "Public"
                 (findViewById<View>(R.id.txt_blocked_count) as TextView).text =
